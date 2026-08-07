@@ -1,7 +1,9 @@
 ---
 // Se utiliza el componente Studio oficial de 'sanity' y se inyecta la configuración como se solicitó.
 import { Studio } from 'sanity';
-import config from '../../../sanity.config';
+import rawSanityConfig from '../../../sanity.config';
+
+const config = (rawSanityConfig as any).default || rawSanityConfig;
 
 // Generamos la ruta estática base para el SPA
 export function getStaticPaths() {
