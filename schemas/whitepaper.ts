@@ -1,17 +1,15 @@
-import { defineType, defineField } from 'sanity';
-
-export const whitepaperSchema = defineType({
+export const whitepaperSchema = {
   name: 'whitepaper',
   title: 'Whitepaper (Lead Magnet)',
   type: 'document',
   fields: [
-    defineField({
+    {
       name: 'title',
       title: 'Title',
       type: 'string',
       validation: (Rule: any) => Rule.required(),
-    }),
-    defineField({
+    },
+    {
       name: 'slug',
       title: 'Slug',
       type: 'slug',
@@ -20,14 +18,14 @@ export const whitepaperSchema = defineType({
         maxLength: 96,
       },
       validation: (Rule: any) => Rule.required(),
-    }),
-    defineField({
+    },
+    {
       name: 'summary',
       title: 'Summary',
       type: 'text',
       description: 'Resumen ejecutivo',
-    }),
-    defineField({
+    },
+    {
       name: 'pdfFile',
       title: 'PDF File',
       type: 'file',
@@ -35,8 +33,8 @@ export const whitepaperSchema = defineType({
         accept: 'application/pdf',
       },
       description: 'Archivo PDF de la guía/arquitectura',
-    }),
-    defineField({
+    },
+    {
       name: 'targetRole',
       title: 'Target Role',
       type: 'string',
@@ -47,6 +45,6 @@ export const whitepaperSchema = defineType({
           { title: 'Enterprise Architect', value: 'enterprise-architect' },
         ],
       },
-    }),
+    },
   ],
-});
+};
