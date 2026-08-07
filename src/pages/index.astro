@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ServiceCard from '../components/ServiceCard.astro';
+import TcoCalculator from '../components/TcoCalculator.astro';
+import LeadCaptureForm from '../components/LeadCaptureForm.astro';
 import type { ServiceSchema } from '../types/sanity';
 import { client } from '../lib/sanity';
 
@@ -93,6 +95,18 @@ if (!services || services.length === 0) {
           <ServiceCard service={service} />
         ))}
       </div>
+    </div>
+  </section>
+
+  <section class="py-24 px-4 md:px-8 bg-white border-t border-neutral-200">
+    <div class="max-w-7xl mx-auto">
+      <TcoCalculator />
+    </div>
+  </section>
+
+  <section id="contacto" class="py-24 px-4 md:px-8 bg-neutral-50 border-t border-neutral-200">
+    <div class="max-w-7xl mx-auto">
+      <LeadCaptureForm />
     </div>
   </section>
   

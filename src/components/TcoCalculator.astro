@@ -1,0 +1,76 @@
+---
+---
+<div class="bg-secondary text-white p-8 rounded-none border border-neutral-200/20 shadow-xl max-w-2xl mx-auto font-body">
+  <h3 class="text-3xl font-heading mb-6 tracking-tight">Calculadora FinOps TCO</h3>
+  
+  <div class="space-y-6">
+    <div>
+      <label for="monthlySpend" class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-200">Gasto Mensual Cloud Actual (USD)</label>
+      <input 
+        type="number" 
+        id="monthlySpend" 
+        value="25000"
+        min="1000"
+        class="w-full bg-neutral-900 border border-neutral-200/20 px-4 py-3 text-white focus:outline-none focus:border-interactive transition-colors"
+      />
+    </div>
+
+    <div>
+      <label for="efficiencyGoal" class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-200">Meta de Eficiencia Esperada (<span id="efficiencyLabel">38</span>%)</label>
+      <input 
+        type="range" 
+        id="efficiencyGoal" 
+        value="38" 
+        min="35" 
+        max="40" 
+        class="w-full cursor-pointer accent-accent"
+      />
+    </div>
+
+    <div class="pt-6 border-t border-neutral-200/20 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <p class="text-sm font-bold tracking-widest uppercase text-neutral-400 mb-1">Ahorro Anual Estimado</p>
+        <p class="text-4xl font-heading text-accent">$<span id="annualSavings">114,000</span></p>
+      </div>
+      <div>
+        <p class="text-sm font-bold tracking-widest uppercase text-neutral-400 mb-1">Nuevo Gasto Anual</p>
+        <p class="text-3xl font-heading text-white">$<span id="newAnnualSpend">186,000</span></p>
+      </div>
+    </div>
+
+    <div class="pt-6">
+      <button class="w-full bg-primary hover:bg-interactive text-white font-bold tracking-widest uppercase py-4 transition-colors">
+        Solicitar Auditoría FinOps
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const monthlySpendInput = document.getElementById('monthlySpend') as HTMLInputElement;
+  const efficiencyGoalInput = document.getElementById('efficiencyGoal') as HTMLInputElement;
+  const efficiencyLabel = document.getElementById('efficiencyLabel');
+  const annualSavingsEl = document.getElementById('annualSavings');
+  const newAnnualSpendEl = document.getElementById('newAnnualSpend');
+
+  function calculateTco() {
+    if (!monthlySpendInput || !efficiencyGoalInput || !efficiencyLabel || !annualSavingsEl || !newAnnualSpendEl) return;
+    
+    const monthlySpend = parseFloat(monthlySpendInput.value) || 0;
+    const efficiency = parseFloat(efficiencyGoalInput.value) || 0;
+    
+    const annualSpend = monthlySpend * 12;
+    const savings = annualSpend * (efficiency / 100);
+    const newSpend = annualSpend - savings;
+
+    efficiencyLabel.textContent = efficiency.toString();
+    annualSavingsEl.textContent = savings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    newAnnualSpendEl.textContent = newSpend.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  if (monthlySpendInput && efficiencyGoalInput) {
+    monthlySpendInput.addEventListener('input', calculateTco);
+    efficiencyGoalInput.addEventListener('input', calculateTco);
+    calculateTco();
+  }
+</script>

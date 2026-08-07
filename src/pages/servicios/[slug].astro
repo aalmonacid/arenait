@@ -1,0 +1,147 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { client } from '../../lib/sanity';
+import type { ServiceSchema } from '../../types/sanity';
+
+export async function getStaticPaths() {
+  const fallbackSlugs = [
+    { params: { slug: 'arquitectura-finops-cloud' } },
+    { params: { slug: 'plataformas-alta-resiliencia' } },
+    { params: { slug: 'modernizacion-legacy' } }
+  ];
+
+  try {
+    const services = await client.fetch<{ slug: { current: string } }[]>(`*[_type == "service"] { slug }`);
+    
+    if (services && services.length > 0) {
+      return services.map((service) => ({
+        params: { slug: service.slug.current }
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching slugs from Sanity:", error);
+  }
+
+  return fallbackSlugs;
+}
+
+const { slug } = Astro.params;
+
+// Fallback data if Sanity fetch fails
+const fallbackServicesData: Record<string, ServiceSchema> = {
+  'arquitectura-finops-cloud': {
+    _id: '1',
+    title: 'Arquitectura FinOps Cloud',
+    slug: { current: 'arquitectura-finops-cloud' },
+    description: 'Diseño e implementación de arquitecturas serverless y edge computing optimizadas para máxima rentabilidad, eliminando gastos innecesarios de infraestructura.',
+    tcoSavingsPercentage: 40,
+    sla: '99.999%',
+    iso27001Compliant: true,
+    metrics: [
+      { label: 'Tiempo de despliegue', value: '< 2 mins' },
+      { label: 'Reducción en latencia', value: '-65%' }
+    ]
+  },
+  'plataformas-alta-resiliencia': {
+    _id: '2',
+    title: 'Plataformas de Alta Resiliencia',
+    slug: { current: 'plataformas-alta-resiliencia' },
+    description: 'Ingeniería estructural para portales transaccionales de misión crítica. Balanceo global, redundancia activa-activa y failover automatizado.',
+    tcoSavingsPercentage: 35,
+    sla: '99.999%',
+    iso27001Compliant: true,
+    metrics: [
+      { label: 'Tolerancia a fallos', value: 'N+2' },
+      { label: 'RTO (Recovery Time)', value: '< 5s' }
+    ]
+  },
+  'modernizacion-legacy': {
+    _id: '3',
+    title: 'Modernización Legacy (TOGAF)',
+    slug: { current: 'modernizacion-legacy' },
+    description: 'Transformación de sistemas monolíticos a ecosistemas de microservicios distribuidos mediante metodologías estandarizadas de arquitectura empresarial.',
+    tcoSavingsPercentage: 30,
+    sla: '99.99%',
+    iso27001Compliant: false,
+    metrics: [
+      { label: 'Deuda técnica mitigada', value: '100%' },
+      { label: 'Seguridad', value: 'Zero Trust' }
+    ]
+  }
+};
+
+let service: ServiceSchema | null = null;
+
+try {
+  const query = `*[_type == "service" && slug.current == $slug][0]`;
+  service = await client.fetch<ServiceSchema>(query, { slug });
+} catch (error) {
+  console.error("Error fetching service from Sanity:", error);
+}
+
+if (!service && slug && fallbackServicesData[slug]) {
+  service = fallbackServicesData[slug];
+}
+
+if (!service) {
+  return Astro.redirect('/404');
+}
+---
+
+<BaseLayout title={service.title} description={service.description}>
+  <article class="bg-white min-h-screen">
+    <header class="bg-neutral-900 text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
+      <div class="max-w-7xl mx-auto">
+        <h1 class="text-4xl md:text-6xl font-heading mb-6 tracking-tight text-white">{service.title}</h1>
+        <p class="text-xl md:text-2xl text-neutral-300 max-w-4xl leading-relaxed">
+          {service.description}
+        </p>
+      </div>
+    </header>
+
+    <section class="py-24 px-4 md:px-8 border-b border-neutral-200">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-16">
+        <div class="lg:col-span-2 space-y-12">
+          <div>
+            <h2 class="text-3xl font-heading text-secondary mb-6">Métricas Operativas</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {service.metrics?.map((metric) => (
+                <div class="bg-neutral-50 p-6 border-l-4 border-interactive">
+                  <p class="text-sm font-bold tracking-widest uppercase text-neutral-500 mb-2">{metric.label}</p>
+                  <p class="text-3xl font-heading text-secondary">{metric.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-8">
+          <div class="bg-secondary p-8 text-white">
+            <h3 class="text-lg font-bold tracking-widest uppercase mb-6 text-neutral-300">Resumen Ejecutivo</h3>
+            
+            <div class="space-y-6">
+              <div>
+                <p class="text-sm font-bold tracking-widest uppercase text-accent mb-1">Ahorro TCO</p>
+                <p class="text-3xl font-heading">{service.tcoSavingsPercentage}%</p>
+              </div>
+              
+              <div>
+                <p class="text-sm font-bold tracking-widest uppercase text-accent mb-1">Disponibilidad SLA</p>
+                <p class="text-3xl font-heading">{service.sla}</p>
+              </div>
+              
+              <div>
+                <p class="text-sm font-bold tracking-widest uppercase text-accent mb-1">Cumplimiento ISO 27001</p>
+                <p class="text-xl font-bold">{service.iso27001Compliant ? 'Certificado' : 'En proceso'}</p>
+              </div>
+            </div>
+          </div>
+          
+          <a href="/#contacto" class="block w-full text-center bg-primary hover:bg-interactive text-white font-bold tracking-widest uppercase py-4 transition-colors">
+            Contactar Arquitecto
+          </a>
+        </div>
+      </div>
+    </section>
+  </article>
+</BaseLayout>

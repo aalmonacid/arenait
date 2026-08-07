@@ -19,16 +19,16 @@
 ## Sprint 2: Desarrollo de Propuesta de Valor y Componentes Core
 - **Objetivo**: Desplegar los diferenciadores principales (Resiliencia, TCO, SLAs).
 - **Criterios de Aceptación**:
-  - [ ] Creación de páginas de detalle de servicios (ISO 27001, TOGAF, ISO 25010).
-  - [ ] Componente visual / interactivo para mostrar el ahorro de TCO (-35% a -40%).
-  - [ ] Consistencia en uso de colores corporativos sin romper el estilo Swiss Minimalist.
+  - [x] Creación de páginas de detalle de servicios (ISO 27001, TOGAF, ISO 25010).
+  - [x] Componente visual / interactivo para mostrar el ahorro de TCO (-35% a -40%).
+  - [x] Consistencia en uso de colores corporativos sin romper el estilo Swiss Minimalist.
 
 ## Sprint 3: Optimización y Performance (FinOps y Resiliencia)
 - **Objetivo**: Garantizar métricas de operación crítica.
 - **Criterios de Aceptación**:
-  - [ ] Configuración de caché avanzada en Vercel/Astro.
-  - [ ] Validaciones de seguridad en frontend y backend.
-  - [ ] Rendimiento superior a 90 en todas las métricas de Lighthouse.
+  - [x] Configuración de caché avanzada en Vercel/Astro.
+  - [x] Validaciones de seguridad en frontend y backend.
+  - [x] Rendimiento superior a 90 en todas las métricas de Lighthouse.
 
 ## Sprint 4: Quality Assurance (QA) y Preparación para Producción
 - **Objetivo**: Asegurar la calidad general y despliegue final en producción.
