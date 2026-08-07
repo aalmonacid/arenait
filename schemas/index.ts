@@ -1,5 +1,5 @@
-import service from './service';
-import caseStudy from './caseStudy';
-import whitepaper from './whitepaper';
+import { serviceSchema } from './service';
+import { caseStudySchema } from './caseStudy';
+import { whitepaperSchema } from './whitepaper';
 
-export const schemaTypes = [service, caseStudy, whitepaper];
+export const schemaTypes = [serviceSchema, caseStudySchema, whitepaperSchema];
