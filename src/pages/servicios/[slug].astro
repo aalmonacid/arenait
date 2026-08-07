@@ -14,7 +14,7 @@ export async function getStaticPaths() {
     const services = await client.fetch<{ slug: { current: string } }[]>(`*[_type == "service"] { slug }`);
     
     if (services && services.length > 0) {
-      return services.map((service) => ({
+      return services.map((service: any) => ({
         params: { slug: service.slug.current }
       }));
     }
@@ -105,7 +105,7 @@ if (!service) {
           <div>
             <h2 class="text-3xl font-heading text-secondary mb-6">Métricas Operativas</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {service.metrics?.map((metric) => (
+              {service.metrics?.map((metric: any) => (
                 <div class="bg-neutral-50 p-6 border-l-4 border-interactive">
                   <p class="text-sm font-bold tracking-widest uppercase text-neutral-500 mb-2">{metric.label}</p>
                   <p class="text-3xl font-heading text-secondary">{metric.value}</p>

@@ -32,7 +32,7 @@ const { service } = Astro.props;
   
   {service.metrics && service.metrics.length > 0 && (
     <div class="mt-8 space-y-3">
-      {service.metrics.map(metric => (
+      {service.metrics.map((metric: any) => (
         <div class="flex justify-between items-center text-sm border-b border-neutral-200 pb-2 last:border-0 last:pb-0">
           <span class="text-neutral-900">{metric.label}</span>
           <span class="font-bold text-secondary">{metric.value}</span>

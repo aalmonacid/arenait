@@ -1,9 +1,11 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import sanity from '@sanity/astro';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://arenait.co',
   integrations: [
     tailwind(),
     sanity({
@@ -12,5 +14,6 @@ export default defineConfig({
       useCdn: false, // Recomendado para obtener los datos más recientes en operaciones críticas
       apiVersion: '2024-01-01',
     }),
+    sitemap(),
   ],
 });
