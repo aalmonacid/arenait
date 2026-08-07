@@ -1,7 +1,6 @@
 ---
-// Se utiliza el componente Studio oficial de 'sanity' y se inyecta la configuración como se solicitó.
-import { Studio } from 'sanity';
-import { config } from '../../../sanity.config';
+// Se delega la renderización a un wrapper estricto de React para aislar Vite SSR
+import SanityStudio from '../../components/SanityStudio';
 
 // Generamos la ruta estática base para el SPA
 export function getStaticPaths() {
@@ -33,7 +32,7 @@ export function getStaticPaths() {
   </head>
   <body>
     <div data-ui="AstroStudioLayout">
-      <Studio config={config} client:only="react" />
+      <SanityStudio client:only="react" />
     </div>
   </body>
 </html>
