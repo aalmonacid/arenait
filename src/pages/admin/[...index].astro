@@ -6,7 +6,8 @@ import config from '../../../sanity.config';
 // Generamos la ruta estática base para el SPA
 export function getStaticPaths() {
   return [
-    { params: { index: undefined } }
+    { params: { index: undefined } },
+    { params: { index: 'structure' } },
   ];
 }
 ---
