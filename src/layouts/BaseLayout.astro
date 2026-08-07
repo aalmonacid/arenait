@@ -1,0 +1,68 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Ingeniería de Software Estructural para Operaciones Críticas." } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} | ArenaIT</title>
+    <meta name="description" content={description} />
+    
+    <!-- OpenGraph -->
+    <meta property="og:title" content={`${title} | ArenaIT`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} | ArenaIT`} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <header class="bg-white border-b-2 border-neutral-200 py-6 px-4 md:px-8">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <a href="/" class="text-3xl font-heading text-primary tracking-tight">Arena<span class="text-secondary">IT</span></a>
+        <nav class="hidden md:flex space-x-8">
+          <a href="#" class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors">Servicios</a>
+          <a href="#" class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors">Casos de Estudio</a>
+          <a href="#" class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors">FinOps</a>
+        </nav>
+      </div>
+    </header>
+    
+    <main class="flex-grow">
+      <slot />
+    </main>
+
+    <footer class="bg-neutral-900 text-white py-12 px-4 md:px-8">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <span class="text-2xl font-heading text-white tracking-tight mb-4 block">Arena<span class="text-accent">IT</span></span>
+          <p class="text-neutral-200 max-w-md">Ingeniería de Software Estructural para Operaciones Críticas. Especialistas en entornos de alta disponibilidad y resiliencia.</p>
+        </div>
+        <div class="text-left md:text-right">
+          <p class="text-sm font-bold text-neutral-400 mb-4 uppercase tracking-widest">Estándares</p>
+          <div class="flex flex-wrap gap-2 justify-start md:justify-end">
+            <span class="text-xs font-bold px-3 py-1 bg-secondary text-white">ISO 27001</span>
+            <span class="text-xs font-bold px-3 py-1 bg-secondary text-white">TOGAF</span>
+            <span class="text-xs font-bold px-3 py-1 bg-secondary text-white">ISO 25010</span>
+          </div>
+        </div>
+      </div>
+      <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-sm text-neutral-400 flex flex-col md:flex-row justify-between items-center">
+        <p class="mb-4 md:mb-0">&copy; {new Date().getFullYear()} ArenaIT. Todos los derechos reservados.</p>
+        <p class="font-bold text-white tracking-widest uppercase text-xs">SLA Garantizado: <span class="text-accent">99.999%</span></p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Codec Pro';
+  src: url('/fonts/CodecPro-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Codec Pro Extra Bold';
+  src: url('/fonts/CodecPro-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  html {
+    @apply antialiased scroll-smooth;
+    font-family: 'Codec Pro', 'Plus Jakarta Sans', Inter, sans-serif;
+    color: #0F172A; /* text-neutral-900 */
+    background-color: #F8FAFC; /* bg-neutral-50 */
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Codec Pro Extra Bold', 'Plus Jakarta Sans', Inter, sans-serif;
+  }
+}

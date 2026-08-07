@@ -1,0 +1,97 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import type { ServiceSchema } from '../types/sanity';
+
+const mockServices: ServiceSchema[] = [
+  {
+    _id: '1',
+    title: 'Arquitectura FinOps Cloud',
+    slug: { current: 'arquitectura-finops-cloud' },
+    description: 'Diseño e implementación de arquitecturas serverless y edge computing optimizadas para máxima rentabilidad, eliminando gastos innecesarios de infraestructura.',
+    tcoSavingsPercentage: 40,
+    sla: '99.999%',
+    iso27001Compliant: true,
+    metrics: [
+      { label: 'Tiempo de despliegue', value: '< 2 mins' },
+      { label: 'Reducción en latencia', value: '-65%' }
+    ]
+  },
+  {
+    _id: '2',
+    title: 'Plataformas de Alta Resiliencia',
+    slug: { current: 'plataformas-alta-resiliencia' },
+    description: 'Ingeniería estructural para portales transaccionales de misión crítica. Balanceo global, redundancia activa-activa y failover automatizado.',
+    tcoSavingsPercentage: 35,
+    sla: '99.999%',
+    iso27001Compliant: true,
+    metrics: [
+      { label: 'Tolerancia a fallos', value: 'N+2' },
+      { label: 'RTO (Recovery Time)', value: '< 5s' }
+    ]
+  },
+  {
+    _id: '3',
+    title: 'Modernización Legacy (TOGAF)',
+    slug: { current: 'modernizacion-legacy' },
+    description: 'Transformación de sistemas monolíticos a ecosistemas de microservicios distribuidos mediante metodologías estandarizadas de arquitectura empresarial.',
+    tcoSavingsPercentage: 30,
+    sla: '99.99%',
+    iso27001Compliant: false,
+    metrics: [
+      { label: 'Deuda técnica mitigada', value: '100%' },
+      { label: 'Seguridad', value: 'Zero Trust' }
+    ]
+  }
+];
+---
+
+<BaseLayout title="Ingeniería Estructural para Misión Crítica">
+  <section class="bg-neutral-900 text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-5xl md:text-7xl font-heading leading-tight mb-8 max-w-5xl">
+        Ingeniería de Software Estructural para <span class="text-interactive">Operaciones Críticas</span>.
+      </h1>
+      <p class="text-xl md:text-2xl text-neutral-300 max-w-3xl mb-12 leading-relaxed">
+        Construimos arquitecturas digitales de máxima resiliencia. Cumplimos con ISO 27001, reducimos el TCO corporativo y garantizamos un SLA operativo impecable.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a href="#servicios" class="inline-flex justify-center items-center px-8 py-4 bg-primary text-white font-bold tracking-widest uppercase hover:bg-interactive transition-colors">
+          Explorar Servicios
+        </a>
+        <a href="#contacto" class="inline-flex justify-center items-center px-8 py-4 bg-transparent border-2 border-white text-white font-bold tracking-widest uppercase hover:bg-white hover:text-neutral-900 transition-colors">
+          Contactar Arquitecto
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="servicios" class="py-24 md:py-32 px-4 md:px-8 bg-neutral-50">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-16 max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-heading text-secondary mb-6">Núcleo Operativo</h2>
+        <p class="text-lg text-neutral-600 leading-relaxed">
+          Nuestros servicios de ingeniería base garantizan estabilidad estructural y eficiencia financiera desde el primer día de despliegue, protegiendo las operaciones más críticas de su organización.
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {mockServices.map(service => (
+          <ServiceCard service={service} />
+        ))}
+      </div>
+    </div>
+  </section>
+  
+  <section class="py-24 px-4 md:px-8 bg-white border-t border-neutral-200">
+    <div class="max-w-7xl mx-auto text-center">
+      <h2 class="text-2xl font-bold uppercase tracking-widest text-neutral-400 mb-12">Arquitectura respaldada por estándares globales</h2>
+      <div class="flex flex-wrap justify-center gap-12 md:gap-24 items-center opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+        <span class="text-2xl md:text-3xl font-heading text-secondary">ISO 27001</span>
+        <span class="text-2xl md:text-3xl font-heading text-secondary">TOGAF</span>
+        <span class="text-2xl md:text-3xl font-heading text-secondary">ISO 25010</span>
+        <span class="text-2xl md:text-3xl font-heading text-secondary">FinOps</span>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
