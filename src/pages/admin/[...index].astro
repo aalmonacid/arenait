@@ -1,0 +1,37 @@
+---
+// Se utiliza el componente Studio oficial de 'sanity' y se inyecta la configuración como se solicitó.
+import { Studio } from 'sanity';
+import config from '../../../sanity.config';
+
+// Generamos la ruta estática base para el SPA
+export function getStaticPaths() {
+  return [
+    { params: { index: undefined } }
+  ];
+}
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Sanity Studio | ArenaIT</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        max-height: 100dvh;
+        overflow: hidden;
+        overscroll-behavior: none;
+        -webkit-font-smoothing: antialiased;
+      }
+    </style>
+  </head>
+  <body>
+    <div data-ui="AstroStudioLayout">
+      <Studio config={config} client:only="react" />
+    </div>
+  </body>
+</html>
