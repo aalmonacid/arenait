@@ -1,9 +1,7 @@
 ---
 // Se utiliza el componente Studio oficial de 'sanity' y se inyecta la configuración como se solicitó.
 import { Studio } from 'sanity';
-import rawSanityConfig from '../../../sanity.config';
-
-const config = (rawSanityConfig as any).default || rawSanityConfig;
+import { config } from '../../../sanity.config';
 
 // Generamos la ruta estática base para el SPA
 export function getStaticPaths() {
@@ -29,6 +27,7 @@ export function getStaticPaths() {
         overflow: hidden;
         overscroll-behavior: none;
         -webkit-font-smoothing: antialiased;
+        background-color: #294E6C;
       }
     </style>
   </head>

@@ -19,4 +19,12 @@ export default defineConfig({
     react(),
     sitemap(),
   ],
+  vite: {
+    resolve: {
+      dedupe: ['react', 'react-dom', 'sanity', 'styled-components'],
+    },
+    optimizeDeps: {
+      include: ['sanity', '@sanity/astro'],
+    },
+  },
 });

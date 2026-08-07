@@ -2,7 +2,7 @@ import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { schemaTypes } from './schemas';
 
-export default defineConfig({
+export const config = defineConfig({
   name: 'default',
   title: 'ArenaIT',
 
@@ -16,3 +16,5 @@ export default defineConfig({
     types: schemaTypes,
   },
 });
+
+export default config;
