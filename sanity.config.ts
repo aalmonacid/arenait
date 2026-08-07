@@ -8,6 +8,7 @@ export default defineConfig({
 
   projectId: 'xbayv7k2',
   dataset: 'production',
+  basePath: '/admin',
 
   plugins: [structureTool()],
 
