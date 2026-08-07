@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@astrojs/tailwind": "^6.0.2",
+    "@sanity/astro": "^3.5.0",
+    "@sanity/client": "^7.26.2",
+    "@sanity/image-url": "^2.1.1",
+    "sanity": "^6.9.1",
+    "tailwindcss": "^3.4.19"
+  }
+}
