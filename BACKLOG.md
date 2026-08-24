@@ -33,9 +33,9 @@ Hay schemas de Sanity para funcionalidad de negocio que nunca se construyó del 
 
 ## Épica C — Calidad y confiabilidad
 
-- [x] CI en GitHub Actions: `astro check` + `astro build` en cada PR como mínimo. Resuelto el 2026-08-24 (`.github/workflows/ci.yml`), validado localmente con `npm ci` limpio antes de commitear.
+- [x] CI en GitHub Actions: lint + format check + `astro check` + `astro build` en cada push/PR. Resuelto el 2026-08-24 (`.github/workflows/ci.yml`), validado localmente con `npm ci` limpio antes de cada commit.
 - [ ] Testing: al menos smoke tests de las rutas principales (Playwright) y tests unitarios de la lógica del `TcoCalculator`.
-- [ ] Lint/format: ESLint + Prettier (o Biome) — hoy no hay ninguno configurado, sin guardrails de estilo.
+- [x] Lint/format: ESLint + Prettier. Resuelto el 2026-08-24 (`eslint.config.js`, `.prettierrc.json`) y aplicado al repo completo en un commit de solo estilo. `@typescript-eslint/no-explicit-any` quedó en `warn` (no `error`) porque el borde Sanity/GROQ es genuinamente `any` sin codegen de tipos — ver nota en el commit de setup.
 - [ ] Auditoría Lighthouse real, documentada con un reporte (no solo la afirmación "superior a 90").
 - [ ] Revisar accesibilidad real (WCAG AAA se declara como estándar pero no hay evidencia de auditoría axe/Lighthouse a11y).
 

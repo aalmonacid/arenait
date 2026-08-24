@@ -16,7 +16,7 @@ Es un sitio de marketing, no una aplicación transaccional: una home con seccion
 - **Tailwind CSS 3.4** con tokens de marca (ver §5)
 - **TypeScript 6.0**, `astro check` pasa en 0 errores
 - **Vercel** como hosting (headers de seguridad y rewrite de `/admin` en `vercel.json`), **con `@astrojs/vercel` adapter instalado desde el 2026-08-24**
-- Sin framework de testing, sin ESLint/Prettier. CI básico desde el 2026-08-24 (`.github/workflows/ci.yml`: `npm ci` + `astro check` + `astro build` en cada push/PR a `main`) — todavía sin tests ni linter que correr ahí.
+- Sin framework de testing. ESLint + Prettier desde el 2026-08-24 (`eslint.config.js`, `.prettierrc.json`) — **atención al pinnear `eslint-plugin-astro`**: la versión `3.x` en npm exige Node `^22.22.3 || ^24.16.0 || >=26.3.0` (falla incluso en Node 24.14 local); se usa `1.2.2`, que soporta `^18.18.0 || ^20.9.0 || >=21.1.0` y cubre las mismas reglas para este proyecto. CI desde el 2026-08-24 (`.github/workflows/ci.yml`: `npm ci` + `npm run lint` + `npm run format:check` + `astro check` + `astro build` en cada push/PR a `main`) — todavía sin tests que correr ahí.
 
 ## 3. Arquitectura real
 
