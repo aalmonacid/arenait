@@ -89,7 +89,7 @@ export const POST: APIRoute = async ({ request }) => {
     console.error('Error al guardar el lead en Sanity:', error);
     return new Response(
       JSON.stringify({ ok: false, error: 'No se pudo guardar la solicitud. Intente nuevamente.' }),
-      { status: 502, headers: { 'Content-Type': 'application/json' } }
+      { status: 502, headers: { 'Content-Type': 'application/json' } },
     );
   }
 };

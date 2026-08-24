@@ -11,7 +11,7 @@ Es un sitio de marketing, no una aplicación transaccional: una home con seccion
 ## 2. Stack real (verificado en `package.json`)
 
 - **Astro 7.2** (`output` no configurado → build **estático puro**, sin adapter SSR)
-- **React 19** vía `@astrojs/react`, usado *solo* para aislar Sanity Studio (`SanityStudio.tsx`), no para UI de producto
+- **React 19** vía `@astrojs/react`, usado _solo_ para aislar Sanity Studio (`SanityStudio.tsx`), no para UI de producto
 - **Sanity 6.9 / `@sanity/astro` 3.5** — CMS headless, project `xbayv7k2`, dataset `production`
 - **Tailwind CSS 3.4** con tokens de marca (ver §5)
 - **TypeScript 6.0**, `astro check` pasa en 0 errores
@@ -20,7 +20,7 @@ Es un sitio de marketing, no una aplicación transaccional: una home con seccion
 
 ## 3. Arquitectura real
 
-- **Renderizado mixto desde el 2026-08-24**: `astro.config.mjs` tiene `output: 'server'` + `adapter: vercel()`. Por defecto en este modo *todas* las páginas se renderizan on-demand, así que cada página de contenido lleva `export const prerender = true;` explícito (`index.astro`, `404.astro`, `servicios/[slug].astro`, `admin/[...index].astro`) para seguir compilando a HTML estático — verificado en build: las 7 rutas de contenido salen en la fase `prerendering static routes`, y solo `/api/leads` queda empaquetado dentro de la función serverless (`.vercel/output/functions/_render.func`). **Importante**: en Astro 7, `getStaticPaths()` ya *no* implica prerender automático en modo `server` — hay que declararlo explícito o el build lo ignora (pasó con `servicios/[slug].astro` y `admin/[...index].astro`, corregido).
+- **Renderizado mixto desde el 2026-08-24**: `astro.config.mjs` tiene `output: 'server'` + `adapter: vercel()`. Por defecto en este modo _todas_ las páginas se renderizan on-demand, así que cada página de contenido lleva `export const prerender = true;` explícito (`index.astro`, `404.astro`, `servicios/[slug].astro`, `admin/[...index].astro`) para seguir compilando a HTML estático — verificado en build: las 7 rutas de contenido salen en la fase `prerendering static routes`, y solo `/api/leads` queda empaquetado dentro de la función serverless (`.vercel/output/functions/_render.func`). **Importante**: en Astro 7, `getStaticPaths()` ya _no_ implica prerender automático en modo `server` — hay que declararlo explícito o el build lo ignora (pasó con `servicios/[slug].astro` y `admin/[...index].astro`, corregido).
 - Astro Studio embebido en `/admin` como SPA React (`client:only="react"`), servido mediante rewrite de Vercel a `admin/index.html`. Requirió 5 commits consecutivos de fixes (ver `git log`) para estabilizar por conflictos de Vite SSR con Sanity — **zona fragil, tocar con cuidado**.
 - Todas las páginas (`index.astro`, `servicios/[slug].astro`) intentan `client.fetch(...)` contra Sanity y **caen a datos hardcodeados (`fallbackServices`) si la query falla o devuelve vacío**. No hay evidencia de que el dataset `production` tenga contenido real cargado — es muy probable que **el sitio esté funcionando 100% con datos de fallback en este momento**.
 - `src/pages/api/revalidate.ts` (el webhook stub que no hacía nada) **fue eliminado el 2026-08-24**. La estrategia correcta para refrescar contenido tras editar en Sanity, dado que las páginas siguen siendo estáticas, es un **Deploy Hook de Vercel**: crear uno en Vercel → Project Settings → Git → Deploy Hooks, y configurarlo como target del webhook de Sanity (Studio → API → Webhooks) para que cada edición dispare un rebuild completo. Esto es una tarea de configuración en las consolas de Vercel/Sanity, no de código — **pendiente de hacer por quien tenga acceso a esas cuentas**.
@@ -32,17 +32,17 @@ Es un sitio de marketing, no una aplicación transaccional: una home con seccion
 
 El `BACKLOG.md` anterior marcaba los Sprints 0–4 como completos y el proyecto como `READY FOR PRODUCTION`. La auditoría no sostiene esa conclusión. Brechas concretas encontradas:
 
-| Área | Declarado | Real |
-|---|---|---|
-| CMS integrado | ✅ "Recuperación de datos desde Sanity" | Fetch existe pero corre sobre dataset probablemente vacío; toda la home vive de fallbacks hardcodeados en el `.astro` |
-| Captura de leads | Implícito en "componentes core" | **Resuelto el 2026-08-24**: `LeadCaptureForm.astro` ahora hace `fetch('/api/leads')`, que valida server-side y persiste en Sanity (`lead` document). Antes: solo `alert()` sin persistencia — ver §3 |
-| Casos de estudio | Sprint 2 marcado done | Existe schema `caseStudy.ts` en Sanity pero **cero páginas, rutas o componentes** los consumen. El link "Casos de Estudio" del nav apunta a `href="#"` |
-| Whitepapers (lead magnet) | — | Schema `whitepaper.ts` completo (con targetRole, PDF) pero **sin página de listado ni flujo de descarga**. Trabajo de CMS sin UI que lo use |
-| Performance/Lighthouse | "Superior a 90 en todas las métricas" | Ninguna evidencia de auditoría ejecutada (no hay reportes, ni Lighthouse CI, ni Web Vitals reales). Además hay una regresión de fuentes (ver abajo) que penaliza CLS/perf |
-| QA en múltiples dispositivos | Marcado done | Sin test suite, sin CI, sin evidencia de testing manual documentado |
-| Nav "FinOps" | — | `href="#"`, no lleva a ninguna sección ni página |
+| Área                         | Declarado                               | Real                                                                                                                                                                                                 |
+| ---------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CMS integrado                | ✅ "Recuperación de datos desde Sanity" | Fetch existe pero corre sobre dataset probablemente vacío; toda la home vive de fallbacks hardcodeados en el `.astro`                                                                                |
+| Captura de leads             | Implícito en "componentes core"         | **Resuelto el 2026-08-24**: `LeadCaptureForm.astro` ahora hace `fetch('/api/leads')`, que valida server-side y persiste en Sanity (`lead` document). Antes: solo `alert()` sin persistencia — ver §3 |
+| Casos de estudio             | Sprint 2 marcado done                   | Existe schema `caseStudy.ts` en Sanity pero **cero páginas, rutas o componentes** los consumen. El link "Casos de Estudio" del nav apunta a `href="#"`                                               |
+| Whitepapers (lead magnet)    | —                                       | Schema `whitepaper.ts` completo (con targetRole, PDF) pero **sin página de listado ni flujo de descarga**. Trabajo de CMS sin UI que lo use                                                          |
+| Performance/Lighthouse       | "Superior a 90 en todas las métricas"   | Ninguna evidencia de auditoría ejecutada (no hay reportes, ni Lighthouse CI, ni Web Vitals reales). Además hay una regresión de fuentes (ver abajo) que penaliza CLS/perf                            |
+| QA en múltiples dispositivos | Marcado done                            | Sin test suite, sin CI, sin evidencia de testing manual documentado                                                                                                                                  |
+| Nav "FinOps"                 | —                                       | `href="#"`, no lleva a ninguna sección ni página                                                                                                                                                     |
 
-**Conclusión:** el proyecto está en estado de *prototipo funcional con fallbacks*, no en estado de producción real con datos y flujos operativos. Ver `BACKLOG.md` reescrito para el plan honesto de qué falta.
+**Conclusión:** el proyecto está en estado de _prototipo funcional con fallbacks_, no en estado de producción real con datos y flujos operativos. Ver `BACKLOG.md` reescrito para el plan honesto de qué falta.
 
 ## 5. Bugs concretos encontrados
 
@@ -51,7 +51,7 @@ El `BACKLOG.md` anterior marcaba los Sprints 0–4 como completos y el proyecto 
 3. ~~**Formulario de contacto no persiste nada**~~ — **Resuelto el 2026-08-24**: ver `/api/leads` en §3. Falta que alguien con acceso genere el `SANITY_API_WRITE_TOKEN` real y lo cargue en Vercel (§8) para que funcione en producción.
 4. ~~**Links de navegación rotos**~~ — **Resuelto el 2026-08-24.** "Servicios" y "FinOps" ahora apuntan a `/#servicios` y `/#finops` (se agregó `id="finops"` a la sección del `TcoCalculator` en `index.astro`, que no tenía anchor). "Casos de Estudio" se **quitó del nav** en vez de dejarlo apuntando a `#`: no existe página de casos de estudio todavía (Épica B del backlog) y un link falso es peor que no tenerlo. Se reemplazó por "Contacto" → `/#contacto`, que sí existe. Cuando se construya la página de casos de estudio (Épica B), volver a añadir el link apuntando a esa ruta real.
 5. ~~**Sin CSP en `vercel.json`**~~ — **Resuelto el 2026-08-24**, con alcance acotado a propósito: `Content-Security-Policy` cubre `/`, `/404` y `/servicios/(.*)` (las páginas de contenido). `/admin` queda deliberadamente afuera — el Studio embebido usa styled-components (inyecta `<style>` en runtime) y ya es la integración más frágil del repo (§3); una CSP estricta ahí sin poder probarla contra Vercel real es más riesgo que beneficio. Política: `default-src 'self'` + permitir Google Fonts (`style-src`/`font-src`) + `img-src` habilitado para `cdn.sanity.io` (para cuando se usen imágenes de Sanity, ver Épica B) + `frame-ancestors 'none'`. **Nota de mantenimiento**: cualquier página estática nueva debe agregarse al `source` de este bloque en `vercel.json` o no hereda la CSP.
-6. ~~**Carpetas huérfanas en la raíz del repo**~~ — **Resuelto el 2026-08-24.** `dangerous-doppler/` e `interstellar-inclination/` eran proyectos Astro *starter* (`npm create astro -- --template minimal`) sin relación con ArenaIT. `interstellar-inclination/` estaba commiteada como archivos normales; `dangerous-doppler/` estaba commiteada como referencia de submódulo huérfana (`160000`, sin `.gitmodules`) apuntando a su propio commit `ee36f02` ("Initial commit from Astro"), sin trabajo real más allá del scaffold. Ambas eliminadas; cambios en stage pendientes de commit.
+6. ~~**Carpetas huérfanas en la raíz del repo**~~ — **Resuelto el 2026-08-24.** `dangerous-doppler/` e `interstellar-inclination/` eran proyectos Astro _starter_ (`npm create astro -- --template minimal`) sin relación con ArenaIT. `interstellar-inclination/` estaba commiteada como archivos normales; `dangerous-doppler/` estaba commiteada como referencia de submódulo huérfana (`160000`, sin `.gitmodules`) apuntando a su propio commit `ee36f02` ("Initial commit from Astro"), sin trabajo real más allá del scaffold. Ambas eliminadas; cambios en stage pendientes de commit.
 
 ## 6. Tokens de diseño (fuente de verdad — no duplicar, referenciar)
 
@@ -66,6 +66,7 @@ Tipografía:   Codec Pro Extra Bold (titulares) / Codec Pro (cuerpo)
 Prohibido:    estética cyberpunk, gradientes neón, fondos dark "matrix"
 Estándar:     WCAG AAA, alto contraste
 ```
+
 Definidos en `tailwind.config.mjs` y `AGENTS.md`. `CONTEXT.md` no los redefine, solo los referencia.
 
 ## 7. Inventario de páginas y componentes

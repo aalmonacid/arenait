@@ -6,14 +6,11 @@ import SanityStudio from '../../components/SanityStudio';
 
 // Generamos la ruta estática base para el SPA
 export function getStaticPaths() {
-  return [
-    { params: { index: undefined } },
-    { params: { index: 'structure' } },
-  ];
+  return [{ params: { index: undefined } }, { params: { index: 'structure' } }];
 }
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="utf-8" />
@@ -28,7 +25,7 @@ export function getStaticPaths() {
         overflow: hidden;
         overscroll-behavior: none;
         -webkit-font-smoothing: antialiased;
-        background-color: #294E6C;
+        background-color: #294e6c;
       }
     </style>
   </head>

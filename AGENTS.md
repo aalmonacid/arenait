@@ -1,9 +1,11 @@
 # Contexto del Proyecto: ArenaIT
+
 **Propósito:** Ingeniería de Software Estructural para Operaciones Críticas.
 
 > Este archivo cubre reglas de diseño y arquitectura de alto nivel. Para el estado real auditado (bugs conocidos, brechas entre lo declarado y lo implementado) ver [`CONTEXT.md`](./CONTEXT.md). Para el plan de trabajo priorizado ver [`BACKLOG.md`](./BACKLOG.md).
 
 ## Restricciones y Reglas de Diseño (Swiss Minimalist)
+
 - **Prohibido**: Estéticas cyberpunk, gradientes de neón, o fondos oscuros estilo matriz.
 - **Mantener**: Diseño limpio, corporativo, alto contraste (WCAG AAA).
 - **Palette**:
@@ -18,6 +20,7 @@
   - Fallbacks: Plus Jakarta Sans, Inter
 
 ## Reglas de Arquitectura
+
 - **Stack**: Astro 5.0 + Sanity.io + Tailwind CSS + TypeScript.
 - **Sanity**: Project ID `xbayv7k2`, Dataset `production`.
 - **Enfoque**: Resiliencia operativa, eficiencia en costes (TCO -35/40%), alta disponibilidad (SLA 99.999%).

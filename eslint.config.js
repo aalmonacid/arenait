@@ -40,5 +40,5 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/triple-slash-reference': 'off',
     },
-  }
+  },
 );
