@@ -1,6 +1,8 @@
 # ArenaIT
 Ingeniería de Software Estructural para Operaciones Críticas
 
+> Para el estado real del proyecto (qué funciona, qué falta, bugs conocidos), ver [`CONTEXT.md`](./CONTEXT.md). Para el plan de trabajo priorizado, ver [`BACKLOG.md`](./BACKLOG.md).
+
 ## Propuesta de Valor
 - Resiliencia operativa
 - TCO -35% a -40%
