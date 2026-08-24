@@ -41,10 +41,10 @@ Hay schemas de Sanity para funcionalidad de negocio que nunca se construyó del 
 
 ## Épica D — SEO, analítica y seguridad
 
-- [ ] Analítica de producto (Plausible/GA4/Vercel Analytics) — sin esto no hay forma de medir conversión de leads, que es el objetivo del sitio.
-- [ ] Datos estructurados (JSON-LD `Organization`/`Service`) para SEO, coherente con el posicionamiento B2B.
-- [ ] Añadir `Content-Security-Policy` a `vercel.json` — falta pese a que el resto de headers de seguridad ya están y el sitio se vende explícitamente sobre estándares de seguridad (ISO 27001).
-- [ ] Protección anti-spam en el formulario de leads (honeypot o rate limiting) una vez tenga persistencia real (Épica A).
+- [ ] Analítica de producto (Plausible/GA4/Vercel Analytics) — sin esto no hay forma de medir conversión de leads, que es el objetivo del sitio. **Pendiente**: requiere elegir proveedor y credenciales, es una decisión del negocio, no solo código.
+- [x] Datos estructurados (JSON-LD `Organization`/`Service`) para SEO. Resuelto el 2026-08-24: `Organization` global en `BaseLayout.astro`, `Service` en `servicios/[slug].astro`.
+- [x] Añadir `Content-Security-Policy` a `vercel.json`. Resuelto el 2026-08-24, con alcance deliberado: solo cubre `/`, `/404` y `/servicios/*` (páginas de contenido). `/admin` (Sanity Studio) queda fuera a propósito — el Studio usa styled-components con inyección de `<style>` en runtime y es una integración ya frágil (ver CONTEXT.md §3); aplicarle una CSP estricta sin poder probarla contra Vercel real es un riesgo innecesario. Si se agregan páginas de contenido nuevas, hay que sumarlas al `source` de este bloque en `vercel.json` o no heredan la CSP.
+- [x] Protección anti-spam en el formulario de leads. Resuelto el 2026-08-24: honeypot (`companyWebsite`) validado tanto en cliente como en `/api/leads` — un bot que lo complete recibe una respuesta de éxito falsa sin persistir nada. Rate limiting real (por IP) sigue pendiente si el volumen de spam lo justifica.
 
 ## Épica E — Crecimiento (post-lanzamiento real)
 

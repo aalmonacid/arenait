@@ -88,9 +88,21 @@ if (!service && slug && fallbackServicesData[slug]) {
 if (!service) {
   return Astro.redirect('/404');
 }
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: service.title,
+  description: service.description,
+  provider: {
+    '@type': 'Organization',
+    name: 'ArenaIT',
+    url: 'https://arenait.co',
+  },
+};
 ---
 
-<BaseLayout title={service.title} description={service.description}>
+<BaseLayout title={service.title} description={service.description} structuredData={[serviceSchema]}>
   <article class="bg-white min-h-screen">
     <header class="bg-neutral-900 text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
       <div class="max-w-7xl mx-auto">

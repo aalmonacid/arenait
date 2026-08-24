@@ -21,6 +21,7 @@ interface LeadPayload {
   infrastructure?: unknown;
   message?: unknown;
   source?: unknown;
+  companyWebsite?: unknown; // honeypot anti-spam, debe llegar vacío
 }
 
 function badRequest(message: string) {
@@ -45,6 +46,15 @@ export const POST: APIRoute = async ({ request }) => {
   const infrastructure = typeof body.infrastructure === 'string' ? body.infrastructure.trim() : '';
   const message = typeof body.message === 'string' ? body.message.trim() : '';
   const source = typeof body.source === 'string' ? body.source.trim() : 'lead-capture-form';
+  const honeypot = typeof body.companyWebsite === 'string' ? body.companyWebsite.trim() : '';
+
+  if (honeypot) {
+    // Bot: fingir éxito sin persistir nada ni revelar que fue detectado.
+    return new Response(JSON.stringify({ ok: true, id: null }), {
+      status: 201,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
   if (!fullName || !corporateEmail) {
     return badRequest('Nombre completo y correo corporativo son obligatorios.');

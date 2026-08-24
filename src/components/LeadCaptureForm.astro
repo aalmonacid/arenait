@@ -61,12 +61,18 @@
 
     <div>
       <label for="message" class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900">Mensaje / Reto Técnico</label>
-      <textarea 
-        id="message" 
-        rows="4" 
-        required 
+      <textarea
+        id="message"
+        rows="4"
+        required
         class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
       ></textarea>
+    </div>
+
+    <!-- Honeypot anti-spam: oculto visualmente, no con display:none (bots simples lo detectan). Un humano nunca lo completa. -->
+    <div class="absolute -left-[9999px] w-px h-px overflow-hidden" aria-hidden="true">
+      <label for="companyWebsite">No completar este campo</label>
+      <input type="text" id="companyWebsite" name="companyWebsite" tabindex="-1" autocomplete="off" />
     </div>
 
     <button type="submit" class="w-full md:w-auto px-8 py-4 bg-secondary hover:bg-interactive text-white font-bold tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
@@ -85,6 +91,7 @@
   const infrastructureInput = document.getElementById('infrastructure') as HTMLSelectElement;
   const messageInput = document.getElementById('message') as HTMLTextAreaElement;
   const fullNameInput = document.getElementById('fullName') as HTMLInputElement;
+  const honeypotInput = document.getElementById('companyWebsite') as HTMLInputElement;
   const emailError = document.getElementById('emailError');
   const submitButton = form?.querySelector('button[type="submit"]') as HTMLButtonElement | null;
   const formSuccess = document.getElementById('formSuccess');
@@ -98,6 +105,13 @@
 
       formSuccess.classList.add('hidden');
       formError.classList.add('hidden');
+
+      if (honeypotInput?.value) {
+        // Probablemente un bot: simular éxito sin llamar a la API para no darle señal de qué falló.
+        formSuccess.classList.remove('hidden');
+        form.reset();
+        return;
+      }
 
       const emailValue = emailInput.value.toLowerCase();
       const domain = emailValue.split('@')[1];
@@ -125,6 +139,7 @@
             infrastructure: infrastructureInput?.value ?? '',
             message: messageInput?.value ?? '',
             source: 'home-lead-capture-form',
+            companyWebsite: honeypotInput?.value ?? '',
           }),
         });
 

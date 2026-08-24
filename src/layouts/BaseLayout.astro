@@ -4,9 +4,23 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  structuredData?: Record<string, unknown>[];
 }
 
-const { title, description = "Ingeniería de Software Estructural para Operaciones Críticas." } = Astro.props;
+const {
+  title,
+  description = "Ingeniería de Software Estructural para Operaciones Críticas.",
+} = Astro.props;
+
+const structuredData: Record<string, unknown>[] = Astro.props.structuredData ?? [];
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'ArenaIT',
+  url: 'https://arenait.co',
+  description: 'Ingeniería de Software Estructural para Operaciones Críticas.',
+};
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -36,6 +50,11 @@ const { title, description = "Ingeniería de Software Estructural para Operacion
     <meta name="twitter:description" content={description} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    {structuredData.map((schema) => (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
   </head>
   <body class="min-h-screen flex flex-col">
     <header class="bg-white border-b-2 border-neutral-200 py-6 px-4 md:px-8">
