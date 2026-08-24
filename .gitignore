@@ -6,6 +6,11 @@ node_modules/
 # Astro generated cache/types (regenerated on dev/build/check)
 .astro/
 
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+
 # Sanity
 .env
 .env.*

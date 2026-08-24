@@ -26,12 +26,14 @@
     "preview": "astro preview",
     "astro": "astro",
     "test:unit": "vitest run",
+    "test:e2e": "playwright test",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
     "eslint": "^10.9.1",
     "eslint-plugin-astro": "^1.2.2",
     "globals": "^17.11.0",
