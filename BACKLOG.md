@@ -4,11 +4,11 @@
 
 **ESTADO GLOBAL DEL PROYECTO**: `PROTOTIPO FUNCIONAL — NO LISTO PARA PRODUCCIÓN`
 
-## ⚠️ Gate de calidad roto en CI (no bloquea producción) — pendiente de diagnóstico (2026-08-24)
+## Nota: GitHub Actions removido (2026-08-24)
 
-El job `check-and-build` de GitHub Actions falla en el paso `astro check` de forma consistente y reproducible (2 runs seguidos, commits `47afcb0` y `6ff772a`, mismo punto exacto de falla); lint, format check y unit tests pasan antes. El job `e2e` también falla en el paso de tests reales (a diferencia del intento local en este entorno, donde Playwright nunca llegó a correr por un problema de sandbox — en CI sí corre y falla en aserciones). No se pudo bajar el log crudo vía API de GitHub (403, requiere permisos de admin del repo).
+Se agregó un workflow de CI (`.github/workflows/ci.yml`) durante esta sesión, pero el flujo real del proyecto siempre fue deploy automático vía Vercel (git integration), sin usar GitHub Actions — el workflow se agregó sin que fuera parte del proceso real y el usuario pidió sacarlo. **Removido.**
 
-**Confirmado el 2026-08-24: esto NO bloquea producción.** El deploy de Vercel para el commit `6ff772a` completó exitosamente (`Vercel - Deployment has completed`, check verde) pese a que el mismo commit falla en CI. Hipótesis más probable: el build de Vercel no ejecuta `npm run build` (que encadena `astro check && astro build`) sino el comando de build propio del preset de Astro, que probablemente omite el paso de type-check. Esto significa que **el gate de calidad de CI está roto y no está protegiendo nada ahora mismo** — vale la pena arreglarlo (para que `astro check` sirva como red de seguridad real antes de mergear), pero ya no es urgente para el sitio en producción. Diagnóstico pendiente: reproducir en un entorno Linux (Docker u otro) para ver el error real de `astro check`, y separadamente investigar por qué la suite de Playwright falla en CI cuando localmente nunca pudo ejecutarse (ver nota de verificación en `CONTEXT.md` §2).
+Antes de sacarlo, quedó un hallazgo real sin resolver que vale la pena dejar anotado: `astro check` fallaba de forma consistente y reproducible corriendo en Linux/Node24 (2 runs de CI, mismo punto exacto de falla) pese a pasar siempre en local (Windows/Node 24.14) — nunca se pudo ver el log crudo del error (403 de la API de GitHub, requiere admin del repo). **Se confirmó que esto no afecta el deploy real**: Vercel completó exitosamente el build del mismo commit que fallaba en CI (probablemente porque el build de Vercel no corre `astro check`, solo `astro build`). Si en algún momento se quiere que `astro check` sea una red de seguridad real (correrlo a mano con `npm run lint` / `npx astro check` antes de mergear cambios grandes, o reintroducir alguna forma de CI más adelante), reproducir en un entorno Linux (Docker con `node:24`, cuidado con que `npm ci` dispara la descarga de browsers de Playwright — usar `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1`) es el próximo paso para ver el error real.
 
 ---
 
@@ -38,9 +38,9 @@ Hay schemas de Sanity para funcionalidad de negocio que nunca se construyó del 
 
 ## Épica C — Calidad y confiabilidad
 
-- [x] CI en GitHub Actions: lint + format check + `astro check` + `astro build` en cada push/PR. Resuelto el 2026-08-24 (`.github/workflows/ci.yml`), validado localmente con `npm ci` limpio antes de cada commit.
-- [x] Testing: smoke tests de las rutas principales (Playwright, `e2e/smoke.spec.ts`) y tests unitarios de la lógica del `TcoCalculator` (Vitest, `src/lib/tcoCalculator.test.ts`). Resuelto el 2026-08-24, ambos corriendo en CI.
-  - [ ] **Verificar que el job `e2e` de CI pasa en verde.** Los tests de Playwright se escribieron y se verificaron a mano contra el markup real, pero no pudieron ejecutarse en este entorno de trabajo (ver nota en el commit `90c1b62`: el `astro dev`/`preview` local está envuelto por un manejador de daemon en background que no se comporta como el proceso en foreground que Playwright espera, y la navegación real del browser contra el dev server se cuelga indefinidamente incluso para una página mínima sin dependencias — apunta a algo del sandbox, no del código). GitHub Actions es el primer lugar donde esta suite corre de verdad — confirmar que pasa antes de confiar en ella como red de seguridad.
+- [~] CI en GitHub Actions. Se agregó y luego se removió el 2026-08-24 a pedido del usuario — el proyecto no usa Actions, deploya automático vía Vercel. Ver nota arriba.
+- [x] Testing: smoke tests de las rutas principales (Playwright, `e2e/smoke.spec.ts`) y tests unitarios de la lógica del `TcoCalculator` (Vitest, `src/lib/tcoCalculator.test.ts`). Resuelto el 2026-08-24, disponibles para correr a mano (`npm run test:unit`, `npm run test:e2e`) — ya no corren en CI (ver nota arriba).
+  - [ ] **Verificar manualmente que la suite de Playwright pasa.** Se escribió y se verificó a mano contra el markup real, pero nunca se pudo ejecutar con éxito en este entorno de trabajo (el `astro dev`/`preview` local está envuelto por un manejador de daemon en background que no se comporta como el proceso en foreground que Playwright espera, y la navegación real del browser contra el dev server se colgaba indefinidamente). Si se corre en una máquina/entorno normal (`npm run test:e2e`), confirmar que pasa antes de confiar en ella como red de seguridad.
 - [x] Lint/format: ESLint + Prettier. Resuelto el 2026-08-24 (`eslint.config.js`, `.prettierrc.json`) y aplicado al repo completo en un commit de solo estilo. `@typescript-eslint/no-explicit-any` quedó en `warn` (no `error`) porque el borde Sanity/GROQ es genuinamente `any` sin codegen de tipos — ver nota en el commit de setup.
 - [ ] Auditoría Lighthouse real, documentada con un reporte (no solo la afirmación "superior a 90").
 - [ ] Revisar accesibilidad real (WCAG AAA se declara como estándar pero no hay evidencia de auditoría axe/Lighthouse a11y).
@@ -63,6 +63,6 @@ Hay schemas de Sanity para funcionalidad de negocio que nunca se construyó del 
 ## Cómo priorizar
 
 1. **Épica A primero, sin excepción.** El sitio hoy puede estar recibiendo tráfico y perdiendo leads silenciosamente porque el formulario no los guarda en ningún lado. Es la pérdida de valor más alta y más fácil de no notar.
-2. **Épica C en paralelo, no después.** Añadir CI antes de seguir agregando páginas evita que la próxima ronda de features rompa el build sin que nadie lo note (ya pasó 5 veces con Sanity Studio, ver `git log`).
+2. **Épica C en paralelo, no después.** Correr lint/tests/build a mano antes de mergear cambios grandes evita que la próxima ronda de features rompa algo sin que nadie lo note (ya pasó 5 veces con Sanity Studio, ver `git log`) — sin CI automática, esto depende de disciplina manual.
 3. **Épica B y D** son las que realmente "suben de nivel" el proyecto una vez que la base deja de tener fugas.
 4. **Épica E** es expansión, no corrección — no empezarla antes de cerrar A.

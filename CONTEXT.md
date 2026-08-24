@@ -2,7 +2,7 @@
 
 > Documento de referencia vivo. Generado a partir de una auditoría completa del código, configuración e historial de git el 2026-08-24. Actualizar este archivo cuando cambie la arquitectura o el estado del proyecto — no dejar que se desactualice como pasó con `BACKLOG.md`.
 
-> ⚠️ **Gate de calidad roto en CI, pero no bloquea producción** (2026-08-24): `astro check` falla en GitHub Actions (Linux/Node24) de forma consistente aunque pasa siempre en local (Windows/Node 24.14), y no se pudo bajar el log crudo del error (403, requiere admin del repo). **Confirmado que el deploy de Vercel sí funciona** con el mismo commit (deployment completado exitosamente) — probablemente porque el build de Vercel no corre `astro check`. Ver detalle y próximos pasos en `BACKLOG.md`.
+> **Nota (2026-08-24)**: se agregó y luego se removió un workflow de GitHub Actions durante esta sesión — el proyecto no usa Actions, deploya automático vía Vercel (git integration), y ese CI se agregó sin ser parte del proceso real. Antes de removerlo se detectó (y quedó sin resolver, sin impacto en producción confirmado) que `astro check` fallaba de forma reproducible corriendo en Linux/Node24 pese a pasar siempre en local — ver `BACKLOG.md` para el detalle.
 
 ## 1. Qué es el proyecto
 
@@ -19,7 +19,7 @@ Es un sitio de marketing, no una aplicación transaccional: una home con seccion
 - **TypeScript 6.0**, `astro check` pasa en 0 errores
 - **Vercel** como hosting (headers de seguridad y rewrite de `/admin` en `vercel.json`), **con `@astrojs/vercel` adapter instalado desde el 2026-08-24**
 - ESLint + Prettier desde el 2026-08-24 (`eslint.config.js`, `.prettierrc.json`) — **atención al pinnear `eslint-plugin-astro`**: la versión `3.x` en npm exige Node `^22.22.3 || ^24.16.0 || >=26.3.0` (falla incluso en Node 24.14 local); se usa `1.2.2`, que soporta `^18.18.0 || ^20.9.0 || >=21.1.0` y cubre las mismas reglas para este proyecto.
-- Testing desde el 2026-08-24: **Vitest** (`vitest.config.ts`, unit tests en `src/**/*.test.ts`) y **Playwright** (`playwright.config.ts`, smoke tests en `e2e/`). CI (`.github/workflows/ci.yml`): job principal con `npm ci` + `npm run lint` + `npm run format:check` + `npm run test:unit` + `astro check` + `astro build`; job `e2e` separado con `playwright install --with-deps chromium` + `npm run test:e2e`. **Los tests de Playwright no se ejecutaron con éxito en este entorno de trabajo** — ver nota en el commit `90c1b62` y en `BACKLOG.md` Épica C: confirmar que el job `e2e` pasa en verde en GitHub Actions antes de asumir que la suite es correcta.
+- Testing desde el 2026-08-24: **Vitest** (`vitest.config.ts`, unit tests en `src/**/*.test.ts`, `npm run test:unit`) y **Playwright** (`playwright.config.ts`, smoke tests en `e2e/`, `npm run test:e2e`). **Sin CI** (se removió, ver nota arriba) — correr ambos a mano. **Los tests de Playwright no se ejecutaron con éxito en este entorno de trabajo** — ver nota en el commit `90c1b62` y en `BACKLOG.md`: confirmar que pasan en una máquina/entorno normal antes de asumir que la suite es correcta.
 
 ## 3. Arquitectura real
 
@@ -43,7 +43,7 @@ El `BACKLOG.md` anterior marcaba los Sprints 0–4 como completos y el proyecto 
 | Casos de estudio             | Sprint 2 marcado done                   | **Resuelto el 2026-08-24**: `/casos-de-estudio` + `/casos-de-estudio/[slug]` ya existen y consumen el schema (con `slug` agregado). Antes: cero páginas, rutas o componentes lo usaban               |
 | Whitepapers (lead magnet)    | —                                       | Schema `whitepaper.ts` completo (con targetRole, PDF) pero **sin página de listado ni flujo de descarga**. Trabajo de CMS sin UI que lo use                                                          |
 | Performance/Lighthouse       | "Superior a 90 en todas las métricas"   | Ninguna evidencia de auditoría ejecutada (no hay reportes, ni Lighthouse CI, ni Web Vitals reales). Además hay una regresión de fuentes (ver abajo) que penaliza CLS/perf                            |
-| QA en múltiples dispositivos | Marcado done                            | Sin test suite ni CI al momento de la auditoría (ambos agregados el 2026-08-24, ver §2); sigue sin evidencia de testing manual en múltiples dispositivos reales                                      |
+| QA en múltiples dispositivos | Marcado done                            | Sin test suite al momento de la auditoría (Vitest + Playwright agregados el 2026-08-24, ver §2, sin CI); sigue sin evidencia de testing manual en múltiples dispositivos reales                      |
 | Nav "FinOps"                 | —                                       | `href="#"`, no lleva a ninguna sección ni página                                                                                                                                                     |
 
 **Conclusión:** el proyecto está en estado de _prototipo funcional con fallbacks_, no en estado de producción real con datos y flujos operativos. Ver `BACKLOG.md` reescrito para el plan honesto de qué falta.
