@@ -65,13 +65,15 @@
 </div>
 
 <script>
+  import { calculateTco } from '../lib/tcoCalculator';
+
   const monthlySpendInput = document.getElementById('monthlySpend') as HTMLInputElement;
   const efficiencyGoalInput = document.getElementById('efficiencyGoal') as HTMLInputElement;
   const efficiencyLabel = document.getElementById('efficiencyLabel');
   const annualSavingsEl = document.getElementById('annualSavings');
   const newAnnualSpendEl = document.getElementById('newAnnualSpend');
 
-  function calculateTco() {
+  function updateTco() {
     if (
       !monthlySpendInput ||
       !efficiencyGoalInput ||
@@ -83,25 +85,22 @@
 
     const monthlySpend = parseFloat(monthlySpendInput.value) || 0;
     const efficiency = parseFloat(efficiencyGoalInput.value) || 0;
-
-    const annualSpend = monthlySpend * 12;
-    const savings = annualSpend * (efficiency / 100);
-    const newSpend = annualSpend - savings;
+    const { savings, newAnnualSpend } = calculateTco(monthlySpend, efficiency);
 
     efficiencyLabel.textContent = efficiency.toString();
     annualSavingsEl.textContent = savings.toLocaleString('en-US', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     });
-    newAnnualSpendEl.textContent = newSpend.toLocaleString('en-US', {
+    newAnnualSpendEl.textContent = newAnnualSpend.toLocaleString('en-US', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     });
   }
 
   if (monthlySpendInput && efficiencyGoalInput) {
-    monthlySpendInput.addEventListener('input', calculateTco);
-    efficiencyGoalInput.addEventListener('input', calculateTco);
-    calculateTco();
+    monthlySpendInput.addEventListener('input', updateTco);
+    efficiencyGoalInput.addEventListener('input', updateTco);
+    updateTco();
   }
 </script>

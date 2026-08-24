@@ -25,6 +25,7 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "test:unit": "vitest run",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -36,6 +37,7 @@
     "globals": "^17.11.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
-    "typescript-eslint": "^8.68.0"
+    "typescript-eslint": "^8.68.0",
+    "vitest": "^4.1.11"
   }
 }
