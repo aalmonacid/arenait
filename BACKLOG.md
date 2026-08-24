@@ -4,6 +4,10 @@
 
 **ESTADO GLOBAL DEL PROYECTO**: `PROTOTIPO FUNCIONAL — NO LISTO PARA PRODUCCIÓN`
 
+## ⚠️ Bloqueante activo sin diagnosticar (2026-08-24)
+
+El job `check-and-build` de CI (run `32766284409`, commit `47afcb0`) falla en el paso `astro check` — lint, format check y unit tests pasaron antes, `astro build` se saltó como consecuencia. El job `e2e` también falló en el paso de tests (a diferencia del intento local, donde Playwright nunca llegó a correr por un problema de sandbox — en CI sí corrió y falló en aserciones reales). No se pudo bajar el log crudo vía API de GitHub (403, requiere permisos de admin del repo) ni reproducir en Docker localmente (decisión del usuario: priorizar primero si Vercel puede buildear el estado actual antes de invertir más tiempo en diagnosticar la CI). **Riesgo real**: Vercel también builda sobre Linux, así que es probable que el próximo deploy automático falle por lo mismo. Antes de dar por cerrada cualquier otra épica, confirmar con un redeploy en Vercel si este error se replica ahí, y diagnosticar la causa (sospecha: algo específico de Linux/Node — GitHub deprecó los runners con Node 20 y fuerza Node 24 según el warning del run, y el proyecto corrió siempre en Windows/Node 24.14 durante esta sesión).
+
 ---
 
 ## Épica A — Reparar lo que está roto (bloqueante, antes de cualquier lanzamiento)
