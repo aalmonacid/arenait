@@ -2,7 +2,7 @@
 
 > Documento de referencia vivo. Generado a partir de una auditoría completa del código, configuración e historial de git el 2026-08-24. Actualizar este archivo cuando cambie la arquitectura o el estado del proyecto — no dejar que se desactualice como pasó con `BACKLOG.md`.
 
-> ⚠️ **Bloqueante activo sin diagnosticar** (2026-08-24): `astro check` falla en CI (GitHub Actions, Linux/Node24, run `32766284409`) aunque pasa siempre en local (Windows/Node 24.14). No se pudo bajar el log crudo del error (403, requiere admin del repo) ni reproducir en Docker localmente todavía. Riesgo real: Vercel también builda sobre Linux. Ver detalle en `BACKLOG.md`.
+> ⚠️ **Gate de calidad roto en CI, pero no bloquea producción** (2026-08-24): `astro check` falla en GitHub Actions (Linux/Node24) de forma consistente aunque pasa siempre en local (Windows/Node 24.14), y no se pudo bajar el log crudo del error (403, requiere admin del repo). **Confirmado que el deploy de Vercel sí funciona** con el mismo commit (deployment completado exitosamente) — probablemente porque el build de Vercel no corre `astro check`. Ver detalle y próximos pasos en `BACKLOG.md`.
 
 ## 1. Qué es el proyecto
 
