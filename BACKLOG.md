@@ -34,7 +34,8 @@ Hay schemas de Sanity para funcionalidad de negocio que nunca se construyó del 
 ## Épica C — Calidad y confiabilidad
 
 - [x] CI en GitHub Actions: lint + format check + `astro check` + `astro build` en cada push/PR. Resuelto el 2026-08-24 (`.github/workflows/ci.yml`), validado localmente con `npm ci` limpio antes de cada commit.
-- [ ] Testing: al menos smoke tests de las rutas principales (Playwright) y tests unitarios de la lógica del `TcoCalculator`.
+- [x] Testing: smoke tests de las rutas principales (Playwright, `e2e/smoke.spec.ts`) y tests unitarios de la lógica del `TcoCalculator` (Vitest, `src/lib/tcoCalculator.test.ts`). Resuelto el 2026-08-24, ambos corriendo en CI.
+  - [ ] **Verificar que el job `e2e` de CI pasa en verde.** Los tests de Playwright se escribieron y se verificaron a mano contra el markup real, pero no pudieron ejecutarse en este entorno de trabajo (ver nota en el commit `90c1b62`: el `astro dev`/`preview` local está envuelto por un manejador de daemon en background que no se comporta como el proceso en foreground que Playwright espera, y la navegación real del browser contra el dev server se cuelga indefinidamente incluso para una página mínima sin dependencias — apunta a algo del sandbox, no del código). GitHub Actions es el primer lugar donde esta suite corre de verdad — confirmar que pasa antes de confiar en ella como red de seguridad.
 - [x] Lint/format: ESLint + Prettier. Resuelto el 2026-08-24 (`eslint.config.js`, `.prettierrc.json`) y aplicado al repo completo en un commit de solo estilo. `@typescript-eslint/no-explicit-any` quedó en `warn` (no `error`) porque el borde Sanity/GROQ es genuinamente `any` sin codegen de tipos — ver nota en el commit de setup.
 - [ ] Auditoría Lighthouse real, documentada con un reporte (no solo la afirmación "superior a 90").
 - [ ] Revisar accesibilidad real (WCAG AAA se declara como estándar pero no hay evidencia de auditoría axe/Lighthouse a11y).

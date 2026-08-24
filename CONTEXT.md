@@ -10,13 +10,14 @@ Es un sitio de marketing, no una aplicación transaccional: una home con seccion
 
 ## 2. Stack real (verificado en `package.json`)
 
-- **Astro 7.2** (`output` no configurado → build **estático puro**, sin adapter SSR)
+- **Astro 7.2**, `output: 'server'` + `@astrojs/vercel` adapter desde el 2026-08-24 (renderizado mixto — ver §3), no estático puro como al inicio de la auditoría
 - **React 19** vía `@astrojs/react`, usado _solo_ para aislar Sanity Studio (`SanityStudio.tsx`), no para UI de producto
 - **Sanity 6.9 / `@sanity/astro` 3.5** — CMS headless, project `xbayv7k2`, dataset `production`
 - **Tailwind CSS 3.4** con tokens de marca (ver §5)
 - **TypeScript 6.0**, `astro check` pasa en 0 errores
 - **Vercel** como hosting (headers de seguridad y rewrite de `/admin` en `vercel.json`), **con `@astrojs/vercel` adapter instalado desde el 2026-08-24**
-- Sin framework de testing. ESLint + Prettier desde el 2026-08-24 (`eslint.config.js`, `.prettierrc.json`) — **atención al pinnear `eslint-plugin-astro`**: la versión `3.x` en npm exige Node `^22.22.3 || ^24.16.0 || >=26.3.0` (falla incluso en Node 24.14 local); se usa `1.2.2`, que soporta `^18.18.0 || ^20.9.0 || >=21.1.0` y cubre las mismas reglas para este proyecto. CI desde el 2026-08-24 (`.github/workflows/ci.yml`: `npm ci` + `npm run lint` + `npm run format:check` + `astro check` + `astro build` en cada push/PR a `main`) — todavía sin tests que correr ahí.
+- ESLint + Prettier desde el 2026-08-24 (`eslint.config.js`, `.prettierrc.json`) — **atención al pinnear `eslint-plugin-astro`**: la versión `3.x` en npm exige Node `^22.22.3 || ^24.16.0 || >=26.3.0` (falla incluso en Node 24.14 local); se usa `1.2.2`, que soporta `^18.18.0 || ^20.9.0 || >=21.1.0` y cubre las mismas reglas para este proyecto.
+- Testing desde el 2026-08-24: **Vitest** (`vitest.config.ts`, unit tests en `src/**/*.test.ts`) y **Playwright** (`playwright.config.ts`, smoke tests en `e2e/`). CI (`.github/workflows/ci.yml`): job principal con `npm ci` + `npm run lint` + `npm run format:check` + `npm run test:unit` + `astro check` + `astro build`; job `e2e` separado con `playwright install --with-deps chromium` + `npm run test:e2e`. **Los tests de Playwright no se ejecutaron con éxito en este entorno de trabajo** — ver nota en el commit `90c1b62` y en `BACKLOG.md` Épica C: confirmar que el job `e2e` pasa en verde en GitHub Actions antes de asumir que la suite es correcta.
 
 ## 3. Arquitectura real
 
@@ -39,14 +40,14 @@ El `BACKLOG.md` anterior marcaba los Sprints 0–4 como completos y el proyecto 
 | Casos de estudio             | Sprint 2 marcado done                   | Existe schema `caseStudy.ts` en Sanity pero **cero páginas, rutas o componentes** los consumen. El link "Casos de Estudio" del nav apunta a `href="#"`                                               |
 | Whitepapers (lead magnet)    | —                                       | Schema `whitepaper.ts` completo (con targetRole, PDF) pero **sin página de listado ni flujo de descarga**. Trabajo de CMS sin UI que lo use                                                          |
 | Performance/Lighthouse       | "Superior a 90 en todas las métricas"   | Ninguna evidencia de auditoría ejecutada (no hay reportes, ni Lighthouse CI, ni Web Vitals reales). Además hay una regresión de fuentes (ver abajo) que penaliza CLS/perf                            |
-| QA en múltiples dispositivos | Marcado done                            | Sin test suite, sin CI, sin evidencia de testing manual documentado                                                                                                                                  |
+| QA en múltiples dispositivos | Marcado done                            | Sin test suite ni CI al momento de la auditoría (ambos agregados el 2026-08-24, ver §2); sigue sin evidencia de testing manual en múltiples dispositivos reales                                      |
 | Nav "FinOps"                 | —                                       | `href="#"`, no lleva a ninguna sección ni página                                                                                                                                                     |
 
 **Conclusión:** el proyecto está en estado de _prototipo funcional con fallbacks_, no en estado de producción real con datos y flujos operativos. Ver `BACKLOG.md` reescrito para el plan honesto de qué falta.
 
 ## 5. Bugs concretos encontrados
 
-1. **Fuentes rotas** — **Mitigado el 2026-08-24, no resuelto del todo.** `Codec Pro` es una fuente comercial: no hay licencia para incluir sus `.woff2` en el repo, así que `public/fonts/` seguirá vacío hasta que alguien con la licencia los suba. Lo que sí se corrigió: antes el fallback (`Plus Jakarta Sans`) tampoco estaba cargado, así que el sitio terminaba en sans-serif genérica del sistema sin que nadie lo notara. Ahora `BaseLayout.astro` carga `Plus Jakarta Sans` real vía Google Fonts, así que el fallback declarado en `tailwind.config.mjs`/`global.css` funciona de verdad. **Pendiente real**: conseguir la licencia de Codec Pro y subir `CodecPro-Regular.woff2` / `CodecPro-ExtraBold.woff2` a `public/fonts/` — en cuanto existan, se activan solos, sin tocar código (ver comentario en `global.css`).
+1. **Fuentes rotas** — **Mitigado el 2026-08-24, no resuelto del todo.** `Codec Pro` es una fuente comercial: no hay licencia para incluir sus `.woff2` en el repo, así que `public/fonts/` seguirá vacío hasta que alguien con la licencia los suba. Lo que sí se corrigió: antes el fallback (`Plus Jakarta Sans`) tampoco estaba cargado, así que el sitio terminaba en sans-serif genérica del sistema sin que nadie lo notara. Ahora `BaseLayout.astro` carga `Plus Jakarta Sans` real vía Google Fonts, así que el fallback declarado en `tailwind.config.mjs`/`global.css` funciona de verdad. Esa carga además se hizo **no bloqueante** (preload + inyección por script + `<noscript>`, en vez de un `<link rel="stylesheet">` síncrono) tras confirmar con Playwright que un `<link>` síncrono cuelga la carga completa de la página si Google Fonts está inalcanzable — ver `f19379f`. **Pendiente real**: conseguir la licencia de Codec Pro y subir `CodecPro-Regular.woff2` / `CodecPro-ExtraBold.woff2` a `public/fonts/` — en cuanto existan, se activan solos, sin tocar código (ver comentario en `global.css`).
 2. ~~**Webhook de revalidación muerto**~~ — **Resuelto el 2026-08-24**: eliminado, reemplazado por el flujo de Deploy Hook documentado en §3.
 3. ~~**Formulario de contacto no persiste nada**~~ — **Resuelto el 2026-08-24**: ver `/api/leads` en §3. Falta que alguien con acceso genere el `SANITY_API_WRITE_TOKEN` real y lo cargue en Vercel (§8) para que funcione en producción.
 4. ~~**Links de navegación rotos**~~ — **Resuelto el 2026-08-24.** "Servicios" y "FinOps" ahora apuntan a `/#servicios` y `/#finops` (se agregó `id="finops"` a la sección del `TcoCalculator` en `index.astro`, que no tenía anchor). "Casos de Estudio" se **quitó del nav** en vez de dejarlo apuntando a `#`: no existe página de casos de estudio todavía (Épica B del backlog) y un link falso es peor que no tenerlo. Se reemplazó por "Contacto" → `/#contacto`, que sí existe. Cuando se construya la página de casos de estudio (Épica B), volver a añadir el link apuntando a esa ruta real.
@@ -76,9 +77,11 @@ Definidos en `tailwind.config.mjs` y `AGENTS.md`. `CONTEXT.md` no los redefine, 
 - `src/pages/404.astro`
 - `src/pages/admin/[...index].astro` — Sanity Studio embebido
 - `src/pages/api/leads.ts` — API route real, persiste leads en Sanity (nuevo, 2026-08-24)
-- Componentes: `ServiceCard`, `TcoCalculator` (cálculo 100% client-side, el CTA "Solicitar Auditoría FinOps" todavía no envía nada — ver Épica B del backlog), `LeadCaptureForm` (persiste vía `/api/leads` desde 2026-08-24), `SanityStudio.tsx` (wrapper React)
+- Componentes: `ServiceCard`, `TcoCalculator` (el CTA "Solicitar Auditoría FinOps" todavía no envía nada — ver Épica B del backlog), `LeadCaptureForm` (persiste vía `/api/leads` desde 2026-08-24), `SanityStudio.tsx` (wrapper React)
 - `src/lib/sanityWriteClient.ts` — cliente Sanity server-only con token de escritura (nuevo, 2026-08-24)
+- `src/lib/tcoCalculator.ts` — lógica pura del cálculo de ahorro TCO, extraída de `TcoCalculator.astro` para poder testearla (nuevo, 2026-08-24); `TcoCalculator.astro` la importa en vez de reimplementarla
 - Schemas Sanity: `service`, `caseStudy` (sin UI), `whitepaper` (sin UI), `lead` (nuevo, 2026-08-24 — recibe los leads del formulario)
+- Tests: `src/lib/tcoCalculator.test.ts` (Vitest), `e2e/smoke.spec.ts` (Playwright — ver nota de verificación en §2)
 
 ## 8. Referencias rápidas
 
