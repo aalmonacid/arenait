@@ -3,10 +3,16 @@ import tailwind from '@astrojs/tailwind';
 import sanity from '@sanity/astro';
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://arenait.co',
+  // 'server' habilita las API routes (/api/leads) como funciones serverless
+  // reales en Vercel. Las páginas de contenido se marcan `prerender = true`
+  // individualmente para seguir siendo estáticas — ver CONTEXT.md §3.
+  output: 'server',
+  adapter: vercel(),
   integrations: [
     tailwind(),
     sanity({

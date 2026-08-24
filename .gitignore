@@ -1,6 +1,10 @@
 # build output
 dist/
+.vercel/
 node_modules/
+
+# Astro generated cache/types (regenerated on dev/build/check)
+.astro/
 
 # Sanity
 .env

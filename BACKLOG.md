@@ -10,8 +10,11 @@
 
 Sin esto, el sitio pierde leads reales y no puede llamarse "producción" aunque esté desplegado.
 
-- [ ] **Persistir el formulario de contacto.** Hoy `LeadCaptureForm.astro` termina en `alert()`. Definir destino real: mutación a Sanity (documento `lead`), integración con CRM/email (p. ej. Resend, HubSpot) o ambos. Este es el activo de negocio #1 del sitio.
-- [ ] **Arreglar o eliminar el webhook `/api/revalidate`.** Actualmente compila a un HTML 404 estático porque no hay adapter SSR. Decidir: (a) añadir `@astrojs/vercel` + `output: 'server'`/`hybrid'` para que funcione de verdad, o (b) eliminarlo si no se va a usar revalidación on-demand y confiar en rebuilds por webhook de Vercel/Sanity a nivel de deploy.
+- [x] **Persistir el formulario de contacto.** Resuelto el 2026-08-24: `LeadCaptureForm.astro` ahora hace `POST /api/leads`, que valida server-side y guarda el lead como documento `lead` en Sanity. Requiere trabajo pendiente de configuración (no de código, ver checklist abajo).
+  - [ ] **Generar `SANITY_API_WRITE_TOKEN`** en sanity.io/manage (proyecto `xbayv7k2`, permiso Editor+) y cargarlo en `.env` local y en Vercel → Environment Variables. Sin esto `/api/leads` responde error de forma controlada pero no guarda nada.
+  - [ ] Decidir si además del documento en Sanity se necesita notificación por email/Slack cuando entra un lead nuevo (hoy solo queda visible en el Studio).
+- [x] **Arreglar o eliminar el webhook `/api/revalidate`.** Resuelto el 2026-08-24: se eliminó (no hacía nada real) y se adoptó `output: 'server'` + `@astrojs/vercel` solo para las API routes, con las páginas de contenido marcadas `prerender = true` para seguir siendo estáticas.
+  - [ ] **Configurar el Deploy Hook** en Vercel (Project Settings → Git → Deploy Hooks) y pegar su URL en Sanity Studio → API → Webhooks, para que editar contenido dispare un rebuild automático. Tarea de consola, no de código.
 - [ ] **Cargar contenido real en Sanity** (`production` dataset) para los 3 servicios existentes, o aceptar explícitamente que el fallback hardcodeado *es* el contenido de producción y documentarlo — pero no dejarlo ambiguo.
 - [ ] **Arreglar la carga de fuentes.** `public/fonts/CodecPro-*.woff2` no existen; la marca nunca renderiza "Codec Pro". Subir los archivos de fuente reales o cambiar el CSS a la fuente fallback (Plus Jakarta Sans vía Google Fonts) de forma intencional.
 - [ ] **Arreglar los links muertos del nav** (`Servicios`, `Casos de Estudio`, `FinOps` → todos `href="#"`).

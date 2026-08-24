@@ -69,23 +69,36 @@
       ></textarea>
     </div>
 
-    <button type="submit" class="w-full md:w-auto px-8 py-4 bg-secondary hover:bg-interactive text-white font-bold tracking-widest uppercase transition-colors">
+    <button type="submit" class="w-full md:w-auto px-8 py-4 bg-secondary hover:bg-interactive text-white font-bold tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
       Enviar Solicitud
     </button>
+
+    <p id="formSuccess" class="text-sm text-green-700 font-bold hidden">Solicitud enviada correctamente. Un arquitecto se pondrá en contacto pronto.</p>
+    <p id="formError" class="text-sm text-red-600 font-bold hidden"></p>
   </form>
 </div>
 
 <script>
   const form = document.getElementById('leadCaptureForm') as HTMLFormElement;
   const emailInput = document.getElementById('corporateEmail') as HTMLInputElement;
+  const jobTitleInput = document.getElementById('jobTitle') as HTMLSelectElement;
+  const infrastructureInput = document.getElementById('infrastructure') as HTMLSelectElement;
+  const messageInput = document.getElementById('message') as HTMLTextAreaElement;
+  const fullNameInput = document.getElementById('fullName') as HTMLInputElement;
   const emailError = document.getElementById('emailError');
+  const submitButton = form?.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+  const formSuccess = document.getElementById('formSuccess');
+  const formError = document.getElementById('formError');
 
   const blockedDomains = ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com', 'live.com', 'aol.com'];
 
-  if (form && emailInput && emailError) {
-    form.addEventListener('submit', (e) => {
+  if (form && emailInput && emailError && submitButton && formSuccess && formError) {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
+      formSuccess.classList.add('hidden');
+      formError.classList.add('hidden');
+
       const emailValue = emailInput.value.toLowerCase();
       const domain = emailValue.split('@')[1];
 
@@ -97,10 +110,39 @@
 
       emailInput.classList.remove('border-red-500');
       emailError.classList.add('hidden');
-      
-      // Submit logic here
-      alert('Solicitud enviada correctamente. Un arquitecto se pondrá en contacto pronto.');
-      form.reset();
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'Enviando...';
+
+      try {
+        const response = await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName: fullNameInput?.value ?? '',
+            jobTitle: jobTitleInput?.value ?? '',
+            corporateEmail: emailInput.value,
+            infrastructure: infrastructureInput?.value ?? '',
+            message: messageInput?.value ?? '',
+            source: 'home-lead-capture-form',
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || 'No se pudo enviar la solicitud.');
+        }
+
+        formSuccess.classList.remove('hidden');
+        form.reset();
+      } catch (err) {
+        formError.textContent = err instanceof Error ? err.message : 'No se pudo enviar la solicitud. Intente nuevamente.';
+        formError.classList.remove('hidden');
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Enviar Solicitud';
+      }
     });
 
     emailInput.addEventListener('input', () => {
