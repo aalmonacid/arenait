@@ -18,6 +18,7 @@ export interface ServiceSchema {
 export interface CaseStudySchema {
   _id: string;
   title: string;
+  slug: { current: string };
   client: string;
   industry: string;
   challenge: string;

@@ -29,6 +29,10 @@ test.describe('Home page', () => {
       'href',
       '/#servicios',
     );
+    await expect(nav.getByRole('link', { name: 'Casos de Estudio' })).toHaveAttribute(
+      'href',
+      '/casos-de-estudio',
+    );
     await expect(nav.getByRole('link', { name: 'FinOps' })).toHaveAttribute('href', '/#finops');
     await expect(nav.getByRole('link', { name: 'Contacto' })).toHaveAttribute('href', '/#contacto');
 
@@ -56,6 +60,18 @@ test.describe('Service detail page', () => {
       'Arquitectura FinOps Cloud',
     );
     await expect(page.getByText('Ahorro TCO')).toBeVisible();
+  });
+});
+
+test.describe('Case studies page', () => {
+  test('shows the honest empty state when Sanity has no case studies yet', async ({ page }) => {
+    // No fallback data here on purpose — unlike services, a case study
+    // implies a real client and real results, so there's nothing honest to
+    // fake. If real content lands in Sanity, this test needs to change to
+    // match (see BACKLOG.md's "cargar contenido real en Sanity" item).
+    await page.goto('/casos-de-estudio');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Casos de Estudio');
+    await expect(page.getByText('Todavía no hay casos de estudio publicados')).toBeVisible();
   });
 });
 

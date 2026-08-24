@@ -22,15 +22,14 @@ Sin esto, el sitio pierde leads reales y no puede llamarse "producción" aunque 
 - [ ] **Cargar contenido real en Sanity** (`production` dataset) para los 3 servicios existentes, o aceptar explícitamente que el fallback hardcodeado _es_ el contenido de producción y documentarlo — pero no dejarlo ambiguo.
 - [x] **Arreglar la carga de fuentes.** Resuelto parcialmente el 2026-08-24: `BaseLayout.astro` ahora carga `Plus Jakarta Sans` real vía Google Fonts, así que el fallback funciona en vez de caer a sans-serif del sistema.
   - [ ] `Codec Pro` sigue sin archivos (fuente comercial, sin licencia en el repo) — **pendiente conseguir la licencia y subir los `.woff2` reales** a `public/fonts/` para que la marca se vea como está diseñada.
-- [x] **Arreglar los links muertos del nav.** Resuelto el 2026-08-24: "Servicios" → `/#servicios`, "FinOps" → `/#finops` (se agregó el anchor que faltaba), "Casos de Estudio" se quitó (no existe esa página todavía — ver Épica B) y se reemplazó por "Contacto" → `/#contacto`.
-  - [ ] Cuando exista la página de Casos de Estudio (Épica B), volver a agregar ese link al nav apuntando a la ruta real.
+- [x] **Arreglar los links muertos del nav.** Resuelto el 2026-08-24: "Servicios" → `/#servicios`, "Casos de Estudio" → `/casos-de-estudio` (re-agregado tras construir esa página, ver Épica B), "FinOps" → `/#finops` (se agregó el anchor que faltaba), "Contacto" → `/#contacto`.
 - [x] **Limpiar las carpetas huérfanas** `dangerous-doppler/` e `interstellar-inclination/` (starters de Astro sin relación con el proyecto, sin trabajo real). Eliminadas el 2026-08-24 (cambios en stage, pendiente de commit).
 
 ## Épica B — Completar la arquitectura de contenido
 
 Hay schemas de Sanity para funcionalidad de negocio que nunca se construyó del lado del frontend.
 
-- [ ] Página de listado + detalle de **Casos de Estudio** (`caseStudy` schema ya existe, sin consumir).
+- [x] Página de listado + detalle de **Casos de Estudio**. Resuelto el 2026-08-24: `/casos-de-estudio` (listado) y `/casos-de-estudio/[slug]` (detalle), agregado campo `slug` al schema (no existía). **Decisión de contenido deliberada**: a diferencia de `servicios/[slug].astro`, esta página NO tiene datos de fallback inventados — un caso de estudio implica un cliente y resultados reales, fabricarlos sería publicar testimonios falsos. Con Sanity vacío, el listado muestra un estado vacío honesto ("Todavía no hay casos de estudio publicados") y no se generan páginas de detalle (`getStaticPaths` devuelve `[]`). En cuanto se cargue contenido real en Sanity, las páginas aparecen solas en el próximo build. Nav actualizado: "Casos de Estudio" vuelve a apuntar a una ruta real.
 - [ ] Página de listado + flujo de descarga gated de **Whitepapers** (`whitepaper` schema ya existe, sin consumir). Definir si la descarga requiere pasar por `LeadCaptureForm` (lead magnet real) — parece ser la intención del schema (`targetRole`).
 - [ ] Evaluar si el envío del `TcoCalculator` ("Solicitar Auditoría FinOps") debe conectar al mismo flujo de captura de leads en vez de ser un botón sin acción.
 - [ ] Imágenes: ningún schema de Sanity tiene campo de imagen todavía pese a existir `imageBuilder.ts`/`urlFor()` ya implementado y sin uso — decidir si los servicios/casos de estudio llevan imagen y añadir el campo.
