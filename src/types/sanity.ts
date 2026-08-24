@@ -1,18 +1,10 @@
-export interface Metric {
-  label: string;
-  value: string;
-}
-
 export interface ServiceSchema {
   _id: string;
   title: string;
   slug: { current: string };
-  description: string;
   icon?: string;
-  tcoSavingsPercentage: number;
-  sla: string;
-  iso27001Compliant: boolean;
-  metrics: Metric[];
+  summary: string;
+  description: string;
 }
 
 export interface CaseStudySchema {
@@ -24,4 +16,13 @@ export interface CaseStudySchema {
   challenge: string;
   solution: string;
   results: string[];
+}
+
+export interface TestimonialSchema {
+  _id: string;
+  authorName: string;
+  role?: string;
+  company?: string;
+  quote: string;
+  photo?: unknown;
 }

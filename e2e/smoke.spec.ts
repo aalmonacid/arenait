@@ -1,43 +1,35 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Home page', () => {
-  test('renders hero, services, and TCO calculator with correct defaults', async ({ page }) => {
+  test('renders hero and the real services list', async ({ page }) => {
     await page.goto('/');
 
     await expect(page).toHaveTitle(/ArenaIT/);
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Ingeniería de Software Estructural',
+      'Software a la medida para operaciones reales',
     );
 
     await expect(page.locator('#servicios')).toBeVisible();
-    // Count-based, not content-based: today the 3 services come from
+    // Count-based, not content-based: today the 6 services come from
     // index.astro's hardcoded fallback (Sanity has no real content yet, see
-    // CONTEXT.md §4). Once BACKLOG.md's "cargar contenido real en Sanity"
-    // item ships, the count may change — update this alongside it.
-    await expect(page.locator('#servicios article')).toHaveCount(3);
-
-    // Default TcoCalculator values: 25000/month at 38% efficiency -> 114,000 / 186,000.
-    await expect(page.locator('#annualSavings')).toHaveText('114,000');
-    await expect(page.locator('#newAnnualSpend')).toHaveText('186,000');
+    // CONTEXT.md §4). If real content lands in Sanity, update alongside it.
+    await expect(page.locator('#servicios article')).toHaveCount(6);
   });
 
-  test('nav links resolve to real sections instead of "#"', async ({ page }) => {
+  test('nav links resolve to real pages', async ({ page }) => {
     await page.goto('/');
     const nav = page.locator('header nav');
 
     await expect(nav.getByRole('link', { name: 'Servicios' })).toHaveAttribute(
       'href',
-      '/#servicios',
+      '/servicios',
     );
     await expect(nav.getByRole('link', { name: 'Casos de Estudio' })).toHaveAttribute(
       'href',
       '/casos-de-estudio',
     );
-    await expect(nav.getByRole('link', { name: 'FinOps' })).toHaveAttribute('href', '/#finops');
-    await expect(nav.getByRole('link', { name: 'Contacto' })).toHaveAttribute('href', '/#contacto');
-
-    await nav.getByRole('link', { name: 'FinOps' }).click();
-    await expect(page.locator('#finops')).toBeInViewport();
+    await expect(nav.getByRole('link', { name: 'Nosotros' })).toHaveAttribute('href', '/nosotros');
+    await expect(nav.getByRole('link', { name: 'Contacto' })).toHaveAttribute('href', '/contacto');
   });
 
   test('embeds Organization JSON-LD structured data', async ({ page }) => {
@@ -51,27 +43,40 @@ test.describe('Home page', () => {
   });
 });
 
-test.describe('Service detail page', () => {
-  test('renders a known service by slug', async ({ page }) => {
-    // Slug + title come from the same hardcoded fallback as above — update
-    // together if BACKLOG.md's "cargar contenido real en Sanity" item ships.
-    await page.goto('/servicios/arquitectura-finops-cloud');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Arquitectura FinOps Cloud',
-    );
-    await expect(page.getByText('Ahorro TCO')).toBeVisible();
+test.describe('Servicios page', () => {
+  test('renders all 6 real services, no fake metrics', async ({ page }) => {
+    await page.goto('/servicios');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Servicios');
+    await expect(page.getByText('Desarrollo de software a la medida')).toBeVisible();
+    await expect(page.getByText('Mantenimiento y migración de software')).toBeVisible();
+    await expect(page.getByText('ISO 27001')).toHaveCount(0);
+    await expect(page.getByText('SLA')).toHaveCount(0);
+  });
+});
+
+test.describe('Nosotros page', () => {
+  test('renders verified copy and marks pending content, not raw brackets', async ({ page }) => {
+    await page.goto('/nosotros');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Quiénes somos');
+    await expect(page.getByText('Andrés Arena')).toBeVisible();
+    await expect(page.getByText('pendiente de confirmar con el cliente').first()).toBeVisible();
+    await expect(page.getByText('[PENDIENTE', { exact: false })).toHaveCount(0);
   });
 });
 
 test.describe('Case studies page', () => {
-  test('shows the honest empty state when Sanity has no case studies yet', async ({ page }) => {
-    // No fallback data here on purpose — unlike services, a case study
-    // implies a real client and real results, so there's nothing honest to
-    // fake. If real content lands in Sanity, this test needs to change to
-    // match (see BACKLOG.md's "cargar contenido real en Sanity" item).
+  test('shows the real Sadep case study', async ({ page }) => {
     await page.goto('/casos-de-estudio');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Casos de Estudio');
-    await expect(page.getByText('Todavía no hay casos de estudio publicados')).toBeVisible();
+    await expect(page.getByText('SADEP LTDA')).toBeVisible();
+  });
+
+  test('renders the Sadep case study detail page', async ({ page }) => {
+    await page.goto('/casos-de-estudio/sadep');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'Gestión remota de fincas ganaderas',
+    );
+    await expect(page.getByText('Tauruswebs')).toBeVisible();
   });
 });
 
@@ -83,24 +88,10 @@ test.describe('404 page', () => {
   });
 });
 
-test.describe('Lead capture form', () => {
-  test('blocks free-mail domains client-side without calling the API', async ({ page }) => {
-    let apiCalled = false;
-    await page.route('**/api/leads', (route) => {
-      apiCalled = true;
-      route.abort();
-    });
-
-    await page.goto('/#contacto');
-    await page.locator('#fullName').fill('Test User');
-    await page.locator('#jobTitle').selectOption('CTO');
-    await page.locator('#corporateEmail').fill('test@gmail.com');
-    await page.locator('#infrastructure').selectOption('AWS');
-    await page.locator('#message').fill('Test message');
-    await page.locator('#leadCaptureForm button[type="submit"]').click();
-
-    await expect(page.locator('#emailError')).toBeVisible();
-    expect(apiCalled).toBe(false);
+test.describe('Contacto page', () => {
+  test('preselects the service passed via query param', async ({ page }) => {
+    await page.goto('/contacto?servicio=Business%20Intelligence');
+    await expect(page.locator('#serviceOfInterest')).toHaveValue('Business Intelligence');
   });
 
   test('submits valid data to /api/leads and shows the success message', async ({ page }) => {
@@ -114,17 +105,16 @@ test.describe('Lead capture form', () => {
       });
     });
 
-    await page.goto('/#contacto');
+    await page.goto('/contacto');
     await page.locator('#fullName').fill('Test User');
-    await page.locator('#jobTitle').selectOption('CTO');
-    await page.locator('#corporateEmail').fill('test@empresa.com');
-    await page.locator('#infrastructure').selectOption('AWS');
+    await page.locator('#company').fill('Empresa de Prueba');
+    await page.locator('#corporateEmail').fill('test@gmail.com');
     await page.locator('#message').fill('Test message');
     await page.locator('#leadCaptureForm button[type="submit"]').click();
 
     await expect(page.locator('#formSuccess')).toBeVisible();
     expect((requestBody as unknown as { corporateEmail?: string } | null)?.corporateEmail).toBe(
-      'test@empresa.com',
+      'test@gmail.com',
     );
   });
 
@@ -135,11 +125,9 @@ test.describe('Lead capture form', () => {
       route.abort();
     });
 
-    await page.goto('/#contacto');
+    await page.goto('/contacto');
     await page.locator('#fullName').fill('Bot');
-    await page.locator('#jobTitle').selectOption('CTO');
     await page.locator('#corporateEmail').fill('bot@empresa.com');
-    await page.locator('#infrastructure').selectOption('AWS');
     await page.locator('#message').fill('spam');
     await page.locator('#companyWebsite').fill('http://spam.example');
     await page.locator('#leadCaptureForm button[type="submit"]').click();

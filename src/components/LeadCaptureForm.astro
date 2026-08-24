@@ -1,11 +1,24 @@
 ---
+interface Props {
+  showServiceDropdown?: boolean;
+  services?: { title: string }[];
+}
 
+const {
+  showServiceDropdown = false,
+  services = [
+    { title: 'Desarrollo de software a la medida' },
+    { title: 'Implementación de aplicaciones' },
+    { title: 'Gestión de proyectos de TI' },
+    { title: 'Business Intelligence' },
+    { title: 'Aseguramiento de la calidad (QA / Testing)' },
+    { title: 'Mantenimiento y migración de software' },
+  ],
+}: Props = Astro.props;
 ---
 
 <div class="bg-neutral-50 p-8 md:p-12 border-2 border-neutral-200 max-w-3xl mx-auto font-body">
-  <h3 class="text-3xl font-heading mb-8 text-secondary tracking-tight">
-    Evaluación Arquitectónica
-  </h3>
+  <h3 class="text-3xl font-heading mb-8 text-secondary tracking-tight">Cuéntanos tu reto</h3>
 
   <form id="leadCaptureForm" class="space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -24,68 +37,79 @@
       </div>
       <div>
         <label
-          for="jobTitle"
+          for="company"
           class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
-          >Cargo Ejecución</label
+          >Empresa</label
         >
-        <select
-          id="jobTitle"
-          required
+        <input
+          type="text"
+          id="company"
           class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
-        >
-          <option value="" disabled selected>Seleccione cargo...</option>
-          <option value="CTO">CTO</option>
-          <option value="CIO">CIO</option>
-          <option value="VP Engineering">VP Engineering</option>
-          <option value="Director IT">Director IT</option>
-          <option value="Otro">Otro</option>
-        </select>
+        />
       </div>
     </div>
 
-    <div>
-      <label
-        for="corporateEmail"
-        class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
-        >Correo Corporativo</label
-      >
-      <input
-        type="email"
-        id="corporateEmail"
-        required
-        placeholder="nombre@empresa.com"
-        class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
-      />
-      <p id="emailError" class="text-sm text-red-600 font-bold mt-2 hidden">
-        Por favor, utilice un correo corporativo válido.
-      </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label
+          for="corporateEmail"
+          class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
+          >Correo</label
+        >
+        <input
+          type="email"
+          id="corporateEmail"
+          required
+          placeholder="nombre@empresa.com"
+          class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
+        />
+        <p id="emailError" class="text-sm text-red-600 font-bold mt-2 hidden">
+          Por favor, ingrese un correo válido.
+        </p>
+      </div>
+      <div>
+        <label
+          for="phone"
+          class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
+          >Teléfono (opcional)</label
+        >
+        <input
+          type="tel"
+          id="phone"
+          class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
+        />
+      </div>
     </div>
 
-    <div>
-      <label
-        for="infrastructure"
-        class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
-        >Infraestructura Actual</label
-      >
-      <select
-        id="infrastructure"
-        required
-        class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
-      >
-        <option value="" disabled selected>Seleccione infraestructura...</option>
-        <option value="AWS">AWS</option>
-        <option value="Azure">Azure</option>
-        <option value="GCP">GCP</option>
-        <option value="On-Premises">On-Premises</option>
-        <option value="Híbrida">Híbrida</option>
-      </select>
-    </div>
+    {
+      showServiceDropdown && (
+        <div>
+          <label
+            for="serviceOfInterest"
+            class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
+          >
+            Servicio de interés
+          </label>
+          <select
+            id="serviceOfInterest"
+            class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
+          >
+            <option value="" selected>
+              Seleccione un servicio...
+            </option>
+            {services.map((service) => (
+              <option value={service.title}>{service.title}</option>
+            ))}
+          </select>
+        </div>
+      )
+    }
 
     <div>
       <label
         for="message"
         class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
-        >Mensaje / Reto Técnico</label
+        >Cuéntanos tu reto</label
       >
       <textarea
         id="message"
@@ -111,11 +135,11 @@
       type="submit"
       class="w-full md:w-auto px-8 py-4 bg-secondary hover:bg-interactive text-white font-bold tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      Enviar Solicitud
+      Enviar mensaje
     </button>
 
     <p id="formSuccess" class="text-sm text-green-700 font-bold hidden">
-      Solicitud enviada correctamente. Un arquitecto se pondrá en contacto pronto.
+      Mensaje enviado correctamente. Te respondemos con una propuesta concreta.
     </p>
     <p id="formError" class="text-sm text-red-600 font-bold hidden"></p>
   </form>
@@ -124,8 +148,11 @@
 <script>
   const form = document.getElementById('leadCaptureForm') as HTMLFormElement;
   const emailInput = document.getElementById('corporateEmail') as HTMLInputElement;
-  const jobTitleInput = document.getElementById('jobTitle') as HTMLSelectElement;
-  const infrastructureInput = document.getElementById('infrastructure') as HTMLSelectElement;
+  const companyInput = document.getElementById('company') as HTMLInputElement;
+  const phoneInput = document.getElementById('phone') as HTMLInputElement;
+  const serviceOfInterestInput = document.getElementById(
+    'serviceOfInterest',
+  ) as HTMLSelectElement | null;
   const messageInput = document.getElementById('message') as HTMLTextAreaElement;
   const fullNameInput = document.getElementById('fullName') as HTMLInputElement;
   const honeypotInput = document.getElementById('companyWebsite') as HTMLInputElement;
@@ -134,14 +161,17 @@
   const formSuccess = document.getElementById('formSuccess');
   const formError = document.getElementById('formError');
 
-  const blockedDomains = [
-    'gmail.com',
-    'hotmail.com',
-    'yahoo.com',
-    'outlook.com',
-    'live.com',
-    'aol.com',
-  ];
+  if (serviceOfInterestInput) {
+    const preselected = new URLSearchParams(window.location.search).get('servicio');
+    if (preselected) {
+      const match = Array.from(serviceOfInterestInput.options).find(
+        (option) => option.value === preselected,
+      );
+      if (match) {
+        serviceOfInterestInput.value = preselected;
+      }
+    }
+  }
 
   if (form && emailInput && emailError && submitButton && formSuccess && formError) {
     form.addEventListener('submit', async (e) => {
@@ -157,18 +187,6 @@
         return;
       }
 
-      const emailValue = emailInput.value.toLowerCase();
-      const domain = emailValue.split('@')[1];
-
-      if (domain && blockedDomains.includes(domain)) {
-        emailInput.classList.add('border-red-500');
-        emailError.classList.remove('hidden');
-        return;
-      }
-
-      emailInput.classList.remove('border-red-500');
-      emailError.classList.add('hidden');
-
       submitButton.disabled = true;
       submitButton.textContent = 'Enviando...';
 
@@ -178,11 +196,12 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             fullName: fullNameInput?.value ?? '',
-            jobTitle: jobTitleInput?.value ?? '',
+            company: companyInput?.value ?? '',
             corporateEmail: emailInput.value,
-            infrastructure: infrastructureInput?.value ?? '',
+            phone: phoneInput?.value ?? '',
+            serviceOfInterest: serviceOfInterestInput?.value ?? '',
             message: messageInput?.value ?? '',
-            source: 'home-lead-capture-form',
+            source: 'lead-capture-form',
             companyWebsite: honeypotInput?.value ?? '',
           }),
         });
@@ -190,25 +209,22 @@
         const data = await response.json();
 
         if (!response.ok || !data.ok) {
-          throw new Error(data.error || 'No se pudo enviar la solicitud.');
+          throw new Error(data.error || 'No se pudo enviar el mensaje.');
         }
 
         formSuccess.classList.remove('hidden');
         form.reset();
       } catch (err) {
         formError.textContent =
-          err instanceof Error
-            ? err.message
-            : 'No se pudo enviar la solicitud. Intente nuevamente.';
+          err instanceof Error ? err.message : 'No se pudo enviar el mensaje. Intente nuevamente.';
         formError.classList.remove('hidden');
       } finally {
         submitButton.disabled = false;
-        submitButton.textContent = 'Enviar Solicitud';
+        submitButton.textContent = 'Enviar mensaje';
       }
     });
 
     emailInput.addEventListener('input', () => {
-      emailInput.classList.remove('border-red-500');
       emailError.classList.add('hidden');
     });
   }

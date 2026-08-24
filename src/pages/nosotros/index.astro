@@ -1,0 +1,48 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PendingContentTag from '../../components/PendingContentTag.astro';
+---
+
+<BaseLayout
+  title="Quiénes somos"
+  description="Arena IT es una empresa colombiana de desarrollo de software, dedicada a diseñar, construir e integrar soluciones tecnológicas a la medida de las necesidades reales de cada negocio."
+>
+  <header class="bg-neutral-900 text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-4xl md:text-6xl font-heading mb-6 tracking-tight text-white">
+        Quiénes somos
+      </h1>
+    </div>
+  </header>
+
+  <section class="py-24 px-4 md:px-8 bg-white">
+    <div class="max-w-3xl mx-auto space-y-12">
+      <p class="text-lg text-neutral-900 leading-relaxed">
+        Arena IT es una empresa colombiana de desarrollo de software, dedicada a diseñar, construir
+        e integrar soluciones tecnológicas a la medida de las necesidades reales de cada negocio.
+        Acompañamos a nuestros clientes desde el diseño de la solución hasta su mantenimiento en
+        producción, con un enfoque en que el software funcione para la operación diaria — no solo en
+        la demo.
+      </p>
+
+      <div class="border-t border-neutral-200 pt-8">
+        <p class="text-sm font-bold tracking-widest uppercase text-neutral-500 mb-2">Contacto</p>
+        <p class="text-lg font-heading text-secondary">Andrés Arena — Gerente</p>
+      </div>
+
+      <div class="border-t border-neutral-200 pt-8 space-y-4">
+        <p class="text-sm font-bold tracking-widest uppercase text-neutral-500">
+          Todavía por confirmar con el cliente
+        </p>
+        <div class="flex flex-col gap-3 items-start">
+          <PendingContentTag label="Año de fundación / años operando" />
+          <PendingContentTag label="Tamaño del equipo" />
+          <PendingContentTag label="Misión y visión" />
+          <PendingContentTag label="Sectores con experiencia comprobada más allá de agro" />
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

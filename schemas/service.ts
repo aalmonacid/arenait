@@ -19,39 +19,24 @@ export const serviceSchema = {
       },
     },
     {
-      name: 'description',
-      title: 'Description',
-      type: 'text',
+      name: 'icon',
+      title: 'Icon',
+      type: 'string',
+      description: 'Nombre del ícono del set del tablero de marca',
+    },
+    {
+      name: 'summary',
+      title: 'Summary',
+      type: 'string',
+      description: 'Una línea de descripción, usada en la card de home',
       validation: (Rule: any) => Rule.required(),
     },
     {
-      name: 'tcoSavingsPercentage',
-      title: 'TCO Savings Percentage',
-      type: 'number',
-    },
-    {
-      name: 'sla',
-      title: 'SLA',
-      type: 'string',
-    },
-    {
-      name: 'iso27001Compliant',
-      title: 'ISO 27001 Compliant',
-      type: 'boolean',
-    },
-    {
-      name: 'metrics',
-      title: 'Metrics',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            { name: 'label', title: 'Label', type: 'string' },
-            { name: 'value', title: 'Value', type: 'string' },
-          ],
-        },
-      ],
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      description: 'Descripción completa, usada en la página de Servicios',
+      validation: (Rule: any) => Rule.required(),
     },
   ],
 };

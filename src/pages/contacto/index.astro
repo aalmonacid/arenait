@@ -1,0 +1,37 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LeadCaptureForm from '../../components/LeadCaptureForm.astro';
+import PendingContentTag from '../../components/PendingContentTag.astro';
+---
+
+<BaseLayout
+  title="Hablemos de tu proyecto"
+  description="Cuéntanos tu reto. Te respondemos con una propuesta concreta."
+>
+  <header class="bg-neutral-900 text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-4xl md:text-6xl font-heading mb-6 tracking-tight text-white">
+        Hablemos de tu proyecto
+      </h1>
+      <p class="text-xl md:text-2xl text-neutral-300 max-w-3xl leading-relaxed mb-4">
+        Cuéntanos tu reto.
+      </p>
+      <PendingContentTag label="Tiempo de respuesta comprometido (SLA de contacto)" />
+    </div>
+  </header>
+
+  <section class="py-24 px-4 md:px-8 bg-neutral-50">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-16 items-start">
+      <div class="lg:col-span-1 space-y-4">
+        <p class="text-sm font-bold tracking-widest uppercase text-neutral-500 mb-2">Contacto</p>
+        <p class="text-lg font-heading text-secondary">Andrés Arena — Gerente</p>
+        <PendingContentTag label="Correo/teléfono público a publicar" />
+      </div>
+      <div class="lg:col-span-2">
+        <LeadCaptureForm showServiceDropdown />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

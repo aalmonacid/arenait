@@ -3,22 +3,14 @@ import { sanityWriteClient } from '../../lib/sanityWriteClient';
 
 export const prerender = false;
 
-const BLOCKED_EMAIL_DOMAINS = new Set([
-  'gmail.com',
-  'hotmail.com',
-  'yahoo.com',
-  'outlook.com',
-  'live.com',
-  'aol.com',
-]);
-
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface LeadPayload {
   fullName?: unknown;
-  jobTitle?: unknown;
+  company?: unknown;
   corporateEmail?: unknown;
-  infrastructure?: unknown;
+  phone?: unknown;
+  serviceOfInterest?: unknown;
   message?: unknown;
   source?: unknown;
   companyWebsite?: unknown; // honeypot anti-spam, debe llegar vacío
@@ -41,9 +33,11 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const fullName = typeof body.fullName === 'string' ? body.fullName.trim() : '';
+  const company = typeof body.company === 'string' ? body.company.trim() : '';
   const corporateEmail = typeof body.corporateEmail === 'string' ? body.corporateEmail.trim() : '';
-  const jobTitle = typeof body.jobTitle === 'string' ? body.jobTitle.trim() : '';
-  const infrastructure = typeof body.infrastructure === 'string' ? body.infrastructure.trim() : '';
+  const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
+  const serviceOfInterest =
+    typeof body.serviceOfInterest === 'string' ? body.serviceOfInterest.trim() : '';
   const message = typeof body.message === 'string' ? body.message.trim() : '';
   const source = typeof body.source === 'string' ? body.source.trim() : 'lead-capture-form';
   const honeypot = typeof body.companyWebsite === 'string' ? body.companyWebsite.trim() : '';
@@ -57,25 +51,21 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   if (!fullName || !corporateEmail) {
-    return badRequest('Nombre completo y correo corporativo son obligatorios.');
+    return badRequest('Nombre completo y correo son obligatorios.');
   }
 
   if (!EMAIL_RE.test(corporateEmail)) {
-    return badRequest('El correo corporativo no tiene un formato válido.');
-  }
-
-  const domain = corporateEmail.toLowerCase().split('@')[1];
-  if (domain && BLOCKED_EMAIL_DOMAINS.has(domain)) {
-    return badRequest('Por favor, utilice un correo corporativo válido.');
+    return badRequest('El correo no tiene un formato válido.');
   }
 
   try {
     const doc = await sanityWriteClient.create({
       _type: 'lead',
       fullName,
+      company,
       corporateEmail,
-      jobTitle,
-      infrastructure,
+      phone,
+      serviceOfInterest,
       message,
       source,
       createdAt: new Date().toISOString(),

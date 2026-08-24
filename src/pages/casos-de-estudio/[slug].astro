@@ -3,6 +3,7 @@ export const prerender = true;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { client } from '../../lib/sanity';
+import { fallbackCaseStudies } from '../../lib/fallbackContent';
 import type { CaseStudySchema } from '../../types/sanity';
 
 export async function getStaticPaths() {
@@ -20,11 +21,14 @@ export async function getStaticPaths() {
     console.error('Error fetching case study slugs from Sanity:', error);
   }
 
-  // Sin contenido real en Sanity todavía no se generan páginas estáticas
-  // (ver CONTEXT.md §4) — a diferencia de servicios/[slug].astro, esta
-  // página no usa datos de fallback inventados: un caso de estudio implica
-  // un cliente y resultados reales, no algo que sea correcto simular.
-  return [];
+  // Sin contenido real en Sanity todavía, se usa el único caso verificado
+  // (Sadep) como fallback — no es una invención, es un cliente real (ver
+  // copy-arenait-textos-reales.md). Otros casos siguen sin fallback: un caso
+  // de estudio implica un cliente y resultados reales, no algo que sea
+  // correcto simular.
+  return fallbackCaseStudies.map((caseStudy) => ({
+    params: { slug: caseStudy.slug.current },
+  }));
 }
 
 const { slug } = Astro.params;
@@ -36,6 +40,10 @@ try {
   caseStudy = await client.fetch<CaseStudySchema>(query, { slug });
 } catch (error) {
   console.error('Error fetching case study from Sanity:', error);
+}
+
+if (!caseStudy) {
+  caseStudy = fallbackCaseStudies.find((item) => item.slug.current === slug) ?? null;
 }
 
 if (!caseStudy) {
@@ -60,13 +68,13 @@ if (!caseStudy) {
       <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-16">
         <div class="lg:col-span-2 space-y-12">
           <div>
-            <h2 class="text-3xl font-heading text-secondary mb-6">Desafío</h2>
+            <h2 class="text-3xl font-heading text-secondary mb-6">El reto</h2>
             <p class="text-lg text-neutral-900 leading-relaxed whitespace-pre-line">
               {caseStudy.challenge}
             </p>
           </div>
           <div>
-            <h2 class="text-3xl font-heading text-secondary mb-6">Solución</h2>
+            <h2 class="text-3xl font-heading text-secondary mb-6">Lo que construimos</h2>
             <p class="text-lg text-neutral-900 leading-relaxed whitespace-pre-line">
               {caseStudy.solution}
             </p>
@@ -76,7 +84,7 @@ if (!caseStudy) {
         <div class="space-y-8">
           <div class="bg-secondary p-8 text-white">
             <h3 class="text-lg font-bold tracking-widest uppercase mb-6 text-neutral-300">
-              Resultados
+              Resultado
             </h3>
             <ul class="space-y-4">
               {
@@ -91,10 +99,10 @@ if (!caseStudy) {
           </div>
 
           <a
-            href="/#contacto"
+            href="/contacto"
             class="block w-full text-center bg-primary hover:bg-interactive text-white font-bold tracking-widest uppercase py-4 transition-colors"
           >
-            Contactar Arquitecto
+            Cuéntanos tu reto
           </a>
         </div>
       </div>

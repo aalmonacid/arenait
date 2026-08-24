@@ -1,0 +1,36 @@
+---
+interface Props {
+  name: 'code' | 'deploy' | 'tasks' | 'chart' | 'shield-check' | 'wrench' | 'refresh';
+  class?: string;
+}
+
+const { name, class: className = 'w-8 h-8' }: Props = Astro.props;
+
+const paths: Record<Props['name'], string> = {
+  code: 'M9 18l-6-6 6-6M15 6l6 6-6 6',
+  deploy: 'M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2',
+  tasks:
+    'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-5 9l2 2 4-4',
+  chart:
+    'M9 19V6m0 13H5a1 1 0 01-1-1v-2a1 1 0 011-1h4m0 4h6m5 0h-4a1 1 0 01-1-1V9a1 1 0 011-1h4a1 1 0 011 1v9a1 1 0 01-1 1zM9 19V4a1 1 0 011-1h0a1 1 0 011 1v15',
+  'shield-check':
+    'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+  wrench:
+    'M11 4a4 4 0 104.899 4.899l4.101 4.1a1 1 0 001.414-1.414l-4.1-4.101A4 4 0 0011 4zM3 21l6.5-6.5',
+  refresh:
+    'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15',
+};
+---
+
+<svg
+  class={className}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <path d={paths[name]}></path>
+</svg>

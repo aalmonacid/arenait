@@ -4,6 +4,21 @@
 
 **ESTADO GLOBAL DEL PROYECTO**: `PROTOTIPO FUNCIONAL — NO LISTO PARA PRODUCCIÓN`
 
+## Épica 0 — Pivote de posicionamiento (cerrada, 2026-08-24)
+
+El posicionamiento "Ingeniería de misión crítica para CTO/CIO" (ISO 27001/TOGAF/ISO 25010, SLA 99.999%, TCO -35/40% garantizado) fue confirmado por el cliente como no real. Se reescribió el sitio completo a la posición real acordada ("punto medio", ver `copy-arenait-textos-reales.md`):
+
+- [x] Home: nuevo hero, 4 pilares, 6 servicios reales (sin métricas fake), caso de éxito Sadep, testimonios CMS-ready, CTA de contacto corto.
+- [x] Schema `service` reescrito (sin `tcoSavingsPercentage`/`sla`/`iso27001Compliant`); schema `lead` reescrito (sin `jobTitle`/`infrastructure`); schema `testimonial` nuevo.
+- [x] Calculadora FinOps (`TcoCalculator.astro`, `tcoCalculator.ts`, su test, sección `#finops`, link de nav) eliminada por completo — su única premisa era el ahorro garantizado que se rechazó.
+- [x] Formulario de leads simplificado: sin bloqueo de correos gratuitos, sin gatekeeping por cargo/infraestructura.
+- [x] Páginas nuevas: `/servicios` (única, 6 servicios), `/nosotros` (con `[PENDIENTE]` marcado vía `PendingContentTag`), `/contacto` (destino canónico, con dropdown de servicio).
+- [x] Footer/nav reescritos: sin sellos ISO/TOGAF ni "SLA Garantizado 99.999%"; nav con "Nosotros" agregado.
+- [x] `vercel.json`: CSP extendida a `/servicios`, `/nosotros`, `/contacto`.
+- [x] `AGENTS.md`/`CONTEXT.md` actualizados para reflejar el posicionamiento real.
+
+Pendiente fuera de código (ver `/nosotros`, `/contacto` y footer en el sitio): año de fundación, tamaño de equipo, misión/visión, sectores, correo/teléfono público a publicar, dirección física, redes sociales, y el tiempo de respuesta comprometido — todo marcado explícitamente, nada inventado.
+
 ## Nota: GitHub Actions removido (2026-08-24)
 
 Se agregó un workflow de CI (`.github/workflows/ci.yml`) durante esta sesión, pero el flujo real del proyecto siempre fue deploy automático vía Vercel (git integration), sin usar GitHub Actions — el workflow se agregó sin que fuera parte del proceso real y el usuario pidió sacarlo. **Removido.**
@@ -24,7 +39,7 @@ Sin esto, el sitio pierde leads reales y no puede llamarse "producción" aunque 
 - [ ] **Cargar contenido real en Sanity** (`production` dataset) para los 3 servicios existentes, o aceptar explícitamente que el fallback hardcodeado _es_ el contenido de producción y documentarlo — pero no dejarlo ambiguo.
 - [x] **Arreglar la carga de fuentes.** Resuelto parcialmente el 2026-08-24: `BaseLayout.astro` ahora carga `Plus Jakarta Sans` real vía Google Fonts, así que el fallback funciona en vez de caer a sans-serif del sistema.
   - [ ] `Codec Pro` sigue sin archivos (fuente comercial, sin licencia en el repo) — **pendiente conseguir la licencia y subir los `.woff2` reales** a `public/fonts/` para que la marca se vea como está diseñada.
-- [x] **Arreglar los links muertos del nav.** Resuelto el 2026-08-24: "Servicios" → `/#servicios`, "Casos de Estudio" → `/casos-de-estudio` (re-agregado tras construir esa página, ver Épica B), "FinOps" → `/#finops` (se agregó el anchor que faltaba), "Contacto" → `/#contacto`.
+- [x] **Arreglar los links muertos del nav.** Resuelto el 2026-08-24; superado más tarde el mismo día por el pivote de posicionamiento (Épica 0): el nav ya no usa anchors — "Servicios" → `/servicios`, "Casos de Estudio" → `/casos-de-estudio`, "Nosotros" → `/nosotros` (nuevo), "Contacto" → `/contacto`. "FinOps" se quitó del nav al eliminarse la calculadora.
 - [x] **Limpiar las carpetas huérfanas** `dangerous-doppler/` e `interstellar-inclination/` (starters de Astro sin relación con el proyecto, sin trabajo real). Eliminadas el 2026-08-24 (cambios en stage, pendiente de commit).
 
 ## Épica B — Completar la arquitectura de contenido
@@ -32,8 +47,8 @@ Sin esto, el sitio pierde leads reales y no puede llamarse "producción" aunque 
 Hay schemas de Sanity para funcionalidad de negocio que nunca se construyó del lado del frontend.
 
 - [x] Página de listado + detalle de **Casos de Estudio**. Resuelto el 2026-08-24: `/casos-de-estudio` (listado) y `/casos-de-estudio/[slug]` (detalle), agregado campo `slug` al schema (no existía). **Decisión de contenido deliberada**: a diferencia de `servicios/[slug].astro`, esta página NO tiene datos de fallback inventados — un caso de estudio implica un cliente y resultados reales, fabricarlos sería publicar testimonios falsos. Con Sanity vacío, el listado muestra un estado vacío honesto ("Todavía no hay casos de estudio publicados") y no se generan páginas de detalle (`getStaticPaths` devuelve `[]`). En cuanto se cargue contenido real en Sanity, las páginas aparecen solas en el próximo build. Nav actualizado: "Casos de Estudio" vuelve a apuntar a una ruta real.
-- [ ] Página de listado + flujo de descarga gated de **Whitepapers** (`whitepaper` schema ya existe, sin consumir). Definir si la descarga requiere pasar por `LeadCaptureForm` (lead magnet real) — parece ser la intención del schema (`targetRole`).
-- [ ] Evaluar si el envío del `TcoCalculator` ("Solicitar Auditoría FinOps") debe conectar al mismo flujo de captura de leads en vez de ser un botón sin acción.
+- [ ] Página de listado + flujo de descarga gated de **Whitepapers** (`whitepaper` schema ya existe, sin consumir). Definir si la descarga requiere pasar por `LeadCaptureForm` (lead magnet real) — parece ser la intención del schema (`targetRole`). Nota: el `targetRole` del schema (C-Level/VP Engineering/Enterprise Architect) es del posicionamiento viejo — revisar si aplica al pivotar este ítem.
+- [ ] ~~Evaluar si el envío del `TcoCalculator` debe conectar al flujo de leads~~ — ya no aplica: el `TcoCalculator` se eliminó por completo en el pivote de posicionamiento (ver Épica 0).
 - [ ] Imágenes: ningún schema de Sanity tiene campo de imagen todavía pese a existir `imageBuilder.ts`/`urlFor()` ya implementado y sin uso — decidir si los servicios/casos de estudio llevan imagen y añadir el campo.
 
 ## Épica C — Calidad y confiabilidad

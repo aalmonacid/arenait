@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import PendingContentTag from '../components/PendingContentTag.astro';
 
 interface Props {
   title: string;
@@ -7,7 +8,7 @@ interface Props {
   structuredData?: Record<string, unknown>[];
 }
 
-const { title, description = 'Ingeniería de Software Estructural para Operaciones Críticas.' } =
+const { title, description = 'Desarrollo de software a la medida para operaciones reales.' } =
   Astro.props;
 
 const structuredData: Record<string, unknown>[] = Astro.props.structuredData ?? [];
@@ -17,7 +18,7 @@ const organizationSchema = {
   '@type': 'Organization',
   name: 'ArenaIT',
   url: 'https://arenait.co',
-  description: 'Ingeniería de Software Estructural para Operaciones Críticas.',
+  description: 'Desarrollo de software a la medida para operaciones reales.',
 };
 ---
 
@@ -88,7 +89,7 @@ const organizationSchema = {
         >
         <nav class="hidden md:flex space-x-8">
           <a
-            href="/#servicios"
+            href="/servicios"
             class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
             >Servicios</a
           >
@@ -98,12 +99,12 @@ const organizationSchema = {
             >Casos de Estudio</a
           >
           <a
-            href="/#finops"
+            href="/nosotros"
             class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
-            >FinOps</a
+            >Nosotros</a
           >
           <a
-            href="/#contacto"
+            href="/contacto"
             class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
             >Contacto</a
           >
@@ -121,31 +122,28 @@ const organizationSchema = {
           <span class="text-2xl font-heading text-white tracking-tight mb-4 block"
             >Arena<span class="text-accent">IT</span></span
           >
-          <p class="text-neutral-200 max-w-md">
-            Ingeniería de Software Estructural para Operaciones Críticas. Especialistas en entornos
-            de alta disponibilidad y resiliencia.
-          </p>
+          <p class="text-neutral-200 max-w-md">Arena IT — Desarrollo de software a la medida.</p>
         </div>
-        <div class="text-left md:text-right">
-          <p class="text-sm font-bold text-neutral-400 mb-4 uppercase tracking-widest">
-            Estándares
-          </p>
-          <div class="flex flex-wrap gap-2 justify-start md:justify-end">
-            <span class="text-xs font-bold px-3 py-1 bg-secondary text-white">ISO 27001</span>
-            <span class="text-xs font-bold px-3 py-1 bg-secondary text-white">TOGAF</span>
-            <span class="text-xs font-bold px-3 py-1 bg-secondary text-white">ISO 25010</span>
-          </div>
-        </div>
+        <nav class="flex flex-col gap-2 text-left md:text-right">
+          <a href="/servicios" class="text-neutral-200 hover:text-white transition-colors"
+            >Servicios</a
+          >
+          <a href="/casos-de-estudio" class="text-neutral-200 hover:text-white transition-colors"
+            >Casos de estudio</a
+          >
+          <a href="/nosotros" class="text-neutral-200 hover:text-white transition-colors"
+            >Nosotros</a
+          >
+          <a href="/contacto" class="text-neutral-200 hover:text-white transition-colors"
+            >Contacto</a
+          >
+        </nav>
       </div>
       <div
-        class="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-sm text-neutral-400 flex flex-col md:flex-row justify-between items-center"
+        class="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-sm text-neutral-400 flex flex-col md:flex-row justify-between items-center gap-4"
       >
-        <p class="mb-4 md:mb-0">
-          &copy; {new Date().getFullYear()} ArenaIT. Todos los derechos reservados.
-        </p>
-        <p class="font-bold text-white tracking-widest uppercase text-xs">
-          SLA Garantizado: <span class="text-accent">99.999%</span>
-        </p>
+        <p>&copy; {new Date().getFullYear()} Arena IT. Todos los derechos reservados.</p>
+        <PendingContentTag label="Dirección física y redes sociales" />
       </div>
     </footer>
   </body>

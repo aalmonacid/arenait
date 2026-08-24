@@ -3,6 +3,7 @@ export const prerender = true;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { client } from '../../lib/sanity';
+import { fallbackCaseStudies } from '../../lib/fallbackContent';
 import type { CaseStudySchema } from '../../types/sanity';
 
 let caseStudies: CaseStudySchema[] = [];
@@ -12,11 +13,15 @@ try {
 } catch (error) {
   console.error('Error fetching case studies from Sanity:', error);
 }
+
+if (!caseStudies || caseStudies.length === 0) {
+  caseStudies = fallbackCaseStudies;
+}
 ---
 
 <BaseLayout
   title="Casos de Estudio"
-  description="Resultados reales de clientes que confiaron en ArenaIT para su transformación de infraestructura crítica."
+  description="Estos son proyectos reales que hemos construido. Estamos documentando más casos a medida que cerramos nuevos proyectos."
 >
   <header class="bg-neutral-900 text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
     <div class="max-w-7xl mx-auto">
@@ -24,7 +29,8 @@ try {
         Casos de Estudio
       </h1>
       <p class="text-xl md:text-2xl text-neutral-300 max-w-3xl leading-relaxed">
-        Resultados verificables de clientes reales en entornos de misión crítica.
+        Estos son proyectos reales que hemos construido. Estamos documentando más casos a medida que
+        cerramos nuevos proyectos.
       </p>
     </div>
   </header>
@@ -35,11 +41,11 @@ try {
         caseStudies.length === 0 ? (
           <div class="text-center py-24 border-2 border-dashed border-neutral-200">
             <p class="text-lg text-neutral-600 max-w-xl mx-auto">
-              Todavía no hay casos de estudio publicados. Volvé pronto o{' '}
-              <a href="/#contacto" class="text-interactive font-bold underline">
-                contactá a un arquitecto
-              </a>{' '}
-              para conocer resultados en tu industria.
+              ¿Quieres ser el próximo caso de éxito? Cuéntanos tu proyecto —{' '}
+              <a href="/contacto" class="text-interactive font-bold underline">
+                contáctanos
+              </a>
+              .
             </p>
           </div>
         ) : (

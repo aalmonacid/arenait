@@ -10,24 +10,29 @@ export const leadSchema = {
       validation: (Rule: any) => Rule.required(),
     },
     {
-      name: 'jobTitle',
-      title: 'Cargo',
+      name: 'company',
+      title: 'Empresa',
       type: 'string',
     },
     {
       name: 'corporateEmail',
-      title: 'Correo Corporativo',
+      title: 'Correo',
       type: 'string',
       validation: (Rule: any) => Rule.required(),
     },
     {
-      name: 'infrastructure',
-      title: 'Infraestructura Actual',
+      name: 'phone',
+      title: 'Teléfono',
+      type: 'string',
+    },
+    {
+      name: 'serviceOfInterest',
+      title: 'Servicio de Interés',
       type: 'string',
     },
     {
       name: 'message',
-      title: 'Mensaje / Reto Técnico',
+      title: 'Mensaje',
       type: 'text',
     },
     {

@@ -6,9 +6,11 @@
 
 ## 1. Qué es el proyecto
 
-Landing page corporativa B2B para **ArenaIT**, una consultora de "Ingeniería de Software Estructural para Operaciones Críticas". Objetivo de negocio: captar leads (CTOs/CIOs) mediante una propuesta de valor basada en resiliencia operativa, reducción de TCO (-35/-40%), SLA 99.999% y cumplimiento de estándares (ISO 27001, TOGAF, ISO 25010, FinOps).
+Landing page corporativa B2B para **Arena IT**, una empresa colombiana de desarrollo de software a la medida. Objetivo de negocio: captar leads mediante una propuesta de valor real ("punto medio": ni boutique pequeña, ni ingeniería de misión crítica enterprise no comprobada) — diseño, desarrollo, implementación, BI, QA y mantenimiento de software a la medida de la operación de cada cliente.
 
-Es un sitio de marketing, no una aplicación transaccional: una home con secciones (hero, servicios, calculadora TCO, formulario de contacto, sellos de estándares), páginas de detalle de servicio, y un listado + detalle de casos de estudio (nuevo, 2026-08-24).
+Es un sitio de marketing, no una aplicación transaccional: home (hero, 4 pilares, 6 servicios, caso de éxito Sadep, testimonios CMS-ready, CTA de contacto), página `/servicios` con el detalle de los 6 servicios, `/nosotros`, `/contacto`, y listado + detalle de casos de estudio.
+
+**Pivote de posicionamiento (2026-08-24):** el sitio vivía enteramente del posicionamiento "Ingeniería de Software Estructural para Operaciones Críticas" (CTO/CIO, ISO 27001/TOGAF/ISO 25010, SLA 99.999%, TCO -35/40% garantizado vía una calculadora FinOps) — confirmado por el cliente como no real/no verificado. Se pivotó a la posición real acordada con el cliente (ver `copy-arenait-textos-reales.md`), lo que implicó: reescribir el schema `service` de Sanity (ya no tiene `tcoSavingsPercentage`/`sla`/`iso27001Compliant`), eliminar la calculadora FinOps y su sección, simplificar el formulario de leads (sin gatekeeping por cargo CTO/CIO ni bloqueo de correos gratuitos), crear `/servicios`, `/nosotros` y `/contacto`, agregar el caso de estudio real de Sadep, y un componente de testimonios CMS-ready (invisible sin contenido real).
 
 ## 2. Stack real (verificado en `package.json`)
 
@@ -44,7 +46,8 @@ El `BACKLOG.md` anterior marcaba los Sprints 0–4 como completos y el proyecto 
 | Whitepapers (lead magnet)    | —                                       | Schema `whitepaper.ts` completo (con targetRole, PDF) pero **sin página de listado ni flujo de descarga**. Trabajo de CMS sin UI que lo use                                                          |
 | Performance/Lighthouse       | "Superior a 90 en todas las métricas"   | Ninguna evidencia de auditoría ejecutada (no hay reportes, ni Lighthouse CI, ni Web Vitals reales). Además hay una regresión de fuentes (ver abajo) que penaliza CLS/perf                            |
 | QA en múltiples dispositivos | Marcado done                            | Sin test suite al momento de la auditoría (Vitest + Playwright agregados el 2026-08-24, ver §2, sin CI); sigue sin evidencia de testing manual en múltiples dispositivos reales                      |
-| Nav "FinOps"                 | —                                       | `href="#"`, no lleva a ninguna sección ni página                                                                                                                                                     |
+| Nav "FinOps"                 | —                                       | Resuelto: el nav ya no tiene "FinOps" — la sección y el componente `TcoCalculator` se eliminaron por completo el 2026-08-24 al pivotar de posicionamiento (ver §1)                                    |
+| Posicionamiento del sitio    | "Ingeniería de misión crítica" (ISO 27001/TOGAF/ISO 25010, SLA 99.999%, TCO -35/40%) | **Pivoteado el 2026-08-24**: esas certificaciones/cifras eran ficticias, confirmado por el cliente. Sitio reescrito a la posición real "punto medio" (ver `copy-arenait-textos-reales.md`) — schema `service`, formulario de leads, home, y páginas nuevas `/servicios`, `/nosotros`, `/contacto` |
 
 **Conclusión:** el proyecto está en estado de _prototipo funcional con fallbacks_, no en estado de producción real con datos y flujos operativos. Ver `BACKLOG.md` reescrito para el plan honesto de qué falta.
 
@@ -75,18 +78,23 @@ Definidos en `tailwind.config.mjs` y `AGENTS.md`. `CONTEXT.md` no los redefine, 
 
 ## 7. Inventario de páginas y componentes
 
-- `src/pages/index.astro` — home (hero, servicios, TCO calc, lead form, sellos)
-- `src/pages/servicios/[slug].astro` — detalle de servicio, `getStaticPaths` desde Sanity con fallback a 3 slugs fijos
-- `src/pages/casos-de-estudio/index.astro` — listado, sin fallback (estado vacío honesto si Sanity no tiene contenido; nuevo, 2026-08-24)
-- `src/pages/casos-de-estudio/[slug].astro` — detalle, sin fallback, `getStaticPaths` vacío si Sanity no tiene contenido (nuevo, 2026-08-24)
+_(Actualizado 2026-08-24 tras el pivote de posicionamiento — ver §1.)_
+
+- `src/pages/index.astro` — home: hero, 4 pilares ("En qué te ayudamos"), 6 servicios reales, caso de éxito Sadep, `<Testimonials />`, CTA de contacto corto (enlaza a `/contacto`, ya no embebe el formulario completo)
+- `src/pages/servicios/index.astro` — página única con los 6 servicios reales (title/summary/description/icon). Reemplaza a `servicios/[slug].astro` (eliminado): el copy real no tenía métricas ricas que justificaran páginas de detalle individuales
+- `src/pages/nosotros/index.astro` — nuevo: copy verificado + campos `[PENDIENTE]` (año de fundación, tamaño de equipo, misión/visión, sectores) renderizados vía `PendingContentTag`, nunca como texto crudo
+- `src/pages/contacto/index.astro` — nuevo: destino canónico de contacto, `<LeadCaptureForm showServiceDropdown />` con el dropdown "Servicio de interés"
+- `src/pages/casos-de-estudio/index.astro` — listado; ahora con fallback real (Sadep, ver `src/lib/fallbackContent.ts`) en vez del estado vacío puro; el estado vacío honesto se conserva para cuando haya un caso pero no todos
+- `src/pages/casos-de-estudio/[slug].astro` — detalle; `getStaticPaths` incluye el slug de Sadep como fallback
 - `src/pages/404.astro`
 - `src/pages/admin/[...index].astro` — Sanity Studio embebido
-- `src/pages/api/leads.ts` — API route real, persiste leads en Sanity (nuevo, 2026-08-24)
-- Componentes: `ServiceCard`, `TcoCalculator` (el CTA "Solicitar Auditoría FinOps" todavía no envía nada — ver Épica B del backlog), `LeadCaptureForm` (persiste vía `/api/leads` desde 2026-08-24), `SanityStudio.tsx` (wrapper React)
-- `src/lib/sanityWriteClient.ts` — cliente Sanity server-only con token de escritura (nuevo, 2026-08-24)
-- `src/lib/tcoCalculator.ts` — lógica pura del cálculo de ahorro TCO, extraída de `TcoCalculator.astro` para poder testearla (nuevo, 2026-08-24); `TcoCalculator.astro` la importa en vez de reimplementarla
-- Schemas Sanity: `service`, `caseStudy` (sin UI), `whitepaper` (sin UI), `lead` (nuevo, 2026-08-24 — recibe los leads del formulario)
-- Tests: `src/lib/tcoCalculator.test.ts` (Vitest), `e2e/smoke.spec.ts` (Playwright — ver nota de verificación en §2)
+- `src/pages/api/leads.ts` — persiste leads en Sanity; ya no bloquea dominios de correo gratuito ni pide cargo/infraestructura (campos: fullName, company, corporateEmail, phone, serviceOfInterest, message)
+- Componentes: `ServiceCard` (icono + summary, sin TCO/SLA/ISO), `Icon` (set de íconos de línea propio, nuevo), `Testimonials` (CMS-ready, no renderiza nada sin contenido real, nuevo), `PendingContentTag` (indicador visual para contenido pendiente, nuevo), `LeadCaptureForm` (simplificado, prop `showServiceDropdown`), `SanityStudio.tsx`
+- **Eliminado**: `TcoCalculator.astro`, `src/lib/tcoCalculator.ts` y su test — la calculadora FinOps garantizaba un rango de ahorro (35-40%) que era la premisa central del posicionamiento rechazado; no había forma honesta de conservarla
+- `src/lib/fallbackContent.ts` — nuevo: `fallbackServices` (6 servicios reales) y `fallbackCaseStudies` (Sadep), compartido entre home/`/servicios`/casos de estudio
+- `src/lib/sanityWriteClient.ts` — cliente Sanity server-only con token de escritura
+- Schemas Sanity: `service` (reescrito: `title`/`slug`/`icon`/`summary`/`description`, sin métricas fake), `caseStudy` (sin cambios), `whitepaper` (sin UI), `lead` (reescrito: `company`/`phone`/`serviceOfInterest` en vez de `jobTitle`/`infrastructure`), `testimonial` (nuevo)
+- Tests: `e2e/smoke.spec.ts` (Playwright, reescrito para las páginas nuevas — ver nota de verificación en §2). Sin tests unitarios: la única lógica pura testeada (`tcoCalculator.ts`) se eliminó junto con la calculadora; `vitest.config.ts` tiene `passWithNoTests: true` para que `test:unit` no falle por esto
 
 ## 8. Referencias rápidas
 
