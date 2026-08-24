@@ -20,7 +20,16 @@ const { title, description = "Ingeniería de Software Estructural para Operacion
     <meta property="og:title" content={`${title} | ArenaIT`} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    
+
+    <!-- Fallback tipográfico: Codec Pro es una fuente comercial sin archivos
+         licenciados en este repo (ver public/fonts/ en CONTEXT.md §5). Hasta
+         que se suban esos .woff2, el sitio debe cargar explícitamente su
+         fallback declarado (Plus Jakarta Sans) en vez de caer a sans-serif
+         genérica del sistema. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={`${title} | ArenaIT`} />
@@ -33,9 +42,9 @@ const { title, description = "Ingeniería de Software Estructural para Operacion
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <a href="/" class="text-3xl font-heading text-primary tracking-tight">Arena<span class="text-secondary">IT</span></a>
         <nav class="hidden md:flex space-x-8">
-          <a href="#" class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors">Servicios</a>
-          <a href="#" class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors">Casos de Estudio</a>
-          <a href="#" class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors">FinOps</a>
+          <a href="/#servicios" class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors">Servicios</a>
+          <a href="/#finops" class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors">FinOps</a>
+          <a href="/#contacto" class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors">Contacto</a>
         </nav>
       </div>
     </header>

@@ -16,8 +16,10 @@ Sin esto, el sitio pierde leads reales y no puede llamarse "producción" aunque 
 - [x] **Arreglar o eliminar el webhook `/api/revalidate`.** Resuelto el 2026-08-24: se eliminó (no hacía nada real) y se adoptó `output: 'server'` + `@astrojs/vercel` solo para las API routes, con las páginas de contenido marcadas `prerender = true` para seguir siendo estáticas.
   - [ ] **Configurar el Deploy Hook** en Vercel (Project Settings → Git → Deploy Hooks) y pegar su URL en Sanity Studio → API → Webhooks, para que editar contenido dispare un rebuild automático. Tarea de consola, no de código.
 - [ ] **Cargar contenido real en Sanity** (`production` dataset) para los 3 servicios existentes, o aceptar explícitamente que el fallback hardcodeado *es* el contenido de producción y documentarlo — pero no dejarlo ambiguo.
-- [ ] **Arreglar la carga de fuentes.** `public/fonts/CodecPro-*.woff2` no existen; la marca nunca renderiza "Codec Pro". Subir los archivos de fuente reales o cambiar el CSS a la fuente fallback (Plus Jakarta Sans vía Google Fonts) de forma intencional.
-- [ ] **Arreglar los links muertos del nav** (`Servicios`, `Casos de Estudio`, `FinOps` → todos `href="#"`).
+- [x] **Arreglar la carga de fuentes.** Resuelto parcialmente el 2026-08-24: `BaseLayout.astro` ahora carga `Plus Jakarta Sans` real vía Google Fonts, así que el fallback funciona en vez de caer a sans-serif del sistema.
+  - [ ] `Codec Pro` sigue sin archivos (fuente comercial, sin licencia en el repo) — **pendiente conseguir la licencia y subir los `.woff2` reales** a `public/fonts/` para que la marca se vea como está diseñada.
+- [x] **Arreglar los links muertos del nav.** Resuelto el 2026-08-24: "Servicios" → `/#servicios`, "FinOps" → `/#finops` (se agregó el anchor que faltaba), "Casos de Estudio" se quitó (no existe esa página todavía — ver Épica B) y se reemplazó por "Contacto" → `/#contacto`.
+  - [ ] Cuando exista la página de Casos de Estudio (Épica B), volver a agregar ese link al nav apuntando a la ruta real.
 - [x] **Limpiar las carpetas huérfanas** `dangerous-doppler/` e `interstellar-inclination/` (starters de Astro sin relación con el proyecto, sin trabajo real). Eliminadas el 2026-08-24 (cambios en stage, pendiente de commit).
 
 ## Épica B — Completar la arquitectura de contenido
