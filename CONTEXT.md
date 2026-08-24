@@ -16,7 +16,7 @@ Es un sitio de marketing, no una aplicación transaccional: una home con seccion
 - **Tailwind CSS 3.4** con tokens de marca (ver §5)
 - **TypeScript 6.0**, `astro check` pasa en 0 errores
 - **Vercel** como hosting (headers de seguridad y rewrite de `/admin` en `vercel.json`), **con `@astrojs/vercel` adapter instalado desde el 2026-08-24**
-- Sin framework de testing, sin ESLint/Prettier, sin CI (no existe `.github/workflows`)
+- Sin framework de testing, sin ESLint/Prettier. CI básico desde el 2026-08-24 (`.github/workflows/ci.yml`: `npm ci` + `astro check` + `astro build` en cada push/PR a `main`) — todavía sin tests ni linter que correr ahí.
 
 ## 3. Arquitectura real
 

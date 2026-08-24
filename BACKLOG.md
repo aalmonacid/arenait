@@ -33,7 +33,7 @@ Hay schemas de Sanity para funcionalidad de negocio que nunca se construyó del 
 
 ## Épica C — Calidad y confiabilidad
 
-- [ ] CI en GitHub Actions: `astro check` + `astro build` en cada PR como mínimo (hoy no hay `.github/workflows`).
+- [x] CI en GitHub Actions: `astro check` + `astro build` en cada PR como mínimo. Resuelto el 2026-08-24 (`.github/workflows/ci.yml`), validado localmente con `npm ci` limpio antes de commitear.
 - [ ] Testing: al menos smoke tests de las rutas principales (Playwright) y tests unitarios de la lógica del `TcoCalculator`.
 - [ ] Lint/format: ESLint + Prettier (o Biome) — hoy no hay ninguno configurado, sin guardrails de estilo.
 - [ ] Auditoría Lighthouse real, documentada con un reporte (no solo la afirmación "superior a 90").
