@@ -12,7 +12,7 @@ interface Props {
 const { variant = 'light', size = 'header', link = true, class: className = '' } = Astro.props;
 
 const arenaColor = variant === 'dark' ? 'text-white' : 'text-neutral-900';
-const itColor = variant === 'dark' ? 'text-primary' : 'text-secondary';
+const itColor = 'text-primary';
 const textSize = size === 'header' ? 'text-3xl' : 'text-2xl';
 const dotsWidth = size === 'header' ? 34 : 28;
 const dotsHeight = size === 'header' ? 8 : 7;
