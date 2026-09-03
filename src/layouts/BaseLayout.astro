@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import PendingContentTag from '../components/PendingContentTag.astro';
+import Logo from '../components/Logo.astro';
 
 interface Props {
   title: string;
@@ -84,9 +84,7 @@ const organizationSchema = {
   <body class="min-h-screen flex flex-col">
     <header class="bg-white border-b-2 border-neutral-200 py-6 px-4 md:px-8">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
-        <a href="/" class="text-3xl font-heading text-primary tracking-tight"
-          >Arena<span class="text-secondary">IT</span></a
-        >
+        <Logo variant="light" size="header" />
         <nav class="hidden md:flex space-x-8">
           <a
             href="/servicios"
@@ -119,9 +117,7 @@ const organizationSchema = {
     <footer class="bg-neutral-900 text-white py-12 px-4 md:px-8">
       <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <span class="text-2xl font-heading text-white tracking-tight mb-4 block"
-            >Arena<span class="text-accent">IT</span></span
-          >
+          <Logo variant="dark" size="footer" link={false} class="mb-4" />
           <p class="text-neutral-200 max-w-md">Arena IT — Desarrollo de software a la medida.</p>
         </div>
         <nav class="flex flex-col gap-2 text-left md:text-right">
@@ -139,11 +135,8 @@ const organizationSchema = {
           >
         </nav>
       </div>
-      <div
-        class="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-sm text-neutral-400 flex flex-col md:flex-row justify-between items-center gap-4"
-      >
+      <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-sm text-neutral-400">
         <p>&copy; {new Date().getFullYear()} Arena IT. Todos los derechos reservados.</p>
-        <PendingContentTag label="Dirección física y redes sociales" />
       </div>
     </footer>
   </body>

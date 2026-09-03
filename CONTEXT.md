@@ -4,6 +4,8 @@
 
 > **Nota (2026-08-24)**: se agregó y luego se removió un workflow de GitHub Actions durante esta sesión — el proyecto no usa Actions, deploya automático vía Vercel (git integration), y ese CI se agregó sin ser parte del proceso real. Antes de removerlo se detectó (y quedó sin resolver, sin impacto en producción confirmado) que `astro check` fallaba de forma reproducible corriendo en Linux/Node24 pese a pasar siempre en local — ver `BACKLOG.md` para el detalle.
 
+> **Nota (2026-09-03)**: auditoría visual de dev.arenait.co contra el tablero de marca (ver Épica F en `BACKLOG.md`). Resuelto: logotipo real implementado en `src/components/Logo.astro` (compartido entre header y footer, ver §7) a partir del PDF real del tablero de marca que el cliente subió durante la sesión; contraste del botón del formulario de leads (ahora `bg-primary`, igual que el resto de CTAs); migración de Misión/Visión/sectores a contenido real en `/nosotros` (extraído del sitio viejo); ocultamiento total (no solo estilizado) de los campos sin dato confirmado que antes se mostraban como `[PENDIENTE]` en `/nosotros`, `/contacto` y el footer. Confirmado con el cliente que el fondo oscuro `#0F172A` del hero es intencional, no un error de mapeo de token — no cambiarlo sin instrucción explícita.
+
 ## 1. Qué es el proyecto
 
 Landing page corporativa B2B para **Arena IT**, una empresa colombiana de desarrollo de software a la medida. Objetivo de negocio: captar leads mediante una propuesta de valor real ("punto medio": ni boutique pequeña, ni ingeniería de misión crítica enterprise no comprobada) — diseño, desarrollo, implementación, BI, QA y mantenimiento de software a la medida de la operación de cada cliente.
@@ -82,14 +84,14 @@ _(Actualizado 2026-08-24 tras el pivote de posicionamiento — ver §1.)_
 
 - `src/pages/index.astro` — home: hero, 4 pilares ("En qué te ayudamos"), 6 servicios reales, caso de éxito Sadep, `<Testimonials />`, CTA de contacto corto (enlaza a `/contacto`, ya no embebe el formulario completo)
 - `src/pages/servicios/index.astro` — página única con los 6 servicios reales (title/summary/description/icon). Reemplaza a `servicios/[slug].astro` (eliminado): el copy real no tenía métricas ricas que justificaran páginas de detalle individuales
-- `src/pages/nosotros/index.astro` — nuevo: copy verificado + campos `[PENDIENTE]` (año de fundación, tamaño de equipo, misión/visión, sectores) renderizados vía `PendingContentTag`, nunca como texto crudo
+- `src/pages/nosotros/index.astro` — copy verificado, con Misión/Visión/sectores reales (migrados 2026-09-03 desde el sitio viejo). Año de fundación y tamaño de equipo siguen sin dato confirmado — el bloque no se renderiza (ya no se muestra `[PENDIENTE]`)
 - `src/pages/contacto/index.astro` — nuevo: destino canónico de contacto, `<LeadCaptureForm showServiceDropdown />` con el dropdown "Servicio de interés"
 - `src/pages/casos-de-estudio/index.astro` — listado; ahora con fallback real (Sadep, ver `src/lib/fallbackContent.ts`) en vez del estado vacío puro; el estado vacío honesto se conserva para cuando haya un caso pero no todos
 - `src/pages/casos-de-estudio/[slug].astro` — detalle; `getStaticPaths` incluye el slug de Sadep como fallback
 - `src/pages/404.astro`
 - `src/pages/admin/[...index].astro` — Sanity Studio embebido
 - `src/pages/api/leads.ts` — persiste leads en Sanity; ya no bloquea dominios de correo gratuito ni pide cargo/infraestructura (campos: fullName, company, corporateEmail, phone, serviceOfInterest, message)
-- Componentes: `ServiceCard` (icono + summary, sin TCO/SLA/ISO), `Icon` (set de íconos de línea propio, nuevo), `Testimonials` (CMS-ready, no renderiza nada sin contenido real, nuevo), `PendingContentTag` (indicador visual para contenido pendiente, nuevo), `LeadCaptureForm` (simplificado, prop `showServiceDropdown`), `SanityStudio.tsx`
+- Componentes: `ServiceCard` (icono + summary, sin TCO/SLA/ISO), `Icon` (set de íconos de línea propio, nuevo), `Testimonials` (CMS-ready, no renderiza nada sin contenido real, nuevo), `PendingContentTag` (indicador visual para contenido pendiente — sin uso público desde el 2026-09-03, ver Épica F de `BACKLOG.md`, pero se mantiene disponible para vistas internas), `LeadCaptureForm` (simplificado, prop `showServiceDropdown`, botón `bg-primary` desde 2026-09-03), `Logo` (nuevo 2026-09-03: wordmark + puntos reales del tablero de marca, props `variant`/`size`/`link`, único componente compartido por header y footer), `SanityStudio.tsx`
 - **Eliminado**: `TcoCalculator.astro`, `src/lib/tcoCalculator.ts` y su test — la calculadora FinOps garantizaba un rango de ahorro (35-40%) que era la premisa central del posicionamiento rechazado; no había forma honesta de conservarla
 - `src/lib/fallbackContent.ts` — nuevo: `fallbackServices` (6 servicios reales) y `fallbackCaseStudies` (Sadep), compartido entre home/`/servicios`/casos de estudio
 - `src/lib/sanityWriteClient.ts` — cliente Sanity server-only con token de escritura

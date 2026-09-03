@@ -1,0 +1,48 @@
+---
+interface Props {
+  /** Fondo sobre el que se coloca: 'light' para fondos claros, 'dark' para fondos oscuros/navy. */
+  variant?: 'light' | 'dark';
+  /** Tamaño del wordmark: 'header' (más grande) o 'footer' (más pequeño). */
+  size?: 'header' | 'footer';
+  /** Si el logo debe ser un link a inicio (header) o solo la marca (footer). */
+  link?: boolean;
+  class?: string;
+}
+
+const { variant = 'light', size = 'header', link = true, class: className = '' } = Astro.props;
+
+const arenaColor = variant === 'dark' ? 'text-white' : 'text-neutral-900';
+const itColor = variant === 'dark' ? 'text-primary' : 'text-secondary';
+const textSize = size === 'header' ? 'text-3xl' : 'text-2xl';
+const dotsWidth = size === 'header' ? 34 : 28;
+const dotsHeight = size === 'header' ? 8 : 7;
+
+const Tag = link ? 'a' : 'div';
+---
+
+<Tag
+  href={link ? '/' : undefined}
+  aria-label="Arena IT"
+  class={`inline-flex items-end gap-[0.15em] font-heading font-extrabold uppercase tracking-tight leading-none ${textSize} ${className}`}
+>
+  <span class={arenaColor}>Arena</span>
+  <span class="relative inline-block">
+    <svg
+      class="absolute left-1/2 -top-[0.55em] -translate-x-1/2"
+      width={dotsWidth}
+      height={dotsHeight}
+      viewBox="0 0 34 8"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="2" cy="4" r="0.9" fill="#0075C9"></circle>
+      <circle cx="7" cy="4" r="0.9" fill="#0075C9"></circle>
+      <circle cx="12" cy="4" r="1.8" fill="#0075C9"></circle>
+      <circle cx="17" cy="4" r="2.6" fill="#FEA621"></circle>
+      <circle cx="22" cy="4" r="1.8" fill="#0075C9"></circle>
+      <circle cx="27" cy="4" r="0.9" fill="#0075C9"></circle>
+      <circle cx="32" cy="4" r="0.9" fill="#0075C9"></circle>
+    </svg>
+    <span class={itColor}>IT</span>
+  </span>
+</Tag>

@@ -3,7 +3,6 @@ export const prerender = true;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import LeadCaptureForm from '../../components/LeadCaptureForm.astro';
-import PendingContentTag from '../../components/PendingContentTag.astro';
 ---
 
 <BaseLayout
@@ -15,10 +14,9 @@ import PendingContentTag from '../../components/PendingContentTag.astro';
       <h1 class="text-4xl md:text-6xl font-heading mb-6 tracking-tight text-white">
         Hablemos de tu proyecto
       </h1>
-      <p class="text-xl md:text-2xl text-neutral-300 max-w-3xl leading-relaxed mb-4">
+      <p class="text-xl md:text-2xl text-neutral-300 max-w-3xl leading-relaxed">
         Cuéntanos tu reto.
       </p>
-      <PendingContentTag label="Tiempo de respuesta comprometido (SLA de contacto)" />
     </div>
   </header>
 
@@ -27,7 +25,6 @@ import PendingContentTag from '../../components/PendingContentTag.astro';
       <div class="lg:col-span-1 space-y-4">
         <p class="text-sm font-bold tracking-widest uppercase text-neutral-500 mb-2">Contacto</p>
         <p class="text-lg font-heading text-secondary">Andrés Arena — Gerente</p>
-        <PendingContentTag label="Correo/teléfono público a publicar" />
       </div>
       <div class="lg:col-span-2">
         <LeadCaptureForm showServiceDropdown />

@@ -2,7 +2,6 @@
 export const prerender = true;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PendingContentTag from '../../components/PendingContentTag.astro';
 ---
 
 <BaseLayout
@@ -27,21 +26,35 @@ import PendingContentTag from '../../components/PendingContentTag.astro';
         la demo.
       </p>
 
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-neutral-200 pt-12">
+        <div>
+          <p class="text-sm font-bold tracking-widest uppercase text-neutral-500 mb-2">Misión</p>
+          <p class="text-lg text-neutral-900 leading-relaxed">
+            Brindar productos y servicios con alto grado de calidad en el campo de las
+            tecnologías de información.
+          </p>
+        </div>
+        <div>
+          <p class="text-sm font-bold tracking-widest uppercase text-neutral-500 mb-2">Visión</p>
+          <p class="text-lg text-neutral-900 leading-relaxed">
+            Posicionarnos en el mercado como empresa líder en la provisión de servicios de
+            tecnologías de información, consultorías y en el desarrollo de aplicaciones.
+          </p>
+        </div>
+      </div>
+
+      <div class="border-t border-neutral-200 pt-8">
+        <p class="text-sm font-bold tracking-widest uppercase text-neutral-500 mb-2">
+          Sectores con experiencia comprobada
+        </p>
+        <p class="text-lg text-neutral-900 leading-relaxed">
+          Financiero, asegurador, servicios y agropecuario.
+        </p>
+      </div>
+
       <div class="border-t border-neutral-200 pt-8">
         <p class="text-sm font-bold tracking-widest uppercase text-neutral-500 mb-2">Contacto</p>
         <p class="text-lg font-heading text-secondary">Andrés Arena — Gerente</p>
-      </div>
-
-      <div class="border-t border-neutral-200 pt-8 space-y-4">
-        <p class="text-sm font-bold tracking-widest uppercase text-neutral-500">
-          Todavía por confirmar con el cliente
-        </p>
-        <div class="flex flex-col gap-3 items-start">
-          <PendingContentTag label="Año de fundación / años operando" />
-          <PendingContentTag label="Tamaño del equipo" />
-          <PendingContentTag label="Misión y visión" />
-          <PendingContentTag label="Sectores con experiencia comprobada más allá de agro" />
-        </div>
       </div>
     </div>
   </section>
