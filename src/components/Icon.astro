@@ -5,9 +5,20 @@
  * trazos vectoriales exportados del PDF (no existe el archivo fuente
  * vectorial, solo el render rasterizado) sino una reconstrucción fiel al
  * concepto y composición de cada ícono original, en el mismo estilo de línea
- * (stroke, sin relleno) para poder heredar color por CSS (`currentColor`)
- * igual que el set anterior. Mapeo semántico a los 6 servicios / 4 pilares:
- * - code    → monitor + engranajes (ícono 1 del tablero)
+ * (stroke, sin relleno — el tablero solo usa relleno sólido en la variante de
+ * insignia circular para redes sociales, no en el uso inline que replican
+ * estos íconos) para poder heredar color por CSS (`currentColor`).
+ *
+ * Revisión 2026-09-04: el peso de línea (1.4) y el nivel de detalle de la
+ * primera versión (múltiples marcas de diente de engranaje, puntos muy
+ * pequeños) se leían bien en un render grande pero se perdían/se veían
+ * "delgados" a los 32-40px reales en que se usan estos íconos en el sitio
+ * (cards de servicio, pilares). Se subió el grosor de línea y se simplificó
+ * cada engranaje a 4 dientes cardinales (en vez de 8) y se redujeron
+ * elementos decorativos muy finos, sin cambiar el concepto de cada ícono.
+ *
+ * Mapeo semántico a los 6 servicios / 4 pilares:
+ * - code    → monitor + engranaje (ícono 1 del tablero)
  * - deploy  → manos sosteniendo engranaje (ícono 8 del tablero)
  * - tasks   → portapapeles + diana + lápiz (ícono 10 del tablero)
  * - chart   → barras + flecha de crecimiento (ícono 3 del tablero)
@@ -28,7 +39,7 @@ const { name, class: className = 'w-8 h-8' }: Props = Astro.props;
   viewBox="0 0 24 24"
   fill="none"
   stroke="currentColor"
-  stroke-width="1.4"
+  stroke-width="1.9"
   stroke-linecap="round"
   stroke-linejoin="round"
   aria-hidden="true"
@@ -38,10 +49,9 @@ const { name, class: className = 'w-8 h-8' }: Props = Astro.props;
       <g>
         <rect x="2.5" y="4.5" width="13" height="9" rx="1" />
         <path d="M6.5 15.5v2.2M11.5 15.5v2.2M5 19.7h8" />
-        <path d="M6.2 8l-1.7 1.7L6.2 11.4M11.3 8l1.7 1.7-1.7 1.7M9.6 7.5l-.7 4.5" />
-        <circle cx="18.7" cy="5.2" r="1.5" />
-        <path d="M18.7 2.9v.8M18.7 6.7v.8M16.6 5.2h.8M20 5.2h.8M17.2 3.4l.6.6M20 6.4l.6.6M17.2 7l.6-.6M20 3.9l.6-.6" />
-        <circle cx="21" cy="9.2" r="1" />
+        <path d="M6.7 8l-2 2 2 2M11 8l2 2-2 2" />
+        <circle cx="18.6" cy="5.5" r="2" />
+        <path d="M18.6 2.6v1M18.6 7.4v1M15.7 5.5h1M20.5 5.5h1" />
       </g>
     )
   }
@@ -52,8 +62,8 @@ const { name, class: className = 'w-8 h-8' }: Props = Astro.props;
         <path d="M19.5 15.8c0-1.2-.9-2.1-2.1-2.1h-1.4" />
         <path d="M6.6 13.7v4.8a1 1 0 001 1h1a1 1 0 001-1v-2.4" />
         <path d="M17.4 13.7v4.8a1 1 0 01-1 1h-1a1 1 0 01-1-1v-2.4" />
-        <circle cx="12" cy="9" r="2.4" />
-        <path d="M12 5.8v.9M12 11.3v.9M9.6 9h.9M13.5 9h.9M10.3 6.9l.6.6M13.1 11.5l.6.6M10.3 11.1l.6-.6M13.1 6.5l.6-.6" />
+        <circle cx="12" cy="8.8" r="2.6" />
+        <path d="M12 5.4v1M12 11.2v1M9.2 8.8h1M13.8 8.8h1" />
         <path d="M12 11.4v2.2" />
       </g>
     )
@@ -63,9 +73,9 @@ const { name, class: className = 'w-8 h-8' }: Props = Astro.props;
       <g>
         <rect x="5" y="4" width="14" height="17" rx="1.5" />
         <path d="M9.3 4V3.2a1 1 0 011-1h3.4a1 1 0 011 1V4" />
-        <circle cx="11.5" cy="13.5" r="4" />
-        <circle cx="11.5" cy="13.5" r="1.3" />
-        <path d="M14.8 10.2l3.4-3.4M17.3 5.9l1 1" />
+        <circle cx="11.5" cy="13.5" r="4.2" />
+        <circle cx="11.5" cy="13.5" r="1.4" />
+        <path d="M14.9 10.1l3.3-3.3M17.4 5.7l1 1" />
       </g>
     )
   }
@@ -80,12 +90,11 @@ const { name, class: className = 'w-8 h-8' }: Props = Astro.props;
   {
     name === 'shield-check' && (
       <g>
-        <circle cx="6.6" cy="6.4" r="1.5" />
-        <circle cx="17.4" cy="6.4" r="1.5" />
-        <circle cx="12" cy="4" r="1.5" />
-        <path d="M12 5.5v3M7.9 7.3L10.7 9M16.1 7.3L13.3 9" />
-        <path d="M8.3 15.6L10.7 18l5.6-6.4" />
-        <path d="M8 15.6a3.7 3.7 0 017.5-.6" />
+        <circle cx="7" cy="6.2" r="1.7" />
+        <circle cx="17" cy="6.2" r="1.7" />
+        <circle cx="12" cy="3.8" r="1.7" />
+        <path d="M7.8 7.4Q12 10 16.2 7.4" />
+        <path d="M8 15.6L10.6 18.2 17 11" />
       </g>
     )
   }
@@ -94,9 +103,8 @@ const { name, class: className = 'w-8 h-8' }: Props = Astro.props;
       <g>
         <path d="M12 3.2a4.3 4.3 0 00-2.5 7.8c.5.3.7.9.7 1.4v.4h3.6v-.4c0-.5.2-1 .7-1.4A4.3 4.3 0 0012 3.2z" />
         <path d="M10.6 14.8h2.8M11.1 16.6h1.8" />
-        <circle cx="18.6" cy="6.6" r="1.7" />
-        <path d="M18.6 4v.8M18.6 8.4v.8M16 6.6h.8M20.4 6.6h.8M16.7 4.7l.6.6M20 8.5l.6.6M16.7 8.5l.6-.6M20 4.7l.6-.6" />
-        <path d="M5.8 7.6l.6 1M4.9 6l1 .1M6.2 4.6l.4 1" />
+        <circle cx="18.5" cy="6.6" r="2" />
+        <path d="M18.5 3.7v1M18.5 8.5v1M15.6 6.6h1M20.4 6.6h1" />
       </g>
     )
   }
@@ -104,8 +112,10 @@ const { name, class: className = 'w-8 h-8' }: Props = Astro.props;
     name === 'refresh' && (
       <g>
         <path d="M3.5 20h3.2v-3.2H3.5V20zM8.3 20h3.2v-6.4H8.3V20zM13.1 20h3.2v-9.6h-3.2V20z" />
-        <circle cx="18.5" cy="5.3" r="1.5" />
-        <path d="M18.5 6.8v3.4M18.5 8.2l-2 1.6M18.5 8.2l2 1.6M18.5 10l-1.6 3M18.5 10l1.6 2" />
+        <circle cx="18.5" cy="5.3" r="1.8" />
+        <path d="M18.5 7.1v2.8" />
+        <path d="M16.9 12.5L18.5 9.9 20 12.6" />
+        <path d="M18.5 9.9l1.8-2.5" />
       </g>
     )
   }

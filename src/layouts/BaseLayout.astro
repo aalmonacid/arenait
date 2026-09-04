@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Logo from '../components/Logo.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
+import CookieConsentBanner from '../components/CookieConsentBanner.astro';
 
 interface Props {
   title: string;
@@ -97,7 +98,7 @@ const organizationSchema = {
     <header class="bg-white border-b-2 border-neutral-200 py-6 px-4 md:px-8">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <Logo variant="light" size="header" />
-        <nav class="hidden md:flex space-x-8">
+        <nav class="hidden md:flex items-center space-x-8">
           <a
             href="/servicios"
             class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
@@ -117,6 +118,11 @@ const organizationSchema = {
             href="/contacto"
             class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
             >Contacto</a
+          >
+          <a
+            href="/politica-de-tratamiento-de-datos"
+            class="text-xs font-medium normal-case text-neutral-400 hover:text-interactive transition-colors border-l border-neutral-200 pl-8"
+            >Política de datos</a
           >
         </nav>
       </div>
@@ -156,5 +162,6 @@ const organizationSchema = {
     </footer>
 
     <WhatsAppButton />
+    <CookieConsentBanner />
   </body>
 </html>

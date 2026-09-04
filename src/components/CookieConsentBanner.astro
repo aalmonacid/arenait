@@ -1,0 +1,60 @@
+---
+import { POLICY_URL } from '../lib/legal';
+---
+
+<div
+  id="cookie-consent-banner"
+  class="hidden fixed inset-x-0 bottom-0 z-[60] bg-secondary text-white border-t-4 border-accent"
+>
+  <div
+    class="max-w-7xl mx-auto px-4 md:px-8 py-5 flex flex-col md:flex-row md:items-center gap-4"
+  >
+    <p class="text-sm text-neutral-200 leading-relaxed flex-1">
+      Usamos cookies propias esenciales para que este sitio funcione correctamente. Hoy no
+      utilizamos cookies de analítica ni de publicidad de terceros. Puedes ver el detalle en la{' '}
+      <a href={`${POLICY_URL}#cookies`} class="underline text-white hover:text-accent">
+        Política de Tratamiento de Datos Personales
+      </a>.
+    </p>
+    <div class="flex gap-3 shrink-0">
+      <button
+        id="cookie-reject"
+        type="button"
+        class="px-5 py-2.5 border-2 border-white text-white text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-secondary transition-colors"
+      >
+        Rechazar
+      </button>
+      <button
+        id="cookie-accept"
+        type="button"
+        class="px-5 py-2.5 bg-primary hover:bg-interactive text-white text-sm font-bold uppercase tracking-widest transition-colors"
+      >
+        Aceptar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { readConsent, writeConsent, type ConsentChoice } from '../lib/consent';
+
+  const banner = document.getElementById('cookie-consent-banner');
+  const acceptButton = document.getElementById('cookie-accept');
+  const rejectButton = document.getElementById('cookie-reject');
+  const whatsappButton = document.getElementById('whatsapp-float');
+
+  if (!readConsent()) {
+    banner?.classList.remove('hidden');
+    whatsappButton?.classList.add('hidden');
+  }
+
+  function decide(choice: ConsentChoice) {
+    writeConsent(choice);
+    banner?.classList.add('hidden');
+    whatsappButton?.classList.remove('hidden');
+    window.dispatchEvent(new CustomEvent('arenait:consent-changed', { detail: { choice } }));
+  }
+
+  acceptButton?.addEventListener('click', () => decide('accepted'));
+  rejectButton?.addEventListener('click', () => decide('rejected'));
+</script>
