@@ -256,5 +256,13 @@ const organizationSchema = {
     <CookieConsentBanner />
 
     <script type="module" src="/scripts/mobile-menu.js" is:inline></script>
+    <!-- Vercel Analytics, gateado por consentimiento (BACKLOG.md Épica J).
+         Archivo real en /public/scripts/ (nunca inline) — ver el comentario
+         extenso en analytics.js sobre por qué no se usa el componente
+         <Analytics /> de @vercel/analytics/astro (compila a JS inline,
+         bloqueado por la CSP, confirmado empíricamente con un build de
+         prueba) ni un import directo del paquete de npm (public/ no pasa
+         por Vite, un specifier de npm no resuelve en el navegador). -->
+    <script type="module" src="/scripts/analytics.js" is:inline></script>
   </body>
 </html>

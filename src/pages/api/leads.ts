@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { sanityWriteClient } from '../../lib/sanityWriteClient';
+import { checkRateLimit } from '../../lib/rateLimit';
 
 export const prerender = false;
 
@@ -25,7 +26,40 @@ function badRequest(message: string) {
   });
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async (context) => {
+  const { request } = context;
+
+  // clientAddress lo resuelve @astrojs/vercel a partir de x-forwarded-for
+  // (ver getClientIpAddress en @astrojs/internal-helpers). En local
+  // (astro dev) cae a la IP del socket. Se accede dentro de un try/catch
+  // porque Astro lanza un error si el adaptador en uso no soporta
+  // clientAddress; en ese caso (u otro sin IP disponible), 'unknown' agrupa
+  // todo ese tráfico bajo una sola clave (best-effort, ver limitación
+  // documentada en src/lib/rateLimit.ts).
+  let ip: string;
+  try {
+    ip = context.clientAddress || 'unknown';
+  } catch {
+    ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  }
+
+  const { limited, retryAfterSeconds } = checkRateLimit(ip);
+  if (limited) {
+    return new Response(
+      JSON.stringify({
+        ok: false,
+        error: 'Demasiadas solicitudes desde este origen. Intenta de nuevo en unos minutos.',
+      }),
+      {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': String(retryAfterSeconds),
+        },
+      },
+    );
+  }
+
   let body: LeadPayload;
 
   try {

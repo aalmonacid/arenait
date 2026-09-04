@@ -81,10 +81,14 @@ if (form && emailInput && emailError && submitButton && formSuccess && formError
 
       formSuccess.classList.remove('hidden');
       form.reset();
+      // Evento de conversión (BACKLOG.md Épica J, ver /scripts/analytics.js).
+      // window.arenaitAnalytics es no-op sin consentimiento aceptado.
+      window.arenaitAnalytics?.trackEvent('Lead Form Submit', { result: 'success' });
     } catch (err) {
       formError.textContent =
         err instanceof Error ? err.message : 'No se pudo enviar el mensaje. Intente nuevamente.';
       formError.classList.remove('hidden');
+      window.arenaitAnalytics?.trackEvent('Lead Form Submit', { result: 'failure' });
     } finally {
       submitButton.disabled = false;
       submitButton.textContent = 'Enviar mensaje';
