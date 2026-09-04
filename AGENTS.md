@@ -21,6 +21,11 @@
   - Cuerpo/UI: Codec Pro
   - Fallbacks: Plus Jakarta Sans, Inter
 
+## Iconografía e imágenes
+
+- **Íconos**: el set en `src/components/Icon.astro` es una recreación fiel del set ilustrado de `Tablero de Marca ArenaIT.pdf` (página "ICONOS") — no un set genérico de terceros. Si se agrega un ícono nuevo, buscar primero si existe un concepto equivalente en ese PDF antes de usar un ícono libre sin relación con la marca.
+- **Imágenes**: prohibido el stock genérico cliché (personas sonriendo mirando a cámara, manos en teclado sin contexto, código verde estilo "Matrix/hacker"). Preferir, en este orden: capturas reales de producto > fotografía editorial curada (Unsplash/Pexels, licencia libre) con composición conceptual/abstracta > no poner imagen. Ver Épica G de `BACKLOG.md` para los criterios de curaduría usados en el hero y `/nosotros`.
+
 ## Reglas de Arquitectura
 
 - **Stack**: Astro 7 + Sanity.io + Tailwind CSS + TypeScript.

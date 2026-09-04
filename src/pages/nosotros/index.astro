@@ -1,15 +1,27 @@
 ---
 export const prerender = true;
 
+import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import nosotrosImage from '../../assets/images/nosotros-facade.jpg';
 ---
 
 <BaseLayout
   title="Quiénes somos"
   description="Arena IT es una empresa colombiana de desarrollo de software, dedicada a diseñar, construir e integrar soluciones tecnológicas a la medida de las necesidades reales de cada negocio."
 >
-  <header class="bg-secondary text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
-    <div class="max-w-7xl mx-auto">
+  <header class="relative overflow-hidden bg-secondary text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
+    <Image
+      src={nosotrosImage}
+      alt=""
+      class="absolute inset-0 w-full h-full object-cover opacity-20"
+      widths={[640, 1080, 1600, 2000]}
+      sizes="100vw"
+      loading="eager"
+      quality={70}
+    />
+    <div class="absolute inset-0 bg-secondary/90"></div>
+    <div class="max-w-7xl mx-auto relative">
       <h1 class="text-4xl md:text-6xl font-heading mb-6 tracking-tight text-white">
         Quiénes somos
       </h1>

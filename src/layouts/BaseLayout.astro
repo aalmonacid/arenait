@@ -1,15 +1,22 @@
 ---
 import '../styles/global.css';
 import Logo from '../components/Logo.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
 
 interface Props {
   title: string;
   description?: string;
   structuredData?: Record<string, unknown>[];
+  ogImage?: string;
 }
 
-const { title, description = 'Desarrollo de software a la medida para operaciones reales.' } =
-  Astro.props;
+const {
+  title,
+  description = 'Desarrollo de software a la medida para operaciones reales.',
+  ogImage = '/og-default.png',
+} = Astro.props;
+
+const absoluteOgImage = new URL(ogImage, Astro.site).toString();
 
 const structuredData: Record<string, unknown>[] = Astro.props.structuredData ?? [];
 
@@ -34,6 +41,9 @@ const organizationSchema = {
     <meta property="og:title" content={`${title} | ArenaIT`} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content={absoluteOgImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <!-- Fallback tipográfico: Codec Pro es una fuente comercial sin archivos
          licenciados en este repo (ver public/fonts/ en CONTEXT.md §5). Hasta
@@ -71,8 +81,10 @@ const organizationSchema = {
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={`${title} | ArenaIT`} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteOgImage} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
     {
@@ -135,9 +147,14 @@ const organizationSchema = {
           >
         </nav>
       </div>
-      <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-sm text-neutral-400">
+      <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-sm text-neutral-400 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <p>&copy; {new Date().getFullYear()} Arena IT. Todos los derechos reservados.</p>
+        <a href="/politica-de-tratamiento-de-datos" class="hover:text-white transition-colors">
+          Política de Tratamiento de Datos Personales
+        </a>
       </div>
     </footer>
+
+    <WhatsAppButton />
   </body>
 </html>

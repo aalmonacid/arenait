@@ -1,4 +1,6 @@
 ---
+import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
+
 interface Props {
   showServiceDropdown?: boolean;
   services?: { title: string }[];
@@ -20,7 +22,7 @@ const {
 <div class="bg-neutral-50 p-8 md:p-12 border-2 border-neutral-200 max-w-3xl mx-auto font-body">
   <h3 class="text-3xl font-heading mb-8 text-secondary tracking-tight">Cuéntanos tu reto</h3>
 
-  <form id="leadCaptureForm" class="space-y-6">
+  <form id="leadCaptureForm" class="space-y-6" data-policy-version={POLICY_VERSION}>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <label
@@ -131,6 +133,25 @@ const {
       />
     </div>
 
+    <div class="flex items-start gap-3">
+      <input
+        type="checkbox"
+        id="policyAccepted"
+        required
+        class="mt-1 h-4 w-4 shrink-0 border-neutral-200 text-primary focus:ring-interactive"
+      />
+      <label for="policyAccepted" class="text-sm text-neutral-900">
+        He leído y acepto la{' '}
+        <a href={POLICY_URL} target="_blank" rel="noopener" class="text-interactive underline">
+          Política de Tratamiento de Datos Personales
+        </a>
+        .
+      </label>
+    </div>
+    <p id="policyError" class="text-sm text-red-600 font-bold hidden">
+      Debes aceptar la Política de Tratamiento de Datos Personales para continuar.
+    </p>
+
     <button
       type="submit"
       class="w-full md:w-auto px-8 py-4 bg-primary hover:bg-interactive text-white font-bold tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -156,6 +177,8 @@ const {
   const messageInput = document.getElementById('message') as HTMLTextAreaElement;
   const fullNameInput = document.getElementById('fullName') as HTMLInputElement;
   const honeypotInput = document.getElementById('companyWebsite') as HTMLInputElement;
+  const policyAcceptedInput = document.getElementById('policyAccepted') as HTMLInputElement;
+  const policyError = document.getElementById('policyError');
   const emailError = document.getElementById('emailError');
   const submitButton = form?.querySelector('button[type="submit"]') as HTMLButtonElement | null;
   const formSuccess = document.getElementById('formSuccess');
@@ -179,6 +202,12 @@ const {
 
       formSuccess.classList.add('hidden');
       formError.classList.add('hidden');
+      policyError?.classList.add('hidden');
+
+      if (!policyAcceptedInput?.checked) {
+        policyError?.classList.remove('hidden');
+        return;
+      }
 
       if (honeypotInput?.value) {
         // Probablemente un bot: simular éxito sin llamar a la API para no darle señal de qué falló.
@@ -203,6 +232,8 @@ const {
             message: messageInput?.value ?? '',
             source: 'lead-capture-form',
             companyWebsite: honeypotInput?.value ?? '',
+            policyAccepted: policyAcceptedInput?.checked ?? false,
+            policyVersion: form.dataset.policyVersion ?? '',
           }),
         });
 

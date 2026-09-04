@@ -25,3 +25,8 @@ pnpm-debug.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Tablero de marca: contiene teléfono/correo personal de Andrés Arena
+# (tarjeta de presentación) y el repo es público (github.com/aalmonacid/arenait,
+# confirmado vía API el 2026-09-04). No debe versionarse — ver BACKLOG.md, Épica G.
+Tablero de Marca ArenaIT.pdf

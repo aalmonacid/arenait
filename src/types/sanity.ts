@@ -16,6 +16,7 @@ export interface CaseStudySchema {
   challenge: string;
   solution: string;
   results: string[];
+  screenshots?: unknown[];
 }
 
 export interface TestimonialSchema {

@@ -14,6 +14,8 @@ interface LeadPayload {
   message?: unknown;
   source?: unknown;
   companyWebsite?: unknown; // honeypot anti-spam, debe llegar vacío
+  policyAccepted?: unknown;
+  policyVersion?: unknown;
 }
 
 function badRequest(message: string) {
@@ -41,6 +43,8 @@ export const POST: APIRoute = async ({ request }) => {
   const message = typeof body.message === 'string' ? body.message.trim() : '';
   const source = typeof body.source === 'string' ? body.source.trim() : 'lead-capture-form';
   const honeypot = typeof body.companyWebsite === 'string' ? body.companyWebsite.trim() : '';
+  const policyAccepted = body.policyAccepted === true;
+  const policyVersion = typeof body.policyVersion === 'string' ? body.policyVersion.trim() : '';
 
   if (honeypot) {
     // Bot: fingir éxito sin persistir nada ni revelar que fue detectado.
@@ -58,6 +62,10 @@ export const POST: APIRoute = async ({ request }) => {
     return badRequest('El correo no tiene un formato válido.');
   }
 
+  if (!policyAccepted) {
+    return badRequest('Debes aceptar la Política de Tratamiento de Datos Personales.');
+  }
+
   try {
     const doc = await sanityWriteClient.create({
       _type: 'lead',
@@ -69,6 +77,9 @@ export const POST: APIRoute = async ({ request }) => {
       message,
       source,
       createdAt: new Date().toISOString(),
+      policyAccepted,
+      policyVersion,
+      policyAcceptedAt: new Date().toISOString(),
     });
 
     return new Response(JSON.stringify({ ok: true, id: doc._id }), {

@@ -46,6 +46,22 @@ export const leadSchema = {
       title: 'Fecha de Captura',
       type: 'datetime',
     },
+    {
+      name: 'policyAccepted',
+      title: 'Aceptó la Política de Tratamiento de Datos',
+      type: 'boolean',
+      description: 'Evidencia de consentimiento exigida por la Ley 1581 de 2012.',
+    },
+    {
+      name: 'policyVersion',
+      title: 'Versión de la política aceptada',
+      type: 'string',
+    },
+    {
+      name: 'policyAcceptedAt',
+      title: 'Fecha de aceptación de la política',
+      type: 'datetime',
+    },
   ],
   preview: {
     select: {

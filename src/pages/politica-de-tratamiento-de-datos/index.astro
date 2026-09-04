@@ -1,0 +1,119 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PendingContentTag from '../../components/PendingContentTag.astro';
+import { POLICY_VERSION } from '../../lib/legal';
+
+/**
+ * Política de Tratamiento de Datos Personales, estructurada según la Ley
+ * 1581 de 2012 y el Decreto 1377 de 2013 (Colombia). Los datos específicos
+ * de la empresa (razón social, NIT, domicilio legal, canal para ejercer
+ * derechos ARCO) no están confirmados todavía — se marcan con
+ * `PendingContentTag`, nunca con valores inventados ni con los datos de la
+ * tarjeta de presentación sin confirmar que son los correctos para un
+ * documento legal. Ver BACKLOG.md, Épica G.
+ */
+const LAST_UPDATED = '2026-09-04';
+---
+
+<BaseLayout
+  title="Política de Tratamiento de Datos Personales"
+  description="Política de tratamiento de datos personales de Arena IT, conforme a la Ley 1581 de 2012 y el Decreto 1377 de 2013 de Colombia."
+>
+  <header class="bg-secondary text-white py-16 md:py-24 px-4 md:px-8 border-b-8 border-accent">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-3xl md:text-5xl font-heading mb-4 tracking-tight text-white">
+        Política de Tratamiento de Datos Personales
+      </h1>
+      <p class="text-neutral-300">
+        Versión {POLICY_VERSION} — Última actualización: {LAST_UPDATED}
+      </p>
+    </div>
+  </header>
+
+  <section class="py-16 md:py-24 px-4 md:px-8 bg-white">
+    <div class="max-w-4xl mx-auto space-y-12 text-neutral-900 leading-relaxed">
+      <p>
+        Esta política regula el tratamiento de los datos personales recolectados a través de este
+        sitio web (incluyendo el formulario de contacto), en cumplimiento de la Ley 1581 de 2012 y
+        el Decreto 1377 de 2013 de la República de Colombia.
+      </p>
+
+      <div>
+        <h2 class="text-2xl font-heading text-secondary mb-4">1. Responsable del tratamiento</h2>
+        <div class="flex flex-col gap-2">
+          <PendingContentTag label="Razón social completa" />
+          <PendingContentTag label="NIT" />
+          <PendingContentTag label="Domicilio legal" />
+        </div>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-heading text-secondary mb-4">2. Datos que recolectamos</h2>
+        <p>
+          A través del formulario de contacto de este sitio recolectamos: nombre completo, empresa,
+          correo electrónico, teléfono (opcional), servicio de interés y el mensaje que nos escribas.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-heading text-secondary mb-4">3. Finalidad del tratamiento</h2>
+        <p>
+          Los datos recolectados se usan exclusivamente para: (i) responder a tu solicitud de
+          contacto, (ii) elaborar y dar seguimiento a propuestas comerciales, y (iii) mantener un
+          registro interno de nuestras relaciones comerciales. No vendemos ni compartimos tus datos
+          con terceros para fines distintos a los aquí descritos.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-heading text-secondary mb-4">4. Derechos del titular</h2>
+        <p class="mb-4">Como titular de tus datos personales, tienes derecho a:</p>
+        <ul class="list-disc list-inside space-y-2">
+          <li>
+            <strong>Conocer</strong> los datos personales que tratamos sobre ti.
+          </li>
+          <li>
+            <strong>Actualizar y rectificar</strong> tus datos cuando sean parciales, inexactos,
+            incompletos o estén desactualizados.
+          </li>
+          <li>
+            <strong>Suprimir</strong> tus datos cuando su tratamiento no respete los principios,
+            derechos y garantías constitucionales y legales.
+          </li>
+          <li>
+            <strong>Revocar la autorización</strong> otorgada para el tratamiento de tus datos, en
+            cualquier momento.
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-heading text-secondary mb-4">
+          5. Mecanismos para ejercer tus derechos
+        </h2>
+        <p class="mb-3">
+          Puedes ejercer cualquiera de los derechos anteriores escribiendo al siguiente canal:
+        </p>
+        <PendingContentTag label="Correo o canal designado para ejercer derechos ARCO" />
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-heading text-secondary mb-4">6. Vigencia</h2>
+        <p>
+          Los datos personales se conservarán mientras exista una relación comercial vigente o
+          potencial, o hasta que el titular solicite su supresión conforme a la sección anterior, lo
+          que ocurra primero.
+        </p>
+      </div>
+
+      <div class="border-t border-neutral-200 pt-8">
+        <p class="text-sm text-neutral-500">
+          Al enviar el formulario de contacto de este sitio, aceptas el tratamiento de tus datos
+          personales conforme a lo descrito en esta política, versión {POLICY_VERSION}.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

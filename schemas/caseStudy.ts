@@ -45,5 +45,13 @@ export const caseStudySchema = {
       type: 'array',
       of: [{ type: 'string' }],
     },
+    {
+      name: 'screenshots',
+      title: 'Capturas reales del producto',
+      description:
+        'Capturas de pantalla reales de la plataforma construida para este cliente (no renders ni mockups). Sin esto, la página muestra un aviso de que las capturas están pendientes de recibir.',
+      type: 'array',
+      of: [{ type: 'image', options: { hotspot: true } }],
+    },
   ],
 };
