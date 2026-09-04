@@ -12,7 +12,20 @@ interface Props {
 const { variant = 'light', size = 'header', link = true, class: className = '' } = Astro.props;
 
 const arenaColor = variant === 'dark' ? 'text-white' : 'text-neutral-900';
-const itColor = 'text-primary';
+// Bugfix (auditoría 2026-09-04, Épica J/K): en variant="dark" (footer, bg-secondary
+// #294E6C) "IT" heredaba 'text-primary' (#0075C9) sin condicionar por variant —
+// contraste real ~1.82:1, falla incluso AA (4.5:1). #0075C9 solo funciona sobre
+// fondos claros (variant="light", donde sigue en uso). Para dark se evaluaron los
+// dos únicos candidatos de marca que tiene sentido usar aquí (no se introduce color
+// nuevo): accent #FEA621 ~4.46:1 vs interactive #0446F1 ~1.31:1 (interactive es
+// prácticamente ilegible, ambos son azules oscuros). Ninguno alcanza el 7:1 AAA de
+// texto normal, pero "IT" en el footer es texto grande y en negrita (text-2xl +
+// font-extrabold ⇒ ≥24px bold, categoría "large text" de WCAG), cuyo umbral AAA es
+// 4.5:1 — accent queda a ~0.045 de ese umbral, muy por encima del AA de texto grande
+// (3:1) y muy lejos de la falla actual. Se documenta como mejora real y honesta, no
+// como cumplimiento estricto de AAA — ver resumen de la sesión para el cálculo
+// completo de luminancia relativa.
+const itColor = variant === 'dark' ? 'text-accent' : 'text-primary';
 const textSize = size === 'header' ? 'text-3xl' : 'text-2xl';
 const dotsWidth = size === 'header' ? 34 : 28;
 const dotsHeight = size === 'header' ? 8 : 7;

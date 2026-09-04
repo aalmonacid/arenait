@@ -158,7 +158,9 @@ Cierra el hueco más visible de "no enterprise": hoy no hay navegación mobile p
 
 ## Épica K — SEO técnico y estructurado
 
-- [ ] Auditoría técnica completa por `seo-strategist`: meta description por página, canonical, jerarquía H1-H2, evaluar `BreadcrumbList`/`LocalBusiness` sobre el `Organization`/`Service` JSON-LD ya existente, validar `sitemap.xml`/`robots.txt` generados, OG/Twitter cards.
+- [x] **Infraestructura SEO/canonical/robots (2026-09-04).** Resuelto tras la auditoría del mismo día: `<link rel="canonical">` en `BaseLayout.astro` (construido con `Astro.site` + `Astro.url.pathname`); `/admin` excluido del sitemap (`filter` agregado a `sitemap()` en `astro.config.mjs` — se confirmó en vivo que `/admin/` y `/admin/structure/` estaban publicados en `sitemap-0.xml` real porque esa página está prerenderizada y el sitemap no tenía filtro); `Disallow: /admin/` agregado a `public/robots.txt` (antes solo tenía `/api/`).
+- [ ] **Quitar `<meta name="robots" content="noindex, nofollow">` de `BaseLayout.astro` antes del lanzamiento público real.** Agregado el 2026-09-04 junto con el resto de esta infraestructura: `dev.arenait.co` es un dominio de staging y el proyecto sigue marcado `PROTOTIPO FUNCIONAL — NO LISTO PARA PRODUCCIÓN` (ver encabezado de este archivo), así que no debe indexarse todavía. Hay un comentario `TODO(Épica K, SEO)` en el propio archivo señalando esto — no dejar que se olvide en el momento del lanzamiento a `arenait.co`.
+- [ ] Auditoría técnica completa por `seo-strategist`: meta description por página, jerarquía H1-H2, evaluar `BreadcrumbList`/`LocalBusiness` sobre el `Organization`/`Service` JSON-LD ya existente, OG/Twitter cards.
 - [ ] Decisión de tipografía: licenciar Codec Pro (ver Épica A, pendiente) o adoptar formalmente Plus Jakarta Sans como tipografía principal — afecta percepción de marca "enterprise".
 
 ## Épica L — Contenido editorial y casos de estudio

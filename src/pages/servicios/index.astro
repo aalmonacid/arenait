@@ -18,11 +18,36 @@ try {
 if (!services || services.length === 0) {
   services = fallbackServices;
 }
+
+// JSON-LD: cada servicio real como Service dentro de un ItemList — sin
+// inventar campos que no existen en el schema (nada de precio/rating/reviews).
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: services.map((service, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Service',
+        name: service.title,
+        description: service.description,
+        url: new URL(`/servicios#${service.slug?.current ?? ''}`, Astro.site).toString(),
+        provider: {
+          '@type': 'Organization',
+          name: 'ArenaIT',
+          url: 'https://arenait.co',
+        },
+      },
+    })),
+  },
+];
 ---
 
 <BaseLayout
   title="Servicios"
   description="Trabajamos el ciclo completo de una solución de software: desde el desarrollo a la medida, hasta que quede operando y se mantenga funcionando en el tiempo."
+  structuredData={structuredData}
 >
   <header class="bg-secondary text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
     <div class="max-w-7xl mx-auto">

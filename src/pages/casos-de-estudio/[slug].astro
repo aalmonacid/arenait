@@ -50,9 +50,52 @@ if (!caseStudy) {
 if (!caseStudy) {
   return Astro.redirect('/404');
 }
+
+// JSON-LD: BreadcrumbList Home › Casos de Estudio › [caso], con URLs reales.
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: new URL('/', Astro.site).toString(),
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Casos de Estudio',
+        item: new URL('/casos-de-estudio', Astro.site).toString(),
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: caseStudy.title,
+        item: new URL(`/casos-de-estudio/${slug}`, Astro.site).toString(),
+      },
+    ],
+  },
+];
+
+// Meta description específica del caso (en vez del genérico "Caso de
+// estudio: <cliente>"): usa solo hechos ya presentes en fallbackCaseStudies
+// (cliente + título + solución real construida), sin agregar cifras ni
+// afirmaciones nuevas. Se recorta a ~160 caracteres en un límite de palabra.
+function truncateDescription(text: string, max = 160): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const lastSpace = cut.lastIndexOf(' ');
+  return `${cut.slice(0, lastSpace)}…`;
+}
+
+const metaDescription = truncateDescription(
+  `Caso ${caseStudy.client}: ${caseStudy.title}. ${caseStudy.solution}`,
+);
 ---
 
-<BaseLayout title={caseStudy.title} description={`Caso de estudio: ${caseStudy.client}`}>
+<BaseLayout title={caseStudy.title} description={metaDescription} structuredData={structuredData}>
   <article class="bg-white min-h-screen">
     <header class="bg-secondary text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
       <div class="max-w-7xl mx-auto">

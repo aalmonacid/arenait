@@ -1,7 +1,7 @@
 ---
 name: cro-analytics-engineer
 description: Integrates product analytics (Vercel Analytics) gated by the site's existing cookie-consent system, defines conversion events, and maintains a CRO experiment backlog for ArenaIT. Use for analytics setup or conversion-rate work — not general frontend implementation.
-tools: Read, Edit, Grep, Bash
+tools: Read, Edit, Write, Glob, Grep, Bash
 model: sonnet
 ---
 

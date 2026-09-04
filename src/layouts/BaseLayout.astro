@@ -18,6 +18,7 @@ const {
 } = Astro.props;
 
 const absoluteOgImage = new URL(ogImage, Astro.site).toString();
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 
 const structuredData: Record<string, unknown>[] = Astro.props.structuredData ?? [];
 
@@ -37,6 +38,13 @@ const organizationSchema = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title} | ArenaIT</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- TODO(Épica K, SEO): quitar este noindex antes del lanzamiento público real
+         en arenait.co. dev.arenait.co es un dominio de staging y BACKLOG.md marca
+         el proyecto como "PROTOTIPO FUNCIONAL — NO LISTO PARA PRODUCCIÓN" — no debe
+         indexarse todavía. Ver la entrada correspondiente en BACKLOG.md Épica K. -->
+    <meta name="robots" content="noindex, nofollow" />
 
     <!-- OpenGraph -->
     <meta property="og:title" content={`${title} | ArenaIT`} />
@@ -94,7 +102,7 @@ const organizationSchema = {
     <header class="bg-white border-b-2 border-neutral-200 py-6 px-4 md:px-8">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <Logo variant="light" size="header" />
-        <nav class="hidden md:flex items-center space-x-8">
+        <nav class="hidden md:flex items-center space-x-8" aria-label="Navegación principal">
           <a
             href="/servicios"
             class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
@@ -115,14 +123,92 @@ const organizationSchema = {
             class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
             >Contacto</a
           >
+          <!-- Bugfix (auditoría 2026-09-04, Épica K): text-neutral-400 medía ~2.52:1
+               contra el fondo blanco del header, falla incluso AA (4.5:1). Mismo
+               fix ya validado en el mockup de nav mobile (Épica J): text-secondary
+               (#294E6C sobre blanco ≈ 8.75:1, cumple AAA) preservando el mismo rol
+               de-enfatizado (texto chico, sin mayúsculas, separador). -->
           <a
             href="/politica-de-tratamiento-de-datos"
-            class="text-xs font-medium normal-case text-neutral-400 hover:text-interactive transition-colors border-l border-neutral-200 pl-8"
+            class="text-xs font-medium normal-case text-secondary hover:text-interactive transition-colors border-l border-neutral-200 pl-8"
             >Política de datos</a
           >
         </nav>
+
+        <!-- Menú mobile (Épica J). Trigger de 44x44 visible solo debajo de md;
+             el overlay de abajo cubre toda la pantalla (z-70, por encima del
+             banner de cookies z-60 y WhatsApp z-50) así que el header original no
+             necesita alternar su propio ícono — el botón de cerrar vive dentro
+             del overlay. Lógica de apertura/cierre/foco/Escape en
+             /public/scripts/mobile-menu.js (nunca inline, ver CONTEXT.md §5). -->
+        <button
+          id="mobile-menu-trigger"
+          type="button"
+          class="flex md:hidden flex-col items-center justify-center gap-[5px] w-11 h-11 rounded-sm outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-2"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+          aria-label="Abrir menú"
+        >
+          <span class="block w-6 h-0.5 rounded-full bg-neutral-900" aria-hidden="true"></span>
+          <span class="block w-6 h-0.5 rounded-full bg-neutral-900" aria-hidden="true"></span>
+          <span class="block w-6 h-0.5 rounded-full bg-neutral-900" aria-hidden="true"></span>
+        </button>
       </div>
     </header>
+
+    <div
+      id="mobile-menu"
+      class="hidden md:hidden fixed inset-0 z-[70] flex-col bg-white"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menú de navegación"
+    >
+      <div class="flex justify-between items-center px-4 py-6 border-b-2 border-neutral-200">
+        <Logo variant="light" size="header" link={false} />
+        <button
+          id="mobile-menu-close"
+          type="button"
+          class="relative flex items-center justify-center w-11 h-11 rounded-sm outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-2"
+          aria-label="Cerrar menú"
+        >
+          <span
+            class="absolute w-[22px] h-0.5 rounded-full bg-neutral-900 rotate-45"
+            aria-hidden="true"
+          ></span>
+          <span
+            class="absolute w-[22px] h-0.5 rounded-full bg-neutral-900 -rotate-45"
+            aria-hidden="true"
+          ></span>
+        </button>
+      </div>
+      <nav aria-label="Menú principal" class="flex flex-col overflow-y-auto">
+        <a
+          href="/servicios"
+          class="block px-4 py-5 border-b border-neutral-200 text-xl font-bold tracking-wide uppercase text-neutral-900 hover:text-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
+          >Servicios</a
+        >
+        <a
+          href="/casos-de-estudio"
+          class="block px-4 py-5 border-b border-neutral-200 text-xl font-bold tracking-wide uppercase text-neutral-900 hover:text-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
+          >Casos de Estudio</a
+        >
+        <a
+          href="/nosotros"
+          class="block px-4 py-5 border-b border-neutral-200 text-xl font-bold tracking-wide uppercase text-neutral-900 hover:text-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
+          >Nosotros</a
+        >
+        <a
+          href="/contacto"
+          class="block px-4 py-5 border-b border-neutral-200 text-xl font-bold tracking-wide uppercase text-neutral-900 hover:text-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
+          >Contacto</a
+        >
+        <a
+          href="/politica-de-tratamiento-de-datos"
+          class="block px-4 py-4 mt-2 border-t-2 border-neutral-200 text-sm font-medium text-secondary hover:text-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
+          >Política de datos</a
+        >
+      </nav>
+    </div>
 
     <main class="flex-grow">
       <slot />
@@ -149,7 +235,16 @@ const organizationSchema = {
           >
         </nav>
       </div>
-      <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-sm text-neutral-400 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <!-- Bugfix (auditoría 2026-09-04, Épica K): text-neutral-400 medía ~3.46:1
+           contra bg-secondary (#294E6C), falla AA (4.5:1). neutral-400 no está
+           definido en tailwind.config.mjs (cae al gris genérico de Tailwind, no un
+           token de marca) — se reemplaza por neutral-200, ya en uso en este mismo
+           footer para los demás textos secundarios (párrafo de marca, nav),
+           medido ~7.10:1 contra #294E6C (relative luminance: L_bg≈0.0700,
+           L_neutral-200≈0.8018 ⇒ (0.8018+0.05)/(0.0700+0.05)≈7.10:1) — cumple
+           AAA (7:1). El rol "de-enfatizado" se conserva por tamaño (text-sm),
+           no por un tono más apagado que ya no cabía dentro de AAA. -->
+      <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-sm text-neutral-200 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <p>&copy; {new Date().getFullYear()} Arena IT. Todos los derechos reservados.</p>
         <a href="/politica-de-tratamiento-de-datos" class="hover:text-white transition-colors">
           Política de Tratamiento de Datos Personales
@@ -159,5 +254,7 @@ const organizationSchema = {
 
     <WhatsAppButton />
     <CookieConsentBanner />
+
+    <script type="module" src="/scripts/mobile-menu.js" is:inline></script>
   </body>
 </html>

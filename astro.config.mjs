@@ -23,7 +23,13 @@ export default defineConfig({
       studioUrl: '/admin',
     }),
     react(),
-    sitemap(),
+    sitemap({
+      // Auditoría SEO 2026-09-04 (Épica K): /admin (Sanity Studio) está prerenderizado
+      // (src/pages/admin/[...index].astro) y sin este filtro aparecía publicado en
+      // sitemap-0.xml real de producción — confirmado en vivo. No es contenido
+      // público, se excluye explícitamente.
+      filter: (page) => !new URL(page).pathname.startsWith('/admin'),
+    }),
   ],
   vite: {
     resolve: {
