@@ -133,6 +133,52 @@ Hay schemas de Sanity para funcionalidad de negocio que nunca se construyó del 
 - [ ] Internacionalización (¿versión en inglés para clientes fuera de LATAM/España?).
 - [ ] Más casos de estudio reales con clientes/resultados, una vez exista la página que los muestre (Épica B).
 
+## Fase 0 — Verificación y desbloqueo operativo (2026-09-04)
+
+Gate antes de contar cualquier trabajo de las épicas J–N como "producción": nada de lo siguiente reemplaza esto.
+
+- [ ] Confirmar en vivo que el fix de la Épica I sigue desplegado en `dev.arenait.co` (consola sin violaciones de CSP, submit real dispara `POST /api/leads`).
+- [ ] **Generar `SANITY_API_WRITE_TOKEN`** y cargarlo en Vercel (ver Épica A, sigue pendiente).
+- [ ] **Configurar el Deploy Hook** de Vercel ↔ webhook de Sanity (ver Épica A, sigue pendiente).
+
+Ambos ítems de configuración requieren acceso a las cuentas de Vercel/Sanity del cliente — quedan bloqueados hasta que alguien con ese acceso los ejecute, no se asumen resueltos.
+
+## Modelo multiagente (2026-09-04)
+
+Para llevar el sitio a "nivel enterprise" se adoptaron 7 subagentes especializados reutilizables en `.claude/agents/`: `seo-strategist`, `ui-ux-designer`, `frontend-engineer`, `performance-a11y-auditor`, `content-strategist`, `cro-analytics-engineer`, `qa-release-guardian`. Cada uno tiene un rol acotado (ver el frontmatter/instrucciones de cada archivo) y hereda las reglas ya establecidas del proyecto: no fabricar datos de cliente, ningún `<script>` compartido puede ser inline (causa raíz de la Épica I), no tocar tokens de marca sin confirmar. `qa-release-guardian` cierra cada épica nueva verificando contra la CSP real, no solo contra `astro dev`.
+
+## Épica J — Navegación mobile + analítica + auditoría base
+
+Cierra el hueco más visible de "no enterprise": hoy no hay navegación mobile por header y no hay ninguna evidencia real de performance/accesibilidad.
+
+- [ ] Menú mobile (hamburguesa): `<nav>` en `BaseLayout.astro` es `hidden md:flex` sin alternativa mobile (hallazgo Épica H, bug #7 de `CONTEXT.md`) — mockup por `ui-ux-designer`, implementación por `frontend-engineer` (script en `public/scripts/`, nunca inline), verificación por `qa-release-guardian`.
+- [ ] Vercel Analytics gateado por `hasAcceptedTracking()` (`public/scripts/consent.js`) — implementado por `cro-analytics-engineer`; agregar el dominio a `script-src`/`connect-src` de `vercel.json`.
+- [ ] Primera auditoría real Lighthouse + axe-core contra `dev.arenait.co` con headers CSP reales — `performance-a11y-auditor`, documentada (reemplaza la afirmación sin evidencia de `CONTEXT.md` §4).
+- [ ] Rate limiting por IP en `/api/leads` (hoy solo hay honeypot, ver Épica D) — `frontend-engineer`.
+
+## Épica K — SEO técnico y estructurado
+
+- [ ] Auditoría técnica completa por `seo-strategist`: meta description por página, canonical, jerarquía H1-H2, evaluar `BreadcrumbList`/`LocalBusiness` sobre el `Organization`/`Service` JSON-LD ya existente, validar `sitemap.xml`/`robots.txt` generados, OG/Twitter cards.
+- [ ] Decisión de tipografía: licenciar Codec Pro (ver Épica A, pendiente) o adoptar formalmente Plus Jakarta Sans como tipografía principal — afecta percepción de marca "enterprise".
+
+## Épica L — Contenido editorial y casos de estudio
+
+- [ ] Estrategia de contenido/blog para SEO orgánico (continúa la Épica E original) — `content-strategist`, temas coordinados con los hallazgos de `seo-strategist`.
+- [ ] Casos de estudio reales adicionales más allá de Sadep, solo con datos confirmados del cliente (mismo criterio que `fallbackContent.ts` — nunca fabricados).
+- [ ] Testimonios reales (`Testimonials.astro` ya es CMS-ready, no renderiza nada sin contenido real).
+
+## Épica M — Conversión y flujos faltantes
+
+- [ ] Flujo de descarga gated de whitepapers (schema `whitepaper.ts` existe, sin UI — ver Épica B) — `ui-ux-designer` + `frontend-engineer` + `cro-analytics-engineer` (tracking de descargas como leads).
+- [ ] Backlog de experimentos CRO sobre datos reales de Vercel Analytics (depende de Épica J) — `cro-analytics-engineer`.
+- [ ] Estudio de viabilidad de i18n (versión en inglés) — `seo-strategist` + `ui-ux-designer`, solo evaluación, sin comprometer implementación todavía.
+
+## Épica N — Endurecimiento enterprise
+
+- [ ] Remediación completa de accesibilidad sobre los hallazgos de la Épica J.
+- [ ] Reintroducir CI, resolviendo el fallo no diagnosticado de `astro check` en Linux (ver nota "GitHub Actions removido" arriba).
+- [ ] Pase con la skill `security-review` antes de cualquier relanzamiento público mayor.
+
 ---
 
 ## Cómo priorizar
@@ -141,3 +187,4 @@ Hay schemas de Sanity para funcionalidad de negocio que nunca se construyó del 
 2. **Épica C en paralelo, no después.** Correr lint/tests/build a mano antes de mergear cambios grandes evita que la próxima ronda de features rompa algo sin que nadie lo note (ya pasó 5 veces con Sanity Studio, ver `git log`) — sin CI automática, esto depende de disciplina manual.
 3. **Épica B y D** son las que realmente "suben de nivel" el proyecto una vez que la base deja de tener fugas.
 4. **Épica E** es expansión, no corrección — no empezarla antes de cerrar A.
+5. **Fase 0 y Épica J** son el siguiente bloqueante real: sin navegación mobile ni analítica ni auditoría de performance/a11y documentada, el sitio no puede llamarse "nivel enterprise" aunque A–I ya estén cerradas. **Épicas K–N** (SEO, contenido, conversión, endurecimiento) son las que efectivamente llevan el sitio al "máximo nivel empresarial" pedido — ver la sección "Modelo multiagente" arriba para los agentes (`.claude/agents/`) que ejecutan cada una.

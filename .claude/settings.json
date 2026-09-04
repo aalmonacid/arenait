@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm \"c:/DATOS/ArenaIT/src/pages/servicios/[slug].astro\")",
+      "Bash(npx astro *)"
+    ],
+    "additionalDirectories": ["c:\\DATOS\\ArenaIT\\src\\pages\\servicios"]
+  }
+}
