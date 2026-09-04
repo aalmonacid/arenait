@@ -51,12 +51,14 @@ const organizationSchema = {
          que se suban esos .woff2, el sitio debe cargar explícitamente su
          fallback declarado (Plus Jakarta Sans) en vez de caer a sans-serif
          genérica del sistema. Cargado de forma no bloqueante (preload +
-         inyección por script, en vez de un <link rel="stylesheet"> directo):
-         un <link> síncrono en <head> bloquea el parseo/renderizado hasta que
-         Google Fonts responde, y si ese dominio es lento o inalcanzable
-         (red restringida, tercero caído) cuelga la carga de toda la página
-         — se confirmó este colgado en un entorno de red restringida durante
-         el smoke testing con Playwright. -->
+         inyección por script externo, en vez de un <link rel="stylesheet">
+         directo): un <link> síncrono en <head> bloquea el parseo/renderizado
+         hasta que Google Fonts responde, y si ese dominio es lento o
+         inalcanzable (red restringida, tercero caído) cuelga la carga de
+         toda la página — se confirmó este colgado en un entorno de red
+         restringida durante el smoke testing con Playwright. El script vive
+         en /public/scripts/font-loader.js (no inline aquí) porque la CSP
+         del sitio bloquea scripts inline en producción — ver CONTEXT.md §5. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -64,13 +66,7 @@ const organizationSchema = {
       as="style"
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap"
     />
-    <script>
-      const fontLink = document.createElement('link');
-      fontLink.rel = 'stylesheet';
-      fontLink.href =
-        'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap';
-      document.head.appendChild(fontLink);
-    </script>
+    <script src="/scripts/font-loader.js" is:inline></script>
     <noscript>
       <link
         rel="stylesheet"

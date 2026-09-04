@@ -23,6 +23,22 @@
   font-display: swap;
 }
 
+/* Scrim direccional sobre las fotos reales del hero de home y el header de
+   /nosotros: más opaco donde va el texto (izquierda), transparente hacia el
+   resto para que la fotografía se vea con claridad. Vive en un archivo CSS
+   (no como atributo `style` inline) porque la CSP del sitio (`vercel.json`,
+   `style-src` sin `unsafe-inline`) bloquea estilos inline en producción —
+   ver CONTEXT.md §5, bug "estilos y scripts inline bloqueados por CSP". */
+.hero-scrim {
+  background: linear-gradient(
+    90deg,
+    rgba(41, 78, 108, 0.95) 0%,
+    rgba(41, 78, 108, 0.88) 40%,
+    rgba(41, 78, 108, 0.55) 70%,
+    rgba(41, 78, 108, 0.25) 100%
+  );
+}
+
 @layer base {
   html {
     @apply antialiased scroll-smooth;
