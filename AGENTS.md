@@ -16,10 +16,7 @@
   - Acento: #FEA621 (Naranja Ámbar)
   - Interactivo: #0446F1 (Azul Eléctrico)
   - Neutros: #FFFFFF, #F8FAFC, #E2E8F0, #0F172A
-- **Tipografía**:
-  - Titulares: Codec Pro Extra Bold
-  - Cuerpo/UI: Codec Pro
-  - Fallbacks: Plus Jakarta Sans, Inter
+- **Tipografía**: Plus Jakarta Sans (titulares y cuerpo/UI, pesos 400-800 vía utilidades de Tailwind como `font-extrabold`). Fallback: Inter, sans-serif. **Decisión confirmada por el cliente (2026-09-04)**: usar tipografía libre en vez de licenciar Codec Pro — no reintroducir referencias a Codec Pro como tipografía objetivo (ver `CONTEXT.md` §5/§6).
 
 ## Iconografía e imágenes
 

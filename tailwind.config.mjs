@@ -16,8 +16,12 @@ export default {
         },
       },
       fontFamily: {
-        heading: ['"Codec Pro Extra Bold"', '"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
-        body: ['"Codec Pro"', '"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        // Tipografía libre confirmada por el cliente (2026-09-04) en vez de
+        // licenciar Codec Pro — ver AGENTS.md. El peso extra-bold de los
+        // titulares se logra con la utilidad `font-extrabold` de Tailwind,
+        // no con una familia tipográfica distinta.
+        heading: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        body: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
       },
     },
   },

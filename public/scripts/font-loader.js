@@ -1,9 +1,10 @@
 /**
- * Carga no bloqueante de Plus Jakarta Sans (fallback real mientras Codec Pro
- * no tenga licencia, ver global.css). Archivo estático en /public a
- * propósito — ver el comentario en /scripts/consent.js sobre por qué un
- * <script> inline en un .astro compartido queda bloqueado por la CSP en
- * producción (`script-src 'self'`, sin `unsafe-inline`).
+ * Carga no bloqueante de Plus Jakarta Sans — tipografía oficial del sitio
+ * desde la decisión del cliente (2026-09-04) de usar tipografía libre en vez
+ * de licenciar Codec Pro (ver AGENTS.md, global.css). Archivo estático en
+ * /public a propósito — ver el comentario en /scripts/consent.js sobre por
+ * qué un <script> inline en un .astro compartido queda bloqueado por la CSP
+ * en producción (`script-src 'self'`, sin `unsafe-inline`).
  */
 const fontLink = document.createElement('link');
 fontLink.rel = 'stylesheet';

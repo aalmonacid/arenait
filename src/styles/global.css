@@ -2,27 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Codec Pro es una fuente comercial: estos archivos no están en el repo
-   (no hay licencia para redistribuirlos). Mientras falten, el navegador
-   ignora estas reglas y usa el fallback (Plus Jakarta Sans, cargado en
-   BaseLayout.astro) automáticamente. Subir los .woff2 reales a public/fonts/
-   activa la marca sin tocar más código. */
-@font-face {
-  font-family: 'Codec Pro';
-  src: url('/fonts/CodecPro-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Codec Pro Extra Bold';
-  src: url('/fonts/CodecPro-ExtraBold.woff2') format('woff2');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
 /* Scrim direccional sobre las fotos reales del hero de home y el header de
    /nosotros: más opaco donde va el texto (izquierda), transparente hacia el
    resto para que la fotografía se vea con claridad. Vive en un archivo CSS
@@ -99,7 +78,9 @@
 @layer base {
   html {
     @apply antialiased scroll-smooth;
-    font-family: 'Codec Pro', 'Plus Jakarta Sans', Inter, sans-serif;
+    /* Plus Jakarta Sans: tipografía libre confirmada por el cliente
+       (2026-09-04) en vez de licenciar Codec Pro — ver AGENTS.md. */
+    font-family: 'Plus Jakarta Sans', Inter, sans-serif;
     color: #0f172a; /* text-neutral-900 */
     background-color: #f8fafc; /* bg-neutral-50 */
   }
@@ -110,6 +91,6 @@
   h4,
   h5,
   h6 {
-    font-family: 'Codec Pro Extra Bold', 'Plus Jakarta Sans', Inter, sans-serif;
+    font-family: 'Plus Jakarta Sans', Inter, sans-serif;
   }
 }
