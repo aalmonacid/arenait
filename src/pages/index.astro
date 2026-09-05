@@ -1,7 +1,7 @@
 ---
 export const prerender = true;
 
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import ServiceCard from '../components/ServiceCard.astro';
@@ -49,11 +49,24 @@ const pillars = [
       'El software vivo cambia contigo. Damos mantenimiento, actualizamos y migramos lo que ya construiste para que siga funcionando.',
   },
 ];
+
+// ogImage (Épica K de BACKLOG.md): mismo criterio que /nosotros — se deriva
+// una copia estática 1200x630 de la foto real del hero vía getImage(), en
+// vez de dejar caer la home al og-default.png genérico.
+const ogImage = await getImage({
+  src: heroImage,
+  width: 1200,
+  height: 630,
+  fit: 'cover',
+  format: 'jpg',
+  quality: 70,
+});
 ---
 
 <BaseLayout
   title="Software a la medida para operaciones reales"
   description="Diseñamos, desarrollamos e integramos soluciones tecnológicas que se ajustan a cómo trabaja tu empresa — no al revés."
+  ogImage={ogImage.src}
 >
   <section class="relative overflow-hidden bg-secondary text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
     <Image

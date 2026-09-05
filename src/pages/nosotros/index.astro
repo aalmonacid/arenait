@@ -1,14 +1,30 @@
 ---
 export const prerender = true;
 
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import nosotrosImage from '../../assets/images/nosotros-facade.jpg';
+
+// ogImage (Épica K de BACKLOG.md): BaseLayout espera una URL/ruta plana, no
+// el componente <Image> optimizado de astro:assets. getImage() genera una
+// copia estática 1200x630 (medida estándar de OG) recortada con `fit:
+// 'cover'` de la misma foto real ya usada en el header de esta página — no
+// se fabrica una imagen nueva, se deriva de la existente. `.src` es la ruta
+// pública real que Astro emite en /_astro/ durante el build.
+const ogImage = await getImage({
+  src: nosotrosImage,
+  width: 1200,
+  height: 630,
+  fit: 'cover',
+  format: 'jpg',
+  quality: 70,
+});
 ---
 
 <BaseLayout
   title="Quiénes somos"
   description="Arena IT es una empresa colombiana de desarrollo de software, dedicada a diseñar, construir e integrar soluciones tecnológicas a la medida de las necesidades reales de cada negocio."
+  ogImage={ogImage.src}
 >
   <header class="relative overflow-hidden bg-secondary text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
     <Image

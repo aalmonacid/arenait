@@ -1,0 +1,206 @@
+---
+import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
+
+/**
+ * Modal de descarga gated para /recursos. Instancia única en la página,
+ * reutilizada por todos los cards de whitepaper: whitepaper-gate.js la abre
+ * y le inyecta el id/título del whitepaper elegido al hacer clic en
+ * "Descargar". No es LeadCaptureForm.astro reutilizado tal cual: los campos,
+ * el endpoint (/api/whitepaper-download, no /api/leads) y el estado de éxito
+ * (un link real de descarga, no un mensaje) son distintos — pero reutiliza su
+ * mismo lenguaje visual (clases de input, patrón de checkbox, botón
+ * bg-primary/hover:bg-interactive).
+ */
+---
+
+<div
+  id="whitepaperGateOverlay"
+  class="hidden fixed inset-0 z-[80] items-center justify-center bg-neutral-900/60 px-4 py-8"
+>
+  <div
+    id="whitepaperGateModal"
+    class="bg-white w-full max-w-xl max-h-[90vh] overflow-y-auto border-2 border-neutral-200 shadow-2xl p-8 md:p-12 font-body"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="whitepaperGateTitle"
+  >
+    <div class="flex justify-between items-start gap-4 mb-2">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-widest text-interactive mb-2">
+          Descarga gratuita
+        </p>
+        <h3
+          id="whitepaperGateTitle"
+          class="text-2xl font-heading text-secondary leading-tight"
+        >
+        </h3>
+      </div>
+      <button
+        type="button"
+        id="whitepaperGateClose"
+        aria-label="Cerrar"
+        class="shrink-0 w-11 h-11 flex items-center justify-center text-neutral-900 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-2"
+      >
+        <svg
+          class="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+
+    <p class="text-sm text-neutral-600 leading-relaxed mb-8">
+      Déjanos tus datos y tu descarga comienza de inmediato — no te vamos a escribir sin que nos
+      contactes primero.
+    </p>
+
+    <form id="whitepaperGateForm" class="space-y-6" data-policy-version={POLICY_VERSION}>
+      <input type="hidden" id="whitepaperGateId" name="whitepaperId" />
+
+      <div>
+        <label
+          for="whitepaperFullName"
+          class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
+          >Nombre completo</label
+        >
+        <input
+          type="text"
+          id="whitepaperFullName"
+          required
+          class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
+        />
+      </div>
+
+      <div>
+        <label
+          for="whitepaperEmail"
+          class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
+          >Correo corporativo</label
+        >
+        <input
+          type="email"
+          id="whitepaperEmail"
+          required
+          placeholder="nombre@empresa.com"
+          class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
+        />
+        <p id="whitepaperEmailError" class="text-sm text-red-600 font-bold mt-2 hidden">
+          Por favor, ingrese un correo válido.
+        </p>
+      </div>
+
+      <div>
+        <label
+          for="whitepaperCompany"
+          class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
+          >Empresa (opcional)</label
+        >
+        <input
+          type="text"
+          id="whitepaperCompany"
+          class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
+        />
+      </div>
+
+      <!-- Honeypot anti-spam: mismo patrón que LeadCaptureForm.astro, oculto
+           visualmente (no display:none, para que un bot simple lo complete igual). -->
+      <div class="absolute -left-[9999px] w-px h-px overflow-hidden" aria-hidden="true">
+        <label for="whitepaperCompanyWebsite">No completar este campo</label>
+        <input
+          type="text"
+          id="whitepaperCompanyWebsite"
+          name="companyWebsite"
+          tabindex="-1"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="flex items-start gap-3">
+        <input
+          type="checkbox"
+          id="whitepaperPolicyAccepted"
+          required
+          class="mt-1 h-4 w-4 shrink-0 border-neutral-200 text-primary focus:ring-interactive"
+        />
+        <label for="whitepaperPolicyAccepted" class="text-sm text-neutral-900">
+          He leído y acepto la{' '}
+          <a href={POLICY_URL} target="_blank" rel="noopener" class="text-interactive underline">
+            Política de Tratamiento de Datos Personales
+          </a>
+          .
+        </label>
+      </div>
+      <p id="whitepaperPolicyError" class="text-sm text-red-600 font-bold hidden">
+        Debes aceptar la Política de Tratamiento de Datos Personales para continuar.
+      </p>
+
+      <button
+        type="submit"
+        class="w-full px-8 py-4 bg-primary hover:bg-interactive text-white font-bold tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Descargar ahora
+      </button>
+      <p class="text-xs text-neutral-500 text-center -mt-2">
+        Recibirás el PDF al instante, sin espera por correo.
+      </p>
+
+      <p id="whitepaperFormError" class="text-sm text-red-600 font-bold hidden"></p>
+    </form>
+
+    <!-- Estado de éxito: reemplaza el formulario, nunca coexiste con él. El
+         href del link real se inyecta desde whitepaper-gate.js con la URL que
+         devuelve /api/whitepaper-download — nunca se conoce antes del submit. -->
+    <div id="whitepaperGateSuccess" class="hidden text-center">
+      <div
+        class="w-16 h-16 rounded-full bg-neutral-50 border-2 border-primary flex items-center justify-center mx-auto mb-6"
+      >
+        <svg
+          class="w-7 h-7 text-primary"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <h3 class="text-xl font-heading text-secondary mb-3">Tu descarga está lista</h3>
+      <p class="text-sm text-neutral-600 leading-relaxed mb-8">
+        Gracias — ya puedes abrir el documento. Si necesitas ayuda para aplicarlo a tu caso,{' '}
+        <a href="/contacto" class="text-interactive underline">escríbenos</a>.
+      </p>
+      <a
+        id="whitepaperDownloadLink"
+        href="#"
+        target="_blank"
+        rel="noopener"
+        class="flex items-center justify-center gap-3 w-full bg-primary hover:bg-interactive text-white font-bold text-sm tracking-widest uppercase py-4 transition-colors"
+      >
+        <svg
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" />
+        </svg>
+        Descargar PDF
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Lógica en /public/scripts/ (no inline aquí): este componente vive en una
+     página real del sitio, y la CSP (script-src 'self') bloquea scripts
+     inline compartidos en producción — ver CONTEXT.md §5 bug #8. -->
+<script type="module" src="/scripts/whitepaper-gate.js" is:inline></script>

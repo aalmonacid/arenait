@@ -1,0 +1,65 @@
+---
+export const prerender = true;
+
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+
+  return posts.map((post: CollectionEntry<'blog'>) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article class="bg-white min-h-screen">
+    <header class="bg-secondary text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent">
+      <div class="max-w-3xl mx-auto">
+        {
+          post.data.tags.length > 0 && (
+            <p class="text-sm font-bold uppercase tracking-widest text-accent mb-4">
+              {post.data.tags.join(' · ')}
+            </p>
+          )
+        }
+        <h1 class="text-4xl md:text-6xl font-heading mb-6 tracking-tight text-white">
+          {post.data.title}
+        </h1>
+        <p class="text-neutral-300">
+          {formatDate(post.data.publishDate)}
+          {post.data.author && ` · ${post.data.author}`}
+        </p>
+      </div>
+    </header>
+
+    <section class="py-24 px-4 md:px-8">
+      <div class="max-w-3xl mx-auto markdown-content">
+        <Content />
+      </div>
+    </section>
+
+    <section class="py-16 px-4 md:px-8 bg-neutral-50 border-t border-neutral-200">
+      <div class="max-w-3xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <a href="/blog" class="text-interactive font-bold underline">
+          ← Ver todos los artículos
+        </a>
+        <a
+          href="/contacto"
+          class="inline-flex justify-center items-center px-8 py-4 bg-primary hover:bg-interactive text-white font-bold tracking-widest uppercase transition-colors"
+        >
+          Cuéntanos tu reto
+        </a>
+      </div>
+    </section>
+  </article>
+</BaseLayout>
