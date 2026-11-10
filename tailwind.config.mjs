@@ -1,13 +1,20 @@
+// Tokens de marca (AGENTS.md). Se exponen planos (`bg-primary`, usados en todo
+// el sitio) y agrupados bajo `brand` (`bg-brand-primary`) apuntando al mismo valor.
+const brand = {
+  primary: '#0075C9', // Azul Cerúleo
+  secondary: '#294E6C', // Azul Noche / Pizarra
+  accent: '#FEA621', // Naranja Ámbar
+  interactive: '#0446F1', // Azul Eléctrico
+};
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   theme: {
     extend: {
       colors: {
-        primary: '#0075C9', // Azul Cerúleo
-        secondary: '#294E6C', // Azul Noche / Pizarra
-        accent: '#FEA621', // Naranja Ámbar
-        interactive: '#0446F1', // Azul Eléctrico
+        ...brand,
+        brand,
         neutral: {
           50: '#F8FAFC',
           200: '#E2E8F0',

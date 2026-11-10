@@ -1,0 +1,91 @@
+---
+/**
+ * Bento Grid asimétrico de servicios (reemplaza a ServiceCard + la sección
+ * "En qué te ayudamos", que duplicaba 4 de los 6 servicios).
+ *
+ * - Jerarquía por slug (no por título, que puede cambiar en Sanity): los dos
+ *   servicios destacados ocupan 2 columnas en desktop. Con los 6 servicios
+ *   reales el grid de 4 columnas se llena exacto en 2 filas, sin huecos.
+ * - Sin JavaScript: microinteracciones solo con utilidades de Tailwind
+ *   (group-hover, focus-visible), compatible con la CSP `script-src 'self'`.
+ * - Contraste: el texto usa `secondary` / `neutral-900` (AAA sobre blanco);
+ *   `primary` e `interactive` solo en bordes e íconos, donde basta 3:1.
+ */
+import Icon from './Icon.astro';
+import type { ServiceSchema } from '../types/sanity';
+
+interface Props {
+  services: ServiceSchema[];
+}
+
+const { services } = Astro.props;
+
+const ORDER = [
+  'desarrollo-a-la-medida',
+  'implementacion-de-aplicaciones',
+  'gestion-de-proyectos-de-ti',
+  'business-intelligence',
+  'aseguramiento-de-la-calidad',
+  'mantenimiento-y-migracion-de-software',
+];
+const FEATURED = new Set(['desarrollo-a-la-medida', 'mantenimiento-y-migracion-de-software']);
+
+const rank = (s: ServiceSchema) => {
+  const i = ORDER.indexOf(s.slug?.current ?? '');
+  return i === -1 ? ORDER.length : i;
+};
+const items = [...services].sort((a, b) => rank(a) - rank(b));
+---
+
+<ul
+  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 list-none p-0 m-0"
+  aria-label="Servicios de ArenaIT"
+>
+  {
+    items.map((service, index) => {
+      const slug = service.slug?.current ?? '';
+      const featured = FEATURED.has(slug);
+      return (
+        <li class={featured ? 'md:col-span-2' : ''}>
+          <a
+            href={`/servicios#${slug}`}
+            class:list={[
+              'group block h-full rounded-none border-2 border-neutral-200 bg-white text-neutral-900 transition-colors duration-200',
+              'focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-interactive',
+              featured ? 'hover:border-interactive' : 'hover:border-primary',
+            ]}
+          >
+            <article class:list={['flex h-full flex-col', featured ? 'p-8 md:p-12' : 'p-8']}>
+              <header class="mb-8 flex items-start justify-between">
+                {service.icon ? (
+                  <span class="text-primary">
+                    <Icon name={service.icon as any} class={featured ? 'w-14 h-14' : 'w-10 h-10'} />
+                  </span>
+                ) : (
+                  <span />
+                )}
+                <span class="text-sm font-bold tracking-widest text-secondary" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+              </header>
+              <h3
+                class:list={[
+                  'font-heading font-extrabold text-secondary leading-tight mb-3',
+                  featured ? 'text-3xl md:text-4xl' : 'text-2xl',
+                ]}
+              >
+                {service.title}
+              </h3>
+              <p class="leading-relaxed text-neutral-900">
+                {featured ? service.description : service.summary}
+              </p>
+              <span class="mt-auto pt-8 text-sm font-bold tracking-widest uppercase text-secondary underline decoration-2 underline-offset-4 decoration-neutral-200 group-hover:decoration-interactive">
+                Ver detalle
+              </span>
+            </article>
+          </a>
+        </li>
+      );
+    })
+  }
+</ul>

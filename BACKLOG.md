@@ -188,6 +188,12 @@ Con esto, **Épica J queda cerrada**: los 4 ítems (nav mobile, analítica, audi
 
 ---
 
+## Rediseño del home — Bento de servicios (10/11/2026)
+
+- [x] `ServicesBento.astro` reemplaza `ServiceCard` y la sección "En qué te ayudamos" (duplicada con "Servicios"). Skill de diseño en `.claude/skills/disenador-uiux-suizo-arenait/`. Alias `brand.*` agregado en `tailwind.config.mjs` sin quitar los tokens planos. Verificado: `astro check`/lint/build, layout 2+1+1 / 1+1+2 en desktop y 1 columna en móvil, cero scripts nuevos. Pendiente: revisión visual del cliente y verificación contra la CSP real en el deploy.
+
+---
+
 ## Cómo priorizar
 
 1. **Épica A primero, sin excepción.** El sitio hoy puede estar recibiendo tráfico y perdiendo leads silenciosamente porque el formulario no los guarda en ningún lado. Es la pérdida de valor más alta y más fácil de no notar.

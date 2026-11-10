@@ -94,7 +94,7 @@ Definidos en `tailwind.config.mjs` y `AGENTS.md`. `CONTEXT.md` no los redefine, 
 
 _(Actualizado 2026-08-24 tras el pivote de posicionamiento — ver §1.)_
 
-- `src/pages/index.astro` — home: hero, 4 pilares ("En qué te ayudamos"), 6 servicios reales, caso de éxito Sadep, `<Testimonials />`, CTA de contacto corto (enlaza a `/contacto`, ya no embebe el formulario completo)
+- `src/pages/index.astro` — home: hero, 6 servicios reales en Bento Grid asimétrico (`ServicesBento.astro`, 10/11/2026: reemplazó a `ServiceCard` y a la sección "En qué te ayudamos", que duplicaba 4 de los 6 servicios; destacados por slug: desarrollo-a-la-medida y mantenimiento-y-migracion-de-software, 2 columnas en desktop), caso de éxito Sadep, `<Testimonials />`, CTA de contacto corto (enlaza a `/contacto`, ya no embebe el formulario completo)
 - `src/pages/servicios/index.astro` — página única con los 6 servicios reales (title/summary/description/icon). Reemplaza a `servicios/[slug].astro` (eliminado): el copy real no tenía métricas ricas que justificaran páginas de detalle individuales
 - `src/pages/nosotros/index.astro` — copy verificado, con Misión/Visión/sectores reales (migrados 2026-09-03 desde el sitio viejo). Año de fundación y tamaño de equipo siguen sin dato confirmado — el bloque no se renderiza (ya no se muestra `[PENDIENTE]`)
 - `src/pages/contacto/index.astro` — nuevo: destino canónico de contacto, `<LeadCaptureForm showServiceDropdown />` con el dropdown "Servicio de interés"
