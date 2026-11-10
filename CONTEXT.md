@@ -22,7 +22,7 @@ Es un sitio de marketing, no una aplicación transaccional: home (hero, 4 pilare
 
 ## 2. Stack real (verificado en `package.json`)
 
-- **Astro 7.2**, `output: 'server'` + `@astrojs/vercel` adapter desde el 2026-08-24 (renderizado mixto — ver §3), no estático puro como al inicio de la auditoría
+- **Astro 7.4.8** (actualizado 10/11/2026; **no subir a 7.4.9**: rompe `astro check` en `src/pages/admin/[...index].astro` — `client:only` deja de reconocerse en `<SanityStudio>`; reevaluar en versiones posteriores). `npm audit` (producción) bajó de 40 a 19 vulnerabilidades, 0 críticas; las 5 altas restantes dependen de upstream (`@astrojs/vercel`, `sanity`) y su "fix" automático es un downgrade, no aplicarlo. `output: 'server'` + `@astrojs/vercel` adapter desde el 2026-08-24 (renderizado mixto — ver §3), no estático puro como al inicio de la auditoría
 - **React 19** vía `@astrojs/react`, usado _solo_ para aislar Sanity Studio (`SanityStudio.tsx`), no para UI de producto
 - **Sanity 6.9 / `@sanity/astro` 3.5** — CMS headless, project `xbayv7k2`, dataset `production`
 - **Tailwind CSS 3.4** con tokens de marca (ver §5)
