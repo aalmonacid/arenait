@@ -12,7 +12,7 @@
 | Diseño | Listo, pendiente de aprobación | Sistema editorial aplicado a todo el sitio; el cliente debe aprobar botones naranja y titulares nuevos |
 | Seguridad (código) | Listo | CSP única en todo el sitio (excepto `/admin` y `/api`), endpoint de leads endurecido, leads con ID privado |
 | Seguridad (cuentas) | **Pendiente (usted)** | Ver «Acciones en Sanity» y «Acciones en Vercel» |
-| Rendimiento | Mejorado, por medir | Fuente autoalojada y precargada para eliminar el CLS del home móvil; medir en el deploy |
+| Rendimiento | Medido y mejorado | Lighthouse móvil del home: Performance 94 (88–95) y CLS 0 en 5 de 5 corridas (antes 74–90 y CLS 0.207); LCP ~1.1 s en home, contacto y casos (antes 2.6 s en contacto y casos). TBT variable (88–519 ms), sin tendencia clara. Medido el 12/11/2026 sobre `dev.arenait.co`, en emulación y sin control de CPU |
 | Accesibilidad | AA verificado, AAA parcial | Correcciones aplicadas; ver «Accesibilidad» |
 | SEO | Listo para activar | Indexación por variable de entorno; `noindex` sigue activo hasta que se active |
 | Legal | **Bloqueado por el cliente** | Datos del responsable del tratamiento |
@@ -91,7 +91,8 @@ Todo contenido dirigido al cliente debe ser revisado por una persona del equipo 
 
 - **Verificado (axe-core, 11 rutas, desktop y móvil):** 0 violaciones de contraste AA.
 - **Corregido en este ciclo:** botón «Aceptar» de cookies (ahora naranja con texto oscuro), textos grises de la política, etiquetas «pendiente», mensajes de error y éxito del formulario, nombre accesible del logo, áreas táctiles de enlaces pequeños y foco visible por defecto en todos los enlaces y botones.
-- **Pendiente:** el «IT» del logo en el footer (naranja sobre azul pizarra) mide 4.45:1, apenas por debajo de 4.5:1; es parte de la marca, el cliente decide si se ajusta.
+- **Re-medido tras las correcciones (axe-core, 22 cargas):** 0 violaciones A/AA y de mejores prácticas; los fallos AAA de cookies, placeholders y grises quedaron resueltos. Foco con teclado medido: 6.66:1 sobre blanco y 8.75:1 sobre azul pizarra.
+- **Único fallo AAA automatizado que queda:** el «IT» del logo en el footer (naranja `#FEA621` sobre `#294E6C`) mide 4.45:1 y se exige 4.5:1 (texto grande). Es un color de marca: el cliente decide si se usa blanco para «IT» en el footer, se oscurece ligeramente el fondo del footer o se acepta la excepción de logotipo de WCAG. Hasta entonces no se declara AAA completo.
 - **No se puede certificar solo con herramientas:** varios criterios WCAG AAA (lenguaje claro, secuencia de lectura, zoom y lectores de pantalla) requieren revisión manual. Recomendación: declarar **AA verificado** y AAA como objetivo.
 
 ## Después del lanzamiento
