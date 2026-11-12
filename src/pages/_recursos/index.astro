@@ -1,4 +1,10 @@
 ---
+// PÁGINA DESACTIVADA (12/11/2026): el prefijo `_` hace que Astro no genere la
+// ruta /recursos (ni su sitemap). Se conserva el código del flujo de
+// whitepapers para reactivarlo: renombrar esta carpeta a `recursos`, renombrar
+// `src/pages/api/_whitepaper-download.ts` a `whitepaper-download.ts` y volver a
+// agregar el enlace "Recursos" al nav (header, menú móvil y footer en
+// BaseLayout.astro). Ver BACKLOG.md.
 export const prerender = true;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
