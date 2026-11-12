@@ -44,6 +44,38 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/nosotros.html",
+      "destination": "/nosotros",
+      "statusCode": 301
+    },
+    {
+      "source": "/servicios.html",
+      "destination": "/servicios",
+      "statusCode": 301
+    },
+    {
+      "source": "/contacto.html",
+      "destination": "/contacto",
+      "statusCode": 301
+    },
+    {
+      "source": "/experiencia.html",
+      "destination": "/casos-de-estudio",
+      "statusCode": 301
+    },
+    {
+      "source": "/alianzas.html",
+      "destination": "/nosotros",
+      "statusCode": 301
+    }
+  ],
   "rewrites": [
     {
       "source": "/admin/(.*)",

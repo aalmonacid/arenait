@@ -64,7 +64,7 @@ Todo contenido dirigido al cliente debe ser revisado por una persona del equipo 
 
 **Decisiones**
 
-5. **Dominio canónico**: `arenait.co` o `www.arenait.co` (hoy el sitio viejo vive en `www`). Planear las redirecciones 301 de las URL del sitio anterior (por ejemplo `/nosotros.html`).
+5. **Dominio canónico**: `arenait.co` o `www.arenait.co` (hoy el sitio anterior vive en `www`, detrás de Cloudflare). Las redirecciones 301 de las páginas `.html` del sitio anterior ya están configuradas en `vercel.json` (`/nosotros.html` → `/nosotros`, `/servicios.html` → `/servicios`, `/contacto.html` → `/contacto`, `/experiencia.html` → `/casos-de-estudio`, `/alianzas.html` → `/nosotros`, `/index.html` → `/`); confirmar el destino de `alianzas.html` y verificarlas una vez el dominio apunte al sitio nuevo.
 6. **¿Quién atiende los leads y en qué plazo?** Y por qué canal quieren el aviso (correo, Slack, Teams).
 7. **Aprobación de diseño**: botones primarios naranja con texto oscuro (el blanco sobre azul `#0075C9` mide 4.8:1 y no cumple AAA), titulares nuevos de cada página, las 5 etapas de «Cómo trabajamos» y la lista de sectores.
 8. **Contacto de seguridad**: un correo para `/.well-known/security.txt` (reporte de vulnerabilidades). No lo creé porque no tengo un correo confirmado.
@@ -75,6 +75,14 @@ Todo contenido dirigido al cliente debe ser revisado por una persona del equipo 
 10. Datos de contacto público (correo, teléfono), dirección física y redes sociales; año de fundación y tamaño del equipo, si desean publicarlos.
 11. Revisión y aprobación de los 2 artículos del blog.
 12. Más casos de estudio y testimonios reales, con permiso escrito de uso.
+
+## Línea base del sitio actual (inspeccionada el 12/11/2026)
+
+El sitio actual (`www.arenait.co`, montado hace meses) no tiene SEO técnico: 6 páginas HTML con el mismo título «ARENA IT», sin meta description, canonical, Open Graph ni datos estructurados, sin mapa del sitio (404), con `lang="en-US"` y H1 solo en 1 de 6 páginas. No hay posicionamiento técnico que preservar; el sitio nuevo es el primer trabajo de SEO del dominio. El posicionamiento orgánico real no se midió (requiere Search Console).
+
+## Acciones en Cloudflare
+
+Con acceso confirmado: apuntar el dominio definitivo a Vercel con los registros que indique Vercel, decidir si el registro va con proxy de Cloudflare o solo DNS y revisar el modo SSL/TLS (verificar la documentación vigente de ambos proveedores), configurar la redirección `arenait.co` ↔ `www` según el dominio canónico, y conservar el destino del sitio anterior hasta confirmar el lanzamiento para poder revertir.
 
 ## Lanzamiento (orden sugerido)
 

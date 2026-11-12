@@ -214,7 +214,8 @@ Plan, responsables y acciones pendientes: [`PLAN-PRODUCCION.md`](./PLAN-PRODUCCI
 - [x] Fuente autoalojada y precargada (objetivo: eliminar el CLS 0.207 del home móvil; **por medir en el deploy**), CSP sin Google Fonts.
 - [x] Accesibilidad: botón de cookies, grises fuera de paleta, errores del formulario, nombre del logo, áreas táctiles y foco global.
 - [x] Indexación y dominio por variables de entorno (`PUBLIC_ALLOW_INDEXING`, `PUBLIC_SITE_URL`) con `robots.txt` generado.
-- [ ] **Usuario**: CORS, token, privacidad del dataset, Deploy Hook, Web Analytics, variables y dominio (ver plan).
+- [x] Redirecciones 301 de las páginas `.html` del sitio anterior en `vercel.json` (por verificar tras el cambio de dominio). Línea base de SEO del sitio actual documentada en `PLAN-PRODUCCION.md`.
+- [ ] **Usuario** (con acceso a Vercel, Sanity y Cloudflare): CORS, token, privacidad del dataset, Deploy Hook, Web Analytics, variables y dominio (ver plan).
 - [ ] **Cliente**: datos legales, aprobaciones de diseño, dominio canónico, contenido.
 
 ## Cómo priorizar
