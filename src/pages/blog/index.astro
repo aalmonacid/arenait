@@ -3,6 +3,7 @@ export const prerender = true;
 
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
 
 const posts = (await getCollection('blog')).sort(
   (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) =>
@@ -18,48 +19,50 @@ function formatDate(date: Date): string {
   title="Blog"
   description="Artículos sobre desarrollo de software a la medida, modernización de sistemas y buenas prácticas de TI para empresas."
 >
-  <header
-    class="bg-secondary text-white py-24 md:py-32 px-4 md:px-8 border-b-8 border-accent"
-  >
-    <div class="max-w-7xl mx-auto">
-      <h1 class="text-4xl md:text-6xl font-heading mb-6 tracking-tight text-white">Blog</h1>
-      <p class="text-xl md:text-2xl text-neutral-300 max-w-3xl leading-relaxed">
-        Ideas y prácticas reales sobre desarrollo de software, modernización de sistemas y TI para
-        empresas.
-      </p>
-    </div>
-  </header>
+  <PageHero
+    kicker="Blog"
+    title="Ideas y prácticas reales de software."
+    lead="Ideas y prácticas reales sobre desarrollo de software, modernización de sistemas y TI para empresas."
+  />
 
-  <section class="py-24 px-4 md:px-8 bg-neutral-50">
+  <section class="py-16 md:py-24 px-4 md:px-8 bg-neutral-50">
     <div class="max-w-7xl mx-auto">
       {
         posts.length === 0 ? (
-          <div class="text-center py-24 border-2 border-dashed border-neutral-200">
-            <p class="text-lg text-neutral-600 max-w-xl mx-auto">
+          <div class="py-20 text-center border-2 border-dashed border-neutral-200">
+            <p class="text-lg text-neutral-900 max-w-xl mx-auto">
               Todavía no hay artículos publicados. Estamos preparando el primer contenido —{' '}
-              <a href="/contacto" class="text-interactive font-bold underline">
+              <a
+                href="/contacto"
+                class="font-bold text-secondary underline decoration-interactive decoration-2 underline-offset-4"
+              >
                 escríbenos
               </a>{' '}
               si quieres que cubramos un tema puntual.
             </p>
           </div>
         ) : (
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-px bg-neutral-200 border border-neutral-200 list-none p-0 m-0">
             {posts.map((post: CollectionEntry<'blog'>) => (
-              <a
-                href={`/blog/${post.id}`}
-                class="block border-2 border-neutral-200 bg-white p-8 hover:border-primary transition-colors duration-300"
-              >
-                <p class="text-xs font-bold uppercase tracking-widest text-interactive mb-2">
-                  {formatDate(post.data.publishDate)}
-                </p>
-                <h2 class="text-2xl font-heading text-secondary mb-4 leading-tight">
-                  {post.data.title}
-                </h2>
-                <p class="text-neutral-900 leading-relaxed">{post.data.description}</p>
-              </a>
+              <li class="bg-white">
+                <a
+                  href={`/blog/${post.id}`}
+                  class="group flex h-full min-h-72 flex-col border-2 border-transparent p-8 md:p-10 transition-colors duration-200 hover:border-primary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-interactive"
+                >
+                  <p class="text-xs font-bold uppercase tracking-label text-secondary mb-4">
+                    {formatDate(post.data.publishDate)}
+                  </p>
+                  <h2 class="font-heading text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-secondary text-balance mb-4">
+                    {post.data.title}
+                  </h2>
+                  <p class="text-neutral-900 leading-relaxed">{post.data.description}</p>
+                  <span class="mt-auto pt-8 inline-flex items-center gap-3 text-xs font-extrabold uppercase tracking-label text-neutral-900 after:block after:h-0.5 after:w-6 after:bg-current after:transition-all after:duration-200 group-hover:after:w-14">
+                    Leer artículo
+                  </span>
+                </a>
+              </li>
             ))}
-          </div>
+          </ul>
         )
       }
     </div>

@@ -1,0 +1,50 @@
+---
+/**
+ * Botón/enlace del sistema editorial. Tres variantes con contraste verificado:
+ * - accent: fondo accent + texto neutral-900 (~9.1:1, AAA). Acción principal.
+ * - dark: fondo neutral-900 + texto blanco. Acción principal sobre fondo accent.
+ * - line: solo borde neutral-900, subrayado interactive al hover. Acción secundaria.
+ * Se renderiza como <a> si recibe `href` y como <button> si no; cualquier otro
+ * atributo (data-*, id, type, aria-*) se reenvía tal cual. Sin JS.
+ */
+interface Props {
+  href?: string;
+  variant?: 'accent' | 'dark' | 'line';
+  size?: 'md' | 'sm';
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { href, variant = 'accent', size = 'md', class: className = '', ...rest } = Astro.props;
+
+const variants: Record<'accent' | 'dark' | 'line', string> = {
+  accent:
+    'border-accent bg-accent text-neutral-900 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white',
+  dark: 'border-neutral-900 bg-neutral-900 text-white hover:bg-white hover:text-neutral-900',
+  line: 'border-neutral-900 bg-transparent text-neutral-900 hover:border-interactive hover:bg-white',
+};
+const sizes: Record<'md' | 'sm', string> = {
+  md: 'min-h-14 px-7',
+  sm: 'min-h-11 px-5',
+};
+
+const Tag = href ? 'a' : 'button';
+const focusRing =
+  variant === 'dark' ? 'focus-visible:outline-neutral-900' : 'focus-visible:outline-interactive';
+---
+
+<Tag
+  href={href}
+  type={href ? undefined : 'button'}
+  class:list={[
+    'inline-flex items-center justify-center rounded-none border-2 text-xs font-extrabold uppercase tracking-label transition-colors duration-200',
+    variants[variant as 'accent' | 'dark' | 'line'],
+    sizes[size as 'md' | 'sm'],
+    'focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4',
+    focusRing,
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</Tag>

@@ -26,13 +26,10 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
   >
     <div class="flex justify-between items-start gap-4 mb-2">
       <div>
-        <p class="text-xs font-bold uppercase tracking-widest text-interactive mb-2">
+        <p class="text-xs font-bold uppercase tracking-label text-secondary mb-2">
           Descarga gratuita
         </p>
-        <h3
-          id="whitepaperGateTitle"
-          class="text-2xl font-heading text-secondary leading-tight"
-        >
+        <h3 id="whitepaperGateTitle" class="text-2xl font-heading text-secondary leading-tight">
         </h3>
       </div>
       <button
@@ -49,12 +46,12 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
           stroke-width="2"
           stroke-linecap="round"
         >
-          <path d="M6 6l12 12M18 6L6 18" />
+          <path d="M6 6l12 12M18 6L6 18"></path>
         </svg>
       </button>
     </div>
 
-    <p class="text-sm text-neutral-600 leading-relaxed mb-8">
+    <p class="text-sm text-secondary leading-relaxed mb-8">
       Déjanos tus datos y tu descarga comienza de inmediato — no te vamos a escribir sin que nos
       contactes primero.
     </p>
@@ -65,21 +62,21 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
       <div>
         <label
           for="whitepaperFullName"
-          class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
+          class="block text-xs font-bold tracking-label uppercase mb-2 text-secondary"
           >Nombre completo</label
         >
         <input
           type="text"
           id="whitepaperFullName"
           required
-          class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
+          class="w-full rounded-none bg-white border border-secondary px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-2 focus:ring-interactive transition-colors"
         />
       </div>
 
       <div>
         <label
           for="whitepaperEmail"
-          class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
+          class="block text-xs font-bold tracking-label uppercase mb-2 text-secondary"
           >Correo corporativo</label
         >
         <input
@@ -87,7 +84,7 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
           id="whitepaperEmail"
           required
           placeholder="nombre@empresa.com"
-          class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
+          class="w-full rounded-none bg-white border border-secondary px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-2 focus:ring-interactive transition-colors"
         />
         <p id="whitepaperEmailError" class="text-sm text-red-600 font-bold mt-2 hidden">
           Por favor, ingrese un correo válido.
@@ -97,13 +94,13 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
       <div>
         <label
           for="whitepaperCompany"
-          class="block text-sm font-bold tracking-widest uppercase mb-2 text-neutral-900"
+          class="block text-xs font-bold tracking-label uppercase mb-2 text-secondary"
           >Empresa (opcional)</label
         >
         <input
           type="text"
           id="whitepaperCompany"
-          class="w-full bg-white border border-neutral-200 px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive transition-colors"
+          class="w-full rounded-none bg-white border border-secondary px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-2 focus:ring-interactive transition-colors"
         />
       </div>
 
@@ -125,11 +122,16 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
           type="checkbox"
           id="whitepaperPolicyAccepted"
           required
-          class="mt-1 h-4 w-4 shrink-0 border-neutral-200 text-primary focus:ring-interactive"
+          class="mt-1 h-5 w-5 shrink-0 rounded-none border-secondary text-secondary focus:ring-interactive"
         />
         <label for="whitepaperPolicyAccepted" class="text-sm text-neutral-900">
           He leído y acepto la{' '}
-          <a href={POLICY_URL} target="_blank" rel="noopener" class="text-interactive underline">
+          <a
+            href={POLICY_URL}
+            target="_blank"
+            rel="noopener"
+            class="text-secondary underline decoration-interactive decoration-2 underline-offset-2"
+          >
             Política de Tratamiento de Datos Personales
           </a>
           .
@@ -141,11 +143,11 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
 
       <button
         type="submit"
-        class="w-full px-8 py-4 bg-primary hover:bg-interactive text-white font-bold tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full px-8 py-4 border-2 border-accent bg-accent text-neutral-900 text-xs font-extrabold tracking-label uppercase transition-colors hover:border-neutral-900 hover:bg-neutral-900 hover:text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-interactive disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Descargar ahora
       </button>
-      <p class="text-xs text-neutral-500 text-center -mt-2">
+      <p class="text-xs text-secondary text-center -mt-2">
         Recibirás el PDF al instante, sin espera por correo.
       </p>
 
@@ -157,7 +159,7 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
          devuelve /api/whitepaper-download — nunca se conoce antes del submit. -->
     <div id="whitepaperGateSuccess" class="hidden text-center">
       <div
-        class="w-16 h-16 rounded-full bg-neutral-50 border-2 border-primary flex items-center justify-center mx-auto mb-6"
+        class="w-16 h-16 bg-neutral-50 border-2 border-primary flex items-center justify-center mx-auto mb-6"
       >
         <svg
           class="w-7 h-7 text-primary"
@@ -168,20 +170,24 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path d="M5 13l4 4L19 7" />
+          <path d="M5 13l4 4L19 7"></path>
         </svg>
       </div>
       <h3 class="text-xl font-heading text-secondary mb-3">Tu descarga está lista</h3>
-      <p class="text-sm text-neutral-600 leading-relaxed mb-8">
+      <p class="text-sm text-secondary leading-relaxed mb-8">
         Gracias — ya puedes abrir el documento. Si necesitas ayuda para aplicarlo a tu caso,{' '}
-        <a href="/contacto" class="text-interactive underline">escríbenos</a>.
+        <a
+          href="/contacto"
+          class="text-secondary underline decoration-interactive decoration-2 underline-offset-2"
+          >escríbenos</a
+        >.
       </p>
       <a
         id="whitepaperDownloadLink"
         href="#"
         target="_blank"
         rel="noopener"
-        class="flex items-center justify-center gap-3 w-full bg-primary hover:bg-interactive text-white font-bold text-sm tracking-widest uppercase py-4 transition-colors"
+        class="flex items-center justify-center gap-3 w-full border-2 border-accent bg-accent text-neutral-900 text-xs font-extrabold tracking-label uppercase transition-colors hover:border-neutral-900 hover:bg-neutral-900 hover:text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-interactive py-4"
       >
         <svg
           class="w-4 h-4"
@@ -192,7 +198,7 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" />
+          <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"></path>
         </svg>
         Descargar PDF
       </a>

@@ -1,0 +1,23 @@
+---
+/**
+ * Sectores de experiencia: contenido real migrado del sitio anterior
+ * ("financiero, asegurador, servicios y agropecuario"). Compartido por el home
+ * y /nosotros para que la lista viva en un solo lugar.
+ */
+const sectors = ['Financiero', 'Asegurador', 'Servicios', 'Agropecuario'];
+---
+
+<ul
+  class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-neutral-200 border border-neutral-200 list-none p-0 m-0"
+  aria-label="Sectores de experiencia"
+>
+  {
+    sectors.map((sector) => (
+      <li class="bg-white p-6 pb-10 before:block before:h-1 before:w-8 before:bg-accent before:mb-6">
+        <p class="font-heading text-xl md:text-2xl font-extrabold tracking-tight text-secondary">
+          {sector}
+        </p>
+      </li>
+    ))
+  }
+</ul>

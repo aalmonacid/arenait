@@ -1,0 +1,48 @@
+---
+/**
+ * Cabecera editorial de las páginas interiores (reemplaza al bloque navy con
+ * `border-b-8 border-accent`): fondo blanco, retícula de reglas finas, etiqueta
+ * con regla, titular grande y un lead opcional alineado a la derecha. El motivo
+ * de puntos del logo cierra la cabecera, igual que en el home.
+ */
+import DotsMotif from './DotsMotif.astro';
+
+interface Props {
+  kicker: string;
+  title: string;
+  lead?: string;
+}
+
+const { kicker, title, lead } = Astro.props;
+---
+
+<header class="relative overflow-hidden bg-white border-b border-neutral-200 pt-14 md:pt-24">
+  <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+    <div class="h-full max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-2 md:grid-cols-4">
+      <span class="border-l border-neutral-200"></span>
+      <span class="border-l border-neutral-200"></span>
+      <span class="hidden md:block border-l border-neutral-200"></span>
+      <span class="hidden md:block border-l border-r border-neutral-200"></span>
+    </div>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto px-4 md:px-8">
+    <p
+      class="flex items-center gap-4 text-xs font-bold uppercase tracking-label text-secondary mb-6 before:block before:h-0.5 before:w-12 before:bg-neutral-900"
+    >
+      {kicker}
+    </p>
+    <h1 class="font-heading text-page max-w-4xl text-balance text-neutral-900">{title}</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-6 py-10 md:py-14 items-end">
+      {
+        lead ? (
+          <p class="md:col-span-6 md:col-start-7 text-lead text-neutral-900 max-w-xl">{lead}</p>
+        ) : (
+          <span class="md:col-span-6 md:col-start-7" />
+        )
+      }
+      <DotsMotif class="hidden md:block md:col-span-6 md:col-start-1 md:row-start-1" />
+    </div>
+  </div>
+</header>

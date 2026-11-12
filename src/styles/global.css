@@ -59,7 +59,7 @@
 }
 
 .markdown-content a {
-  @apply text-interactive underline font-medium;
+  @apply text-secondary underline decoration-interactive decoration-2 underline-offset-2 font-medium;
 }
 
 .markdown-content strong {
@@ -67,11 +67,11 @@
 }
 
 .markdown-content blockquote {
-  @apply border-l-4 border-primary pl-6 italic text-neutral-600 my-8;
+  @apply border-l-4 border-accent pl-6 italic text-secondary my-8;
 }
 
 .markdown-content code {
-  @apply bg-neutral-200 px-1.5 py-0.5 text-sm rounded-sm;
+  @apply bg-neutral-200 px-1.5 py-0.5 text-sm;
 }
 
 .markdown-content pre {

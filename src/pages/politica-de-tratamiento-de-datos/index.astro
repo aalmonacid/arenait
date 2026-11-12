@@ -3,6 +3,7 @@ export const prerender = true;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PendingContentTag from '../../components/PendingContentTag.astro';
+import PageHero from '../../components/PageHero.astro';
 import { POLICY_VERSION } from '../../lib/legal';
 
 /**
@@ -21,16 +22,11 @@ const LAST_UPDATED = '2026-09-04';
   title="Política de Tratamiento de Datos Personales"
   description="Política de tratamiento de datos personales de Arena IT, conforme a la Ley 1581 de 2012 y el Decreto 1377 de 2013 de Colombia."
 >
-  <header class="bg-secondary text-white py-16 md:py-24 px-4 md:px-8 border-b-8 border-accent">
-    <div class="max-w-4xl mx-auto">
-      <h1 class="text-3xl md:text-5xl font-heading mb-4 tracking-tight text-white">
-        Política de Tratamiento de Datos Personales
-      </h1>
-      <p class="text-neutral-300">
-        Versión {POLICY_VERSION} — Última actualización: {LAST_UPDATED}
-      </p>
-    </div>
-  </header>
+  <PageHero
+    kicker="Legal"
+    title="Política de Tratamiento de Datos Personales"
+    lead={`Versión ${POLICY_VERSION} — Última actualización: ${LAST_UPDATED}`}
+  />
 
   <section class="py-16 md:py-24 px-4 md:px-8 bg-white">
     <div class="max-w-4xl mx-auto space-y-12 text-neutral-900 leading-relaxed">
@@ -53,7 +49,8 @@ const LAST_UPDATED = '2026-09-04';
         <h2 class="text-2xl font-heading text-secondary mb-4">2. Datos que recolectamos</h2>
         <p>
           A través del formulario de contacto de este sitio recolectamos: nombre completo, empresa,
-          correo electrónico, teléfono (opcional), servicio de interés y el mensaje que nos escribas.
+          correo electrónico, teléfono (opcional), servicio de interés y el mensaje que nos
+          escribas.
         </p>
       </div>
 
@@ -75,16 +72,16 @@ const LAST_UPDATED = '2026-09-04';
             <strong>Conocer</strong> los datos personales que tratamos sobre ti.
           </li>
           <li>
-            <strong>Actualizar y rectificar</strong> tus datos cuando sean parciales, inexactos,
-            incompletos o estén desactualizados.
+            <strong>Actualizar y rectificar</strong> tus datos cuando sean parciales, inexactos, incompletos
+            o estén desactualizados.
           </li>
           <li>
-            <strong>Suprimir</strong> tus datos cuando su tratamiento no respete los principios,
-            derechos y garantías constitucionales y legales.
+            <strong>Suprimir</strong> tus datos cuando su tratamiento no respete los principios, derechos
+            y garantías constitucionales y legales.
           </li>
           <li>
-            <strong>Revocar la autorización</strong> otorgada para el tratamiento de tus datos, en
-            cualquier momento.
+            <strong>Revocar la autorización</strong> otorgada para el tratamiento de tus datos, en cualquier
+            momento.
           </li>
         </ul>
       </div>
@@ -117,8 +114,8 @@ const LAST_UPDATED = '2026-09-04';
         </p>
         <p>
           Si en el futuro se incorpora una herramienta de analítica u otra tecnología que use
-          cookies no esenciales, esta sección se actualizará para describirla con precisión antes
-          de activarla, y su uso quedará condicionado a que aceptes el aviso de cookies del sitio.
+          cookies no esenciales, esta sección se actualizará para describirla con precisión antes de
+          activarla, y su uso quedará condicionado a que aceptes el aviso de cookies del sitio.
         </p>
       </div>
 

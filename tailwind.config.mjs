@@ -37,6 +37,11 @@ export default {
           'clamp(2rem, 5vw, 4rem)',
           { lineHeight: '1.02', letterSpacing: '-0.03em', fontWeight: '800' },
         ],
+        // Titular de páginas interiores (un escalón por debajo del display del home).
+        page: [
+          'clamp(2.25rem, 5.6vw, 4.5rem)',
+          { lineHeight: '1.02', letterSpacing: '-0.03em', fontWeight: '800' },
+        ],
         lead: ['clamp(1.125rem, 1.6vw, 1.3rem)', { lineHeight: '1.6' }],
       },
       letterSpacing: {
