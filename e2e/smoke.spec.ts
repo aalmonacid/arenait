@@ -68,7 +68,7 @@ test.describe('Nosotros page', () => {
   test('renders verified copy and marks pending content, not raw brackets', async ({ page }) => {
     await page.goto('/nosotros');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Quiénes somos');
-    await expect(page.getByText('Andrés Arena')).toBeVisible();
+    await expect(page.getByText('Andrés Arenas')).toBeVisible();
     await expect(page.getByText('pendiente de confirmar con el cliente')).toHaveCount(0);
     await expect(page.getByText('[PENDIENTE', { exact: false })).toHaveCount(0);
   });
