@@ -18,6 +18,13 @@
   );
 }
 
+/* Origen de transformación de los puntos SVG del motivo de marca (DotsMotif):
+   sin esto, `scale()` en un <circle> escala desde la esquina del viewBox. */
+.dot {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
 /* Tipografía del cuerpo de artículos del blog (markdown renderizado vía
    astro:content en src/pages/blog/[slug].astro). Vive en este archivo CSS
    real (no en un bloque <style> con alcance de componente) por el mismo

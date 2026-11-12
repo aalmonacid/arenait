@@ -1,0 +1,58 @@
+---
+/**
+ * "Cómo trabajamos": el ciclo completo de una solución, del diseño al
+ * mantenimiento en producción. Aquí la numeración SÍ codifica información
+ * (es una secuencia real). El copy de cada etapa reutiliza las descripciones
+ * reales de los servicios (src/lib/fallbackContent.ts), sin cifras ni
+ * plazos inventados. Es el destino del botón "Ver cómo trabajamos" del hero.
+ *
+ * Línea de conexión: horizontal en desktop, vertical en móvil, solo con
+ * pseudo-elementos de Tailwind (sin JS). El nodo de Implementación va en
+ * accent por eco del punto naranja grande del logo.
+ */
+const steps = [
+  {
+    title: 'Diseño',
+    text: 'Entendemos tu operación y definimos la solución antes de escribir código.',
+  },
+  {
+    title: 'Desarrollo',
+    text: 'Construimos el sistema a la medida de cómo trabaja tu empresa.',
+  },
+  {
+    title: 'Implementación',
+    text: 'Lo ponemos en marcha cuidando que la transición no interrumpa tu operación diaria.',
+    highlight: true,
+  },
+  {
+    title: 'QA',
+    text: 'Probamos cada entrega para detectar errores en desarrollo, no en producción.',
+  },
+  {
+    title: 'Mantenimiento',
+    text: 'Damos soporte, actualizamos y migramos para que siga respondiendo a tu negocio.',
+  },
+];
+---
+
+<ol
+  class="relative grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-6 list-none p-0 m-0 before:absolute before:bg-white/40 before:left-5 before:top-0 before:bottom-0 before:w-0.5 lg:before:left-0 lg:before:right-0 lg:before:top-5 lg:before:bottom-auto lg:before:w-auto lg:before:h-0.5"
+>
+  {
+    steps.map((step, i) => (
+      <li class="relative pl-16 min-h-10 lg:pl-0 lg:pt-16">
+        <span
+          class:list={[
+            'absolute left-0 top-0 grid h-10 w-10 place-items-center text-base font-extrabold text-neutral-900',
+            step.highlight ? 'bg-accent' : 'bg-white',
+          ]}
+          aria-hidden="true"
+        >
+          {i + 1}
+        </span>
+        <h3 class="font-heading text-xl font-extrabold text-white mb-2">{step.title}</h3>
+        <p class="text-white leading-relaxed">{step.text}</p>
+      </li>
+    ))
+  }
+</ol>

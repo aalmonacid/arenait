@@ -16,6 +16,16 @@ test.describe('Home page', () => {
     await expect(page.locator('#servicios article')).toHaveCount(6);
   });
 
+  test('has the "Cómo trabajamos" process section targeted by the hero CTA', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByRole('link', { name: 'Ver cómo trabajamos' })).toHaveAttribute(
+      'href',
+      '#como-trabajamos',
+    );
+    await expect(page.locator('#como-trabajamos ol > li')).toHaveCount(5);
+    await expect(page.locator('#como-trabajamos')).toContainText('Mantenimiento');
+  });
+
   test('nav links resolve to real pages', async ({ page }) => {
     await page.goto('/');
     const nav = page.locator('header nav');

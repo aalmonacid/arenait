@@ -1,15 +1,18 @@
 ---
 /**
- * Bento Grid asimétrico de servicios (reemplaza a ServiceCard + la sección
+ * Bento Grid asimétrico de servicios (reemplaza a ServiceCard y a la sección
  * "En qué te ayudamos", que duplicaba 4 de los 6 servicios).
  *
+ * - Retícula de reglas finas (gap-px sobre neutral-200): las celdas se leen
+ *   como una grilla editorial, no como cajas flotantes.
  * - Jerarquía por slug (no por título, que puede cambiar en Sanity): los dos
- *   servicios destacados ocupan 2 columnas en desktop. Con los 6 servicios
+ *   servicios destacados ocupan 2 columnas en desktop; con los 6 servicios
  *   reales el grid de 4 columnas se llena exacto en 2 filas, sin huecos.
+ *   "Desarrollo a la medida" va invertido (secondary) como ancla visual.
  * - Sin JavaScript: microinteracciones solo con utilidades de Tailwind
  *   (group-hover, focus-visible), compatible con la CSP `script-src 'self'`.
- * - Contraste: el texto usa `secondary` / `neutral-900` (AAA sobre blanco);
- *   `primary` e `interactive` solo en bordes e íconos, donde basta 3:1.
+ * - Contraste: el texto usa secondary / neutral-900 sobre claro y blanco sobre
+ *   secondary (AAA); primary e interactive solo en bordes e íconos.
  */
 import Icon from './Icon.astro';
 import type { ServiceSchema } from '../types/sanity';
@@ -29,6 +32,7 @@ const ORDER = [
   'mantenimiento-y-migracion-de-software',
 ];
 const FEATURED = new Set(['desarrollo-a-la-medida', 'mantenimiento-y-migracion-de-software']);
+const INVERTED = 'desarrollo-a-la-medida';
 
 const rank = (s: ServiceSchema) => {
   const i = ORDER.indexOf(s.slug?.current ?? '');
@@ -38,48 +42,50 @@ const items = [...services].sort((a, b) => rank(a) - rank(b));
 ---
 
 <ul
-  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 list-none p-0 m-0"
+  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-neutral-200 border border-neutral-200 list-none p-0 m-0"
   aria-label="Servicios de ArenaIT"
 >
   {
-    items.map((service, index) => {
+    items.map((service) => {
       const slug = service.slug?.current ?? '';
       const featured = FEATURED.has(slug);
+      const inverted = slug === INVERTED;
       return (
-        <li class={featured ? 'md:col-span-2' : ''}>
+        <li class:list={['bg-white', featured && 'md:col-span-2']}>
           <a
             href={`/servicios#${slug}`}
             class:list={[
-              'group block h-full rounded-none border-2 border-neutral-200 bg-white text-neutral-900 transition-colors duration-200',
-              'focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-interactive',
-              featured ? 'hover:border-interactive' : 'hover:border-primary',
+              'group block h-full rounded-none border-2 border-transparent transition-colors duration-200',
+              'focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-interactive',
+              inverted
+                ? 'bg-secondary text-white hover:border-accent'
+                : 'bg-white text-neutral-900',
+              !inverted && (featured ? 'hover:border-interactive' : 'hover:border-primary'),
             ]}
           >
-            <article class:list={['flex h-full flex-col', featured ? 'p-8 md:p-12' : 'p-8']}>
-              <header class="mb-8 flex items-start justify-between">
-                {service.icon ? (
-                  <span class="text-primary">
+            <article
+              class:list={['flex h-full min-h-72 flex-col', featured ? 'p-8 md:p-12' : 'p-8']}
+            >
+              <header>
+                {service.icon && (
+                  <span class={inverted ? 'text-accent' : 'text-primary'}>
                     <Icon name={service.icon as any} class={featured ? 'w-14 h-14' : 'w-10 h-10'} />
                   </span>
-                ) : (
-                  <span />
                 )}
-                <span class="text-sm font-bold tracking-widest text-secondary" aria-hidden="true">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
               </header>
               <h3
                 class:list={[
-                  'font-heading font-extrabold text-secondary leading-tight mb-3',
+                  'font-heading font-extrabold tracking-tight leading-tight mt-7 mb-3 text-balance',
                   featured ? 'text-3xl md:text-4xl' : 'text-2xl',
+                  inverted ? 'text-white' : 'text-secondary',
                 ]}
               >
                 {service.title}
               </h3>
-              <p class="leading-relaxed text-neutral-900">
+              <p class="leading-relaxed max-w-prose">
                 {featured ? service.description : service.summary}
               </p>
-              <span class="mt-auto pt-8 text-sm font-bold tracking-widest uppercase text-secondary underline decoration-2 underline-offset-4 decoration-neutral-200 group-hover:decoration-interactive">
+              <span class="mt-auto pt-8 inline-flex items-center gap-3 text-xs font-extrabold uppercase tracking-label after:block after:h-0.5 after:w-6 after:bg-current after:transition-all after:duration-200 group-hover:after:w-14">
                 Ver detalle
               </span>
             </article>

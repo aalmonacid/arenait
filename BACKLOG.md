@@ -188,7 +188,14 @@ Con esto, **Épica J queda cerrada**: los 4 ítems (nav mobile, analítica, audi
 
 ---
 
-## Rediseño del home — Bento de servicios (10/11/2026)
+## Rediseño editorial del home (10–12/11/2026)
+
+- [x] **Rediseño completo del home (12/11/2026)**, tras el feedback de que el cambio del Bento solo se veía poco. Mockup aprobado y luego implementado: hero tipográfico sobre retícula visible (sin foto, con la fila de puntos del logo como motivo), cabeceras editoriales de sección (`SectionHead`), nueva sección "Cómo trabajamos" (`ProcessFlow`, destino del CTA del hero, 5 etapas derivadas del copy real de los servicios), caso Sadep como pieza editorial (usa `fallbackCaseStudies`, sin duplicar copy), franja de sectores reales y CTA final en accent. Botones primarios del hero y CTA pasan a accent + texto neutral-900 (~9.1:1) porque blanco sobre primary solo da ~4.8:1. Animaciones solo CSS con `motion-safe:` (keyframes en `tailwind.config.mjs`), cero scripts ni estilos inline nuevos. Header: hover con subrayado interactive y menú móvil sin `rounded-*`. Footer con más enlaces.
+  - **Decisión de producto**: los marcadores "[PENDIENTE]" del mockup NO se muestran en el sitio público (criterio de la Épica F): sin año/duración del caso ni recuadros de capturas en el home; las capturas siguen con su aviso honesto en `/casos-de-estudio/sadep`.
+  - **Pendiente de validar con el cliente**: las 5 etapas del proceso y su redacción (inferidas del copy de servicios), la lista de sectores, y el cambio a botones naranja.
+  - **Pendiente técnico**: verificación contra la CSP real en el deploy (`qa-release-guardian`), medir contraste con axe-core, y extender el sistema (SectionHead, botones, retícula) a `/servicios`, `/nosotros`, `/contacto`, `/casos-de-estudio` y blog, que siguen con el diseño anterior. Clases fuera de paleta (`neutral-300/500/600`) siguen en esas páginas.
+
+### Paso previo: Bento de servicios (10/11/2026)
 
 - [x] `ServicesBento.astro` reemplaza `ServiceCard` y la sección "En qué te ayudamos" (duplicada con "Servicios"). Skill de diseño en `.claude/skills/disenador-uiux-suizo-arenait/`. Alias `brand.*` agregado en `tailwind.config.mjs` sin quitar los tokens planos. Verificado: `astro check`/lint/build, layout 2+1+1 / 1+1+2 en desktop y 1 columna en móvil, cero scripts nuevos. Pendiente: revisión visual del cliente y verificación contra la CSP real en el deploy.
 

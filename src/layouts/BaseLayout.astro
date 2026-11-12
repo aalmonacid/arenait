@@ -104,32 +104,32 @@ const organizationSchema = {
         <nav class="hidden md:flex items-center space-x-8" aria-label="Navegación principal">
           <a
             href="/servicios"
-            class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
+            class="text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 border-transparent hover:border-interactive transition-colors"
             >Servicios</a
           >
           <a
             href="/casos-de-estudio"
-            class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
+            class="text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 border-transparent hover:border-interactive transition-colors"
             >Casos de Estudio</a
           >
           <a
             href="/recursos"
-            class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
+            class="text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 border-transparent hover:border-interactive transition-colors"
             >Recursos</a
           >
           <a
             href="/blog"
-            class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
+            class="text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 border-transparent hover:border-interactive transition-colors"
             >Blog</a
           >
           <a
             href="/nosotros"
-            class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
+            class="text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 border-transparent hover:border-interactive transition-colors"
             >Nosotros</a
           >
           <a
             href="/contacto"
-            class="text-sm font-bold tracking-widest uppercase text-neutral-900 hover:text-interactive transition-colors"
+            class="text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 border-transparent hover:border-interactive transition-colors"
             >Contacto</a
           >
           <!-- Bugfix (auditoría 2026-09-04, Épica K): text-neutral-400 medía ~2.52:1
@@ -153,14 +153,14 @@ const organizationSchema = {
         <button
           id="mobile-menu-trigger"
           type="button"
-          class="flex md:hidden flex-col items-center justify-center gap-[5px] w-11 h-11 rounded-sm outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-2"
+          class="flex md:hidden flex-col items-center justify-center gap-[5px] w-11 h-11 rounded-none outline-none focus-visible:outline focus-visible:outline-4 focus-visible:outline-interactive focus-visible:outline-offset-2"
           aria-expanded="false"
           aria-controls="mobile-menu"
           aria-label="Abrir menú"
         >
-          <span class="block w-6 h-0.5 rounded-full bg-neutral-900" aria-hidden="true"></span>
-          <span class="block w-6 h-0.5 rounded-full bg-neutral-900" aria-hidden="true"></span>
-          <span class="block w-6 h-0.5 rounded-full bg-neutral-900" aria-hidden="true"></span>
+          <span class="block w-6 h-0.5 bg-neutral-900" aria-hidden="true"></span>
+          <span class="block w-6 h-0.5 bg-neutral-900" aria-hidden="true"></span>
+          <span class="block w-6 h-0.5 bg-neutral-900" aria-hidden="true"></span>
         </button>
       </div>
     </header>
@@ -177,17 +177,11 @@ const organizationSchema = {
         <button
           id="mobile-menu-close"
           type="button"
-          class="relative flex items-center justify-center w-11 h-11 rounded-sm outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-2"
+          class="relative flex items-center justify-center w-11 h-11 rounded-none outline-none focus-visible:outline focus-visible:outline-4 focus-visible:outline-interactive focus-visible:outline-offset-2"
           aria-label="Cerrar menú"
         >
-          <span
-            class="absolute w-[22px] h-0.5 rounded-full bg-neutral-900 rotate-45"
-            aria-hidden="true"
-          ></span>
-          <span
-            class="absolute w-[22px] h-0.5 rounded-full bg-neutral-900 -rotate-45"
-            aria-hidden="true"
-          ></span>
+          <span class="absolute w-[22px] h-0.5 bg-neutral-900 rotate-45" aria-hidden="true"></span>
+          <span class="absolute w-[22px] h-0.5 bg-neutral-900 -rotate-45" aria-hidden="true"></span>
         </button>
       </div>
       <nav aria-label="Menú principal" class="flex flex-col overflow-y-auto">
@@ -239,19 +233,27 @@ const organizationSchema = {
           <Logo variant="dark" size="footer" link={false} class="mb-4" />
           <p class="text-neutral-200 max-w-md">Arena IT — Desarrollo de software a la medida.</p>
         </div>
-        <nav class="flex flex-col gap-2 text-left md:text-right">
-          <a href="/servicios" class="text-neutral-200 hover:text-white transition-colors"
-            >Servicios</a
-          >
-          <a href="/casos-de-estudio" class="text-neutral-200 hover:text-white transition-colors"
-            >Casos de estudio</a
-          >
-          <a href="/nosotros" class="text-neutral-200 hover:text-white transition-colors"
-            >Nosotros</a
-          >
-          <a href="/contacto" class="text-neutral-200 hover:text-white transition-colors"
-            >Contacto</a
-          >
+        <nav
+          class="grid grid-cols-2 gap-x-6 gap-y-1 text-left md:justify-self-end"
+          aria-label="Pie de página"
+        >
+          {
+            [
+              ['/servicios', 'Servicios'],
+              ['/casos-de-estudio', 'Casos de estudio'],
+              ['/recursos', 'Recursos'],
+              ['/blog', 'Blog'],
+              ['/nosotros', 'Nosotros'],
+              ['/contacto', 'Contacto'],
+            ].map(([href, label]) => (
+              <a
+                href={href}
+                class="w-fit py-1 text-neutral-200 border-b border-transparent hover:text-white hover:border-accent transition-colors focus-visible:outline focus-visible:outline-4 focus-visible:outline-white"
+              >
+                {label}
+              </a>
+            ))
+          }
         </nav>
       </div>
       <!-- Bugfix (auditoría 2026-09-04, Épica K): text-neutral-400 medía ~3.46:1
@@ -263,7 +265,9 @@ const organizationSchema = {
            L_neutral-200≈0.8018 ⇒ (0.8018+0.05)/(0.0700+0.05)≈7.10:1) — cumple
            AAA (7:1). El rol "de-enfatizado" se conserva por tamaño (text-sm),
            no por un tono más apagado que ya no cabía dentro de AAA. -->
-      <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-sm text-neutral-200 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <div
+        class="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/40 text-sm text-neutral-200 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
+      >
         <p>&copy; {new Date().getFullYear()} Arena IT. Todos los derechos reservados.</p>
         <a href="/politica-de-tratamiento-de-datos" class="hover:text-white transition-colors">
           Política de Tratamiento de Datos Personales
