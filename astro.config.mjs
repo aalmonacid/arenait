@@ -7,7 +7,9 @@ import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://arenait.co',
+  // Dominio canónico: se define con PUBLIC_SITE_URL en Vercel cuando el cliente
+  // decida entre arenait.co y www.arenait.co (hoy arenait.co redirige a www).
+  site: process.env.PUBLIC_SITE_URL ?? 'https://arenait.co',
   // 'server' habilita las API routes (/api/leads) como funciones serverless
   // reales en Vercel. Las páginas de contenido se marcan `prerender = true`
   // individualmente para seguir siendo estáticas — ver CONTEXT.md §3.

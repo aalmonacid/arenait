@@ -17,6 +17,8 @@ const {
   ogImage = '/og-default.png',
 } = Astro.props;
 
+const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === 'true';
+
 const absoluteOgImage = new URL(ogImage, Astro.site).toString();
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 
@@ -40,11 +42,12 @@ const organizationSchema = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
 
-    <!-- TODO(Épica K, SEO): quitar este noindex antes del lanzamiento público real
-         en arenait.co. dev.arenait.co es un dominio de staging y BACKLOG.md marca
-         el proyecto como "PROTOTIPO FUNCIONAL — NO LISTO PARA PRODUCCIÓN" — no debe
-         indexarse todavía. Ver la entrada correspondiente en BACKLOG.md Épica K. -->
-    <meta name="robots" content="noindex, nofollow" />
+    <!-- Indexación controlada por variable de entorno: mientras
+         PUBLIC_ALLOW_INDEXING no sea 'true' (dev.arenait.co, previews) el sitio
+         se marca noindex. Para el lanzamiento NO hay que tocar código: basta
+         definir PUBLIC_ALLOW_INDEXING=true en las variables de Vercel del
+         entorno de producción y volver a desplegar. Ver PLAN-PRODUCCION.md. -->
+    {!allowIndexing && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- OpenGraph -->
     <meta property="og:title" content={`${title} | ArenaIT`} />
@@ -54,32 +57,20 @@ const organizationSchema = {
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
-    <!-- Tipografía: Plus Jakarta Sans, decisión formal del cliente
-         (2026-09-04) de usar tipografía libre en vez de licenciar Codec Pro
-         — ver AGENTS.md y CONTEXT.md §5/§6. Cargada de forma no bloqueante
-         (preload + inyección por script externo, en vez de un
-         <link rel="stylesheet"> directo): un <link> síncrono en <head>
-         bloquea el parseo/renderizado hasta que Google Fonts responde, y si
-         ese dominio es lento o inalcanzable (red restringida, tercero caído)
-         cuelga la carga de toda la página — se confirmó este colgado en un
-         entorno de red restringida durante el smoke testing con Playwright.
-         El script vive en /public/scripts/font-loader.js (no inline aquí)
-         porque la CSP del sitio bloquea scripts inline en producción — ver
-         CONTEXT.md §5. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Tipografía: Plus Jakarta Sans, decisión formal del cliente (2026-09-04)
+         de usar tipografía libre en vez de licenciar Codec Pro (AGENTS.md).
+         Autoalojada desde 12/11/2026 (public/fonts, variable 200-800, licencia OFL):
+         elimina la dependencia de Google Fonts (privacidad, un origen menos en la
+         CSP) y permite precargar la fuente para que el titular no cambie de
+         tipografía después de pintar (CLS medido 0.207 en el home móvil con la
+         carga tardía anterior). El @font-face vive en src/styles/global.css. -->
     <link
       rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap"
+      as="font"
+      type="font/woff2"
+      href="/fonts/plus-jakarta-sans-latin.woff2"
+      crossorigin
     />
-    <script src="/scripts/font-loader.js" is:inline></script>
-    <noscript>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap"
-      />
-    </noscript>
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -258,7 +249,10 @@ const organizationSchema = {
         class="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/40 text-sm text-neutral-200 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
       >
         <p>&copy; {new Date().getFullYear()} Arena IT. Todos los derechos reservados.</p>
-        <a href="/politica-de-tratamiento-de-datos" class="hover:text-white transition-colors">
+        <a
+          href="/politica-de-tratamiento-de-datos"
+          class="inline-block py-1.5 hover:text-white transition-colors focus-visible:outline-white"
+        >
           Política de Tratamiento de Datos Personales
         </a>
       </div>

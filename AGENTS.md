@@ -9,7 +9,7 @@
 ## Restricciones y Reglas de Diseño (Swiss Minimalist)
 
 - **Prohibido**: Estéticas cyberpunk, gradientes de neón, o fondos oscuros estilo matriz.
-- **Mantener**: Diseño limpio, corporativo, alto contraste (WCAG AAA).
+- **Mantener**: Diseño limpio, corporativo, alto contraste. **Estándar verificado: WCAG AA** (axe-core, 0 violaciones de contraste en 11 rutas, 12/11/2026); **AAA es el objetivo** para texto de cuerpo y controles, pero no se declara cumplido (el logo del footer y varios criterios manuales quedan fuera). Texto: `secondary`/`neutral-900` sobre claro y blanco sobre `secondary`; `primary` e `interactive` solo en bordes, íconos y fondos. Botones primarios: `accent` + texto `neutral-900`.
 - **Palette**:
   - Primario: #0075C9 (Azul Cerúleo)
   - Secundario: #294E6C (Azul Noche / Pizarra)

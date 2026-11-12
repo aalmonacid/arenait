@@ -8,13 +8,14 @@ import { POLICY_URL } from '../lib/legal';
   aria-label="Aviso de cookies"
   class="hidden fixed inset-x-0 bottom-0 z-[60] bg-secondary text-white border-t-4 border-accent"
 >
-  <div
-    class="max-w-7xl mx-auto px-4 md:px-8 py-5 flex flex-col md:flex-row md:items-center gap-4"
-  >
+  <div class="max-w-7xl mx-auto px-4 md:px-8 py-5 flex flex-col md:flex-row md:items-center gap-4">
     <p class="text-sm text-neutral-200 leading-relaxed flex-1">
       Usamos cookies propias esenciales para que este sitio funcione correctamente. Hoy no
       utilizamos cookies de analítica ni de publicidad de terceros. Puedes ver el detalle en la{' '}
-      <a href={`${POLICY_URL}#cookies`} class="underline text-white hover:text-accent">
+      <a
+        href={`${POLICY_URL}#cookies`}
+        class="underline text-white hover:text-accent focus-visible:outline-white"
+      >
         Política de Tratamiento de Datos Personales
       </a>.
     </p>
@@ -22,14 +23,14 @@ import { POLICY_URL } from '../lib/legal';
       <button
         id="cookie-reject"
         type="button"
-        class="px-5 py-2.5 border-2 border-white text-white text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-secondary transition-colors"
+        class="px-5 py-2.5 border-2 border-white text-white text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-secondary transition-colors focus-visible:outline-white"
       >
         Rechazar
       </button>
       <button
         id="cookie-accept"
         type="button"
-        class="px-5 py-2.5 bg-primary hover:bg-interactive text-white text-sm font-bold uppercase tracking-widest transition-colors"
+        class="px-5 py-2.5 border-2 border-accent bg-accent text-neutral-900 text-sm font-bold uppercase tracking-widest transition-colors hover:border-white hover:bg-white focus-visible:outline-white"
       >
         Aceptar
       </button>

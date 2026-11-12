@@ -205,6 +205,18 @@ Con esto, **Épica J queda cerrada**: los 4 ítems (nav mobile, analítica, audi
 
 ---
 
+## Preparación a producción (12/11/2026)
+
+Plan, responsables y acciones pendientes: [`PLAN-PRODUCCION.md`](./PLAN-PRODUCCION.md).
+
+- [x] Endurecimiento de `/api/leads` (topes, límite de cuerpo, Origin, ID privado, sin devolver ID) y aviso opcional de leads sin datos personales.
+- [x] 32 tests unitarios (validación, rate limiting, aviso).
+- [x] Fuente autoalojada y precargada (objetivo: eliminar el CLS 0.207 del home móvil; **por medir en el deploy**), CSP sin Google Fonts.
+- [x] Accesibilidad: botón de cookies, grises fuera de paleta, errores del formulario, nombre del logo, áreas táctiles y foco global.
+- [x] Indexación y dominio por variables de entorno (`PUBLIC_ALLOW_INDEXING`, `PUBLIC_SITE_URL`) con `robots.txt` generado.
+- [ ] **Usuario**: CORS, token, privacidad del dataset, Deploy Hook, Web Analytics, variables y dominio (ver plan).
+- [ ] **Cliente**: datos legales, aprobaciones de diseño, dominio canónico, contenido.
+
 ## Cómo priorizar
 
 1. **Épica A primero, sin excepción.** El sitio hoy puede estar recibiendo tráfico y perdiendo leads silenciosamente porque el formulario no los guarda en ningún lado. Es la pérdida de valor más alta y más fácil de no notar.

@@ -1,33 +1,31 @@
 import type { APIRoute } from 'astro';
 import { sanityWriteClient } from '../../lib/sanityWriteClient';
 import { checkRateLimit } from '../../lib/rateLimit';
+import {
+  MAX_BODY_BYTES,
+  isAllowedOrigin,
+  leadDocumentId,
+  validateLead,
+} from '../../lib/leadValidation';
+import { notifyNewLead } from '../../lib/leadNotify';
 
 export const prerender = false;
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-interface LeadPayload {
-  fullName?: unknown;
-  company?: unknown;
-  corporateEmail?: unknown;
-  phone?: unknown;
-  serviceOfInterest?: unknown;
-  message?: unknown;
-  source?: unknown;
-  companyWebsite?: unknown; // honeypot anti-spam, debe llegar vacío
-  policyAccepted?: unknown;
-  policyVersion?: unknown;
-}
-
-function badRequest(message: string) {
-  return new Response(JSON.stringify({ ok: false, error: message }), {
-    status: 400,
-    headers: { 'Content-Type': 'application/json' },
+function json(status: number, payload: Record<string, unknown>, extraHeaders = {}) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...extraHeaders },
   });
 }
 
 export const POST: APIRoute = async (context) => {
   const { request } = context;
+
+  // Solo se aceptan envíos desde este mismo sitio cuando el navegador informa
+  // su origen (evita formularios ajenos apuntando a este endpoint).
+  if (!isAllowedOrigin(request.url, request.headers.get('origin'))) {
+    return json(403, { ok: false, error: 'Origen no permitido.' });
+  }
 
   // clientAddress lo resuelve @astrojs/vercel a partir de x-forwarded-for
   // (ver getClientIpAddress en @astrojs/internal-helpers). En local
@@ -45,86 +43,78 @@ export const POST: APIRoute = async (context) => {
 
   const { limited, retryAfterSeconds } = checkRateLimit(ip);
   if (limited) {
-    return new Response(
-      JSON.stringify({
+    return json(
+      429,
+      {
         ok: false,
         error: 'Demasiadas solicitudes desde este origen. Intenta de nuevo en unos minutos.',
-      }),
-      {
-        status: 429,
-        headers: {
-          'Content-Type': 'application/json',
-          'Retry-After': String(retryAfterSeconds),
-        },
       },
+      { 'Retry-After': String(retryAfterSeconds) },
     );
   }
 
-  let body: LeadPayload;
+  // Tope de tamaño del cuerpo: primero por la cabecera (barato) y luego por el
+  // texto realmente leído, porque Content-Length puede faltar o mentir.
+  const declaredLength = Number(request.headers.get('content-length') ?? '0');
+  if (declaredLength > MAX_BODY_BYTES) {
+    return json(413, { ok: false, error: 'La solicitud es demasiado grande.' });
+  }
 
+  let rawBody: string;
   try {
-    body = await request.json();
+    rawBody = await request.text();
   } catch {
-    return badRequest('El cuerpo de la solicitud debe ser JSON válido.');
+    return json(400, { ok: false, error: 'No se pudo leer la solicitud.' });
   }
 
-  const fullName = typeof body.fullName === 'string' ? body.fullName.trim() : '';
-  const company = typeof body.company === 'string' ? body.company.trim() : '';
-  const corporateEmail = typeof body.corporateEmail === 'string' ? body.corporateEmail.trim() : '';
-  const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
-  const serviceOfInterest =
-    typeof body.serviceOfInterest === 'string' ? body.serviceOfInterest.trim() : '';
-  const message = typeof body.message === 'string' ? body.message.trim() : '';
-  const source = typeof body.source === 'string' ? body.source.trim() : 'lead-capture-form';
-  const honeypot = typeof body.companyWebsite === 'string' ? body.companyWebsite.trim() : '';
-  const policyAccepted = body.policyAccepted === true;
-  const policyVersion = typeof body.policyVersion === 'string' ? body.policyVersion.trim() : '';
+  if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
+    return json(413, { ok: false, error: 'La solicitud es demasiado grande.' });
+  }
 
-  if (honeypot) {
+  let body: unknown;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    return json(400, { ok: false, error: 'El cuerpo de la solicitud debe ser JSON válido.' });
+  }
+
+  const result = validateLead(body);
+
+  if (result.kind === 'honeypot') {
     // Bot: fingir éxito sin persistir nada ni revelar que fue detectado.
-    return new Response(JSON.stringify({ ok: true, id: null }), {
-      status: 201,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return json(201, { ok: true });
   }
 
-  if (!fullName || !corporateEmail) {
-    return badRequest('Nombre completo y correo son obligatorios.');
+  if (result.kind === 'invalid') {
+    return json(400, { ok: false, error: result.error });
   }
 
-  if (!EMAIL_RE.test(corporateEmail)) {
-    return badRequest('El correo no tiene un formato válido.');
-  }
-
-  if (!policyAccepted) {
-    return badRequest('Debes aceptar la Política de Tratamiento de Datos Personales.');
-  }
+  const { lead } = result;
 
   try {
-    const doc = await sanityWriteClient.create({
+    const now = new Date().toISOString();
+    // `_id` con prefijo `lead.`: documento privado para el API público de
+    // Sanity (ver leadDocumentId en src/lib/leadValidation.ts).
+    await sanityWriteClient.create({
+      _id: leadDocumentId(),
       _type: 'lead',
-      fullName,
-      company,
-      corporateEmail,
-      phone,
-      serviceOfInterest,
-      message,
-      source,
-      createdAt: new Date().toISOString(),
-      policyAccepted,
-      policyVersion,
-      policyAcceptedAt: new Date().toISOString(),
-    });
-
-    return new Response(JSON.stringify({ ok: true, id: doc._id }), {
-      status: 201,
-      headers: { 'Content-Type': 'application/json' },
+      ...lead,
+      createdAt: now,
+      policyAcceptedAt: now,
     });
   } catch (error) {
     console.error('Error al guardar el lead en Sanity:', error);
-    return new Response(
-      JSON.stringify({ ok: false, error: 'No se pudo guardar la solicitud. Intente nuevamente.' }),
-      { status: 502, headers: { 'Content-Type': 'application/json' } },
-    );
+    return json(502, {
+      ok: false,
+      error: 'No se pudo guardar la solicitud. Intente nuevamente.',
+    });
   }
+
+  // Aviso opcional (no bloquea ni cambia la respuesta si falla). No incluye
+  // datos personales: ver src/lib/leadNotify.ts.
+  const studioUrl = new URL('/admin', request.url).toString();
+  await notifyNewLead(import.meta.env.LEAD_NOTIFY_WEBHOOK_URL, lead, studioUrl);
+
+  // No se devuelve el ID interno del documento: el cliente no lo necesita.
+  return json(201, { ok: true });
 };
