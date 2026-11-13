@@ -10,6 +10,8 @@ export const fallbackServices: ServiceSchema[] = [
     _id: 'fallback-desarrollo-a-la-medida',
     title: 'Desarrollo de software a la medida',
     slug: { current: 'desarrollo-a-la-medida' },
+    order: 1,
+    featured: true,
     icon: 'code',
     summary:
       'Construimos el sistema que tu negocio necesita, diseñado desde cero para tu operación.',
@@ -20,6 +22,8 @@ export const fallbackServices: ServiceSchema[] = [
     _id: 'fallback-implementacion-de-aplicaciones',
     title: 'Implementación de aplicaciones',
     slug: { current: 'implementacion-de-aplicaciones' },
+    order: 2,
+    featured: false,
     icon: 'deploy',
     summary:
       'Ponemos en marcha las soluciones tecnológicas que tu empresa eligió o que diseñamos contigo.',
@@ -30,6 +34,8 @@ export const fallbackServices: ServiceSchema[] = [
     _id: 'fallback-gestion-de-proyectos-de-ti',
     title: 'Gestión de proyectos de TI',
     slug: { current: 'gestion-de-proyectos-de-ti' },
+    order: 3,
+    featured: false,
     icon: 'tasks',
     summary:
       'Lideramos tus proyectos tecnológicos con metodología clara, alcance definido y comunicación constante.',
@@ -40,6 +46,8 @@ export const fallbackServices: ServiceSchema[] = [
     _id: 'fallback-business-intelligence',
     title: 'Business Intelligence',
     slug: { current: 'business-intelligence' },
+    order: 4,
+    featured: false,
     icon: 'chart',
     summary:
       'Transformamos los datos que ya genera tu operación en reportes e indicadores que se usan para decidir.',
@@ -50,6 +58,8 @@ export const fallbackServices: ServiceSchema[] = [
     _id: 'fallback-aseguramiento-de-la-calidad',
     title: 'Aseguramiento de la calidad (QA / Testing)',
     slug: { current: 'aseguramiento-de-la-calidad' },
+    order: 5,
+    featured: false,
     icon: 'shield-check',
     summary: 'Probamos cada entrega de software antes de que llegue a tus usuarios.',
     description:
@@ -59,6 +69,8 @@ export const fallbackServices: ServiceSchema[] = [
     _id: 'fallback-mantenimiento-y-migracion-de-software',
     title: 'Mantenimiento y migración de software',
     slug: { current: 'mantenimiento-y-migracion-de-software' },
+    order: 6,
+    featured: true,
     icon: 'wrench',
     summary:
       'El software vivo necesita evolucionar — damos mantenimiento y migramos lo que ya construiste.',

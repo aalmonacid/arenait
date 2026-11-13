@@ -5,21 +5,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
 import PageHero from '../../components/PageHero.astro';
 import Button from '../../components/Button.astro';
-import { client } from '../../lib/sanity';
-import { fallbackServices } from '../../lib/fallbackContent';
-import type { ServiceSchema } from '../../types/sanity';
+import { getServices } from '../../lib/services';
 
-let services: ServiceSchema[] = [];
-
-try {
-  services = await client.fetch<ServiceSchema[]>(`*[_type == "service"]`);
-} catch (error) {
-  console.error('Error fetching services from Sanity:', error);
-}
-
-if (!services || services.length === 0) {
-  services = fallbackServices;
-}
+// Servicios: Sanity con respaldo en el código y orden por el campo `order` (src/lib/services.ts).
+const services = await getServices();
 
 // JSON-LD: cada servicio real como Service dentro de un ItemList — sin
 // inventar campos que no existen en el schema (nada de precio/rating/reviews).

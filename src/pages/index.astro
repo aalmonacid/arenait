@@ -9,22 +9,12 @@ import SectionHead from '../components/SectionHead.astro';
 import ProcessFlow from '../components/ProcessFlow.astro';
 import DotsMotif from '../components/DotsMotif.astro';
 import SectorGrid from '../components/SectorGrid.astro';
-import { client } from '../lib/sanity';
-import { fallbackServices, fallbackCaseStudies } from '../lib/fallbackContent';
-import type { ServiceSchema } from '../types/sanity';
+import { getServices } from '../lib/services';
+import { fallbackCaseStudies } from '../lib/fallbackContent';
 import heroImage from '../assets/images/hero-facade.jpg';
 
-let services: ServiceSchema[] = [];
-
-try {
-  services = await client.fetch<ServiceSchema[]>(`*[_type == "service"]`);
-} catch (error) {
-  console.error('Error fetching services from Sanity:', error);
-}
-
-if (!services || services.length === 0) {
-  services = fallbackServices;
-}
+// Servicios: Sanity con respaldo en el código y orden por el campo `order` (src/lib/services.ts).
+const services = await getServices();
 
 // Caso real de Sadep: misma fuente de contenido que /casos-de-estudio.
 const sadep = fallbackCaseStudies[0];

@@ -5,16 +5,17 @@
  *
  * - Retícula de reglas finas (gap-px sobre neutral-200): las celdas se leen
  *   como una grilla editorial, no como cajas flotantes.
- * - Jerarquía por slug (no por título, que puede cambiar en Sanity): los dos
- *   servicios destacados ocupan 2 columnas en desktop; con los 6 servicios
- *   reales el grid de 4 columnas se llena exacto en 2 filas, sin huecos.
- *   "Desarrollo a la medida" va invertido (secondary) como ancla visual.
+ * - Jerarquía y orden desde los datos (campos `featured` y `order` del Studio):
+ *   los servicios destacados ocupan 2 columnas en desktop; con 6 servicios y
+ *   2 destacados el grid de 4 columnas se llena exacto en 2 filas, sin huecos.
+ *   El primer destacado va invertido (secondary) como ancla visual.
  * - Sin JavaScript: microinteracciones solo con utilidades de Tailwind
  *   (group-hover, focus-visible), compatible con la CSP `script-src 'self'`.
  * - Contraste: el texto usa secondary / neutral-900 sobre claro y blanco sobre
  *   secondary (AAA); primary e interactive solo en bordes e íconos.
  */
 import Icon from './Icon.astro';
+import { sortServices } from '../lib/serviceOrder';
 import type { ServiceSchema } from '../types/sanity';
 
 interface Props {
@@ -23,33 +24,20 @@ interface Props {
 
 const { services } = Astro.props;
 
-const ORDER = [
-  'desarrollo-a-la-medida',
-  'implementacion-de-aplicaciones',
-  'gestion-de-proyectos-de-ti',
-  'business-intelligence',
-  'aseguramiento-de-la-calidad',
-  'mantenimiento-y-migracion-de-software',
-];
-const FEATURED = new Set(['desarrollo-a-la-medida', 'mantenimiento-y-migracion-de-software']);
-const INVERTED = 'desarrollo-a-la-medida';
-
-const rank = (s: ServiceSchema) => {
-  const i = ORDER.indexOf(s.slug?.current ?? '');
-  return i === -1 ? ORDER.length : i;
-};
-const items = [...services].sort((a, b) => rank(a) - rank(b));
+const items = sortServices(services);
+// Primer destacado (en el orden del sitio): tarjeta invertida como ancla visual.
+const invertedId = items.find((s) => s.featured)?._id;
 ---
 
 <ul
-  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-neutral-200 border border-neutral-200 list-none p-0 m-0"
+  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-neutral-200 border border-neutral-200 list-none p-0 m-0 lg:grid-flow-dense"
   aria-label="Servicios de ArenaIT"
 >
   {
     items.map((service) => {
       const slug = service.slug?.current ?? '';
-      const featured = FEATURED.has(slug);
-      const inverted = slug === INVERTED;
+      const featured = Boolean(service.featured);
+      const inverted = service._id === invertedId;
       return (
         <li class:list={['bg-white', featured && 'md:col-span-2']}>
           <a

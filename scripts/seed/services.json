@@ -1,0 +1,86 @@
+[
+  {
+    "_id": "service-desarrollo-a-la-medida",
+    "_type": "service",
+    "title": "Desarrollo de software a la medida",
+    "slug": {
+      "_type": "slug",
+      "current": "desarrollo-a-la-medida"
+    },
+    "icon": "code",
+    "order": 1,
+    "featured": true,
+    "summary": "Construimos el sistema que tu negocio necesita, diseñado desde cero para tu operación.",
+    "description": "Construimos el sistema que tu negocio necesita, diseñado desde cero para tu operación — no una plantilla adaptada a la fuerza."
+  },
+  {
+    "_id": "service-implementacion-de-aplicaciones",
+    "_type": "service",
+    "title": "Implementación de aplicaciones",
+    "slug": {
+      "_type": "slug",
+      "current": "implementacion-de-aplicaciones"
+    },
+    "icon": "deploy",
+    "order": 2,
+    "featured": false,
+    "summary": "Ponemos en marcha las soluciones tecnológicas que tu empresa eligió o que diseñamos contigo.",
+    "description": "Ponemos en marcha las soluciones tecnológicas que tu empresa eligió o que diseñamos contigo, cuidando que la transición no interrumpa tu operación diaria."
+  },
+  {
+    "_id": "service-gestion-de-proyectos-de-ti",
+    "_type": "service",
+    "title": "Gestión de proyectos de TI",
+    "slug": {
+      "_type": "slug",
+      "current": "gestion-de-proyectos-de-ti"
+    },
+    "icon": "tasks",
+    "order": 3,
+    "featured": false,
+    "summary": "Lideramos tus proyectos tecnológicos con metodología clara, alcance definido y comunicación constante.",
+    "description": "Lideramos tus proyectos tecnológicos con metodología clara, alcance definido y comunicación constante, para que siempre sepas en qué punto va tu inversión."
+  },
+  {
+    "_id": "service-business-intelligence",
+    "_type": "service",
+    "title": "Business Intelligence",
+    "slug": {
+      "_type": "slug",
+      "current": "business-intelligence"
+    },
+    "icon": "chart",
+    "order": 4,
+    "featured": false,
+    "summary": "Transformamos los datos que ya genera tu operación en reportes e indicadores que se usan para decidir.",
+    "description": "Transformamos los datos que ya genera tu operación en reportes e indicadores que se usan para decidir, no en dashboards que nadie abre."
+  },
+  {
+    "_id": "service-aseguramiento-de-la-calidad",
+    "_type": "service",
+    "title": "Aseguramiento de la calidad (QA / Testing)",
+    "slug": {
+      "_type": "slug",
+      "current": "aseguramiento-de-la-calidad"
+    },
+    "icon": "shield-check",
+    "order": 5,
+    "featured": false,
+    "summary": "Probamos cada entrega de software antes de que llegue a tus usuarios.",
+    "description": "Probamos cada entrega de software antes de que llegue a tus usuarios, para detectar errores en desarrollo, no en producción."
+  },
+  {
+    "_id": "service-mantenimiento-y-migracion-de-software",
+    "_type": "service",
+    "title": "Mantenimiento y migración de software",
+    "slug": {
+      "_type": "slug",
+      "current": "mantenimiento-y-migracion-de-software"
+    },
+    "icon": "wrench",
+    "order": 6,
+    "featured": true,
+    "summary": "El software vivo necesita evolucionar — damos mantenimiento y migramos lo que ya construiste.",
+    "description": "El software vivo necesita evolucionar. Damos mantenimiento, actualizamos versiones y migramos aplicaciones legadas para que sigan respondiendo a tu negocio."
+  }
+]

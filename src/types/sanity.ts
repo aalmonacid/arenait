@@ -3,6 +3,10 @@ export interface ServiceSchema {
   title: string;
   slug: { current: string };
   icon?: string;
+  /** Posición en el sitio (1 = primero). Sin orden, va al final. */
+  order?: number;
+  /** Ocupa 2 columnas en el inicio. */
+  featured?: boolean;
   summary: string;
   description: string;
 }
