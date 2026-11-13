@@ -97,6 +97,33 @@ describe('validateLead', () => {
   });
 });
 
+describe('validateLead: copia y captcha', () => {
+  it('sendCopy es false salvo que llegue true estricto', () => {
+    const base = validateLead(valid);
+    expect(base.kind === 'ok' && base.sendCopy).toBe(false);
+    const yes = validateLead({ ...valid, sendCopy: true });
+    expect(yes.kind === 'ok' && yes.sendCopy).toBe(true);
+    for (const v of ['true', 1, 'yes']) {
+      const r = validateLead({ ...valid, sendCopy: v });
+      expect(r.kind === 'ok' && r.sendCopy).toBe(false);
+    }
+  });
+
+  it('conserva el token del captcha y lo recorta si es excesivo', () => {
+    const r = validateLead({ ...valid, turnstileToken: 'abc123' });
+    expect(r.kind === 'ok' && r.captchaToken).toBe('abc123');
+    const long = validateLead({ ...valid, turnstileToken: 'x'.repeat(5000) });
+    expect(long.kind === 'ok' && long.captchaToken.length).toBe(2048);
+    const none = validateLead(valid);
+    expect(none.kind === 'ok' && none.captchaToken).toBe('');
+  });
+
+  it('el honeypot sigue ganando aunque venga el token', () => {
+    const r = validateLead({ ...valid, companyWebsite: 'x', turnstileToken: 't' });
+    expect(r.kind).toBe('honeypot');
+  });
+});
+
 describe('isAllowedOrigin', () => {
   const url = 'https://dev.arenait.co/api/leads';
 

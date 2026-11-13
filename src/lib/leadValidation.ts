@@ -20,6 +20,9 @@ export const LIMITS = {
   policyVersion: 40,
 } as const;
 
+/** Longitud máxima aceptada del token del captcha (los reales miden < 2100). */
+const MAX_CAPTCHA_TOKEN = 2048;
+
 /** Tamaño máximo del cuerpo JSON de la solicitud, en bytes. */
 export const MAX_BODY_BYTES = 16 * 1024;
 
@@ -40,7 +43,16 @@ export interface Lead {
 }
 
 export type LeadValidation =
-  { kind: 'honeypot' } | { kind: 'invalid'; error: string } | { kind: 'ok'; lead: Lead };
+  | { kind: 'honeypot' }
+  | { kind: 'invalid'; error: string }
+  | {
+      kind: 'ok';
+      lead: Lead;
+      /** El visitante pidió recibir una copia de su mensaje en su correo. */
+      sendCopy: boolean;
+      /** Token del captcha (Cloudflare Turnstile), vacío si no hay captcha. */
+      captchaToken: string;
+    };
 
 // Caracteres de control C0 salvo \t (9), \n (10) y \r (13), más DEL (127).
 // eslint-disable-next-line no-control-regex
@@ -113,6 +125,8 @@ export function validateLead(body: unknown): LeadValidation {
   return {
     kind: 'ok',
     lead: { ...fields, source, policyAccepted: true },
+    sendCopy: raw.sendCopy === true,
+    captchaToken: clean(raw.turnstileToken).slice(0, MAX_CAPTCHA_TOKEN),
   };
 }
 

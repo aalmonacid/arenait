@@ -71,6 +71,37 @@ Pide a Andrés Arenas que se una al proyecto como **Editor** (Sanity → Members
 3. Borra el lead de prueba desde el panel.
 4. **Servicios:** en el panel edita un servicio de prueba (título, orden o destacado), pulsa **Publish** y espera a que Vercel redespliegue (1–2 minutos); verifica el cambio en el sitio. Crea uno nuevo y elimínalo para comprobar ambos casos.
 
+## 7. Captcha del formulario (Cloudflare Turnstile)
+
+Sin las claves el formulario funciona igual, pero sin captcha. Turnstile es gratuito y no muestra imágenes ni acertijos en la mayoría de los casos (verifica los valores vigentes en la documentación de Cloudflare).
+
+1. Cloudflare → **Turnstile → Add widget.** Nombre `arenait-contacto`. Hostnames: `dev.arenait.co` (al lanzar, agrega también el dominio definitivo y su `www`). Modo **Managed**. Crea el widget.
+2. Copia la **Site Key** (pública) y la **Secret Key** (secreta).
+3. Vercel → **Environment Variables**, en Production:
+   - `PUBLIC_TURNSTILE_SITE_KEY` = la Site Key
+   - `TURNSTILE_SECRET_KEY` = la Secret Key (márcala como sensible)
+4. **Redeploy.** La clave pública se imprime al construir el sitio, así que sin redespliegue no aparece el widget.
+5. Prueba: en `/contacto` debe verse la verificación; envía un mensaje y confirma que llega. Si pones solo una de las dos variables, el formulario falla: ponlas juntas.
+
+Para probar sin riesgo existen claves de prueba de Cloudflare (la clave de sitio `1x00000000000000000000AA` siempre aprueba), útiles solo en local.
+
+## 8. Correo: copia al visitante y aviso al dueño (Resend)
+
+Sin estas variables no se envía ningún correo; el formulario sigue guardando los contactos. Si el visitante marca «Enviarme una copia» y no hay correo configurado, la pantalla de éxito le avisa que no pudo enviarse.
+
+1. Crea una cuenta en https://resend.com (revisa en su página los límites y precios vigentes del plan gratuito).
+2. **Domains → Add Domain** con tu dominio (por ejemplo `arenait.co`) y agrega en Cloudflare los registros DNS que Resend indique. **Si ya usan correo en ese dominio, no reemplaces el registro SPF existente:** solo puede haber uno, se combina. Espera a que figure como verificado.
+3. **API Keys → Create** con permiso solo de envío. Cópiala una vez.
+4. Vercel → **Environment Variables**, en Production:
+   - `RESEND_API_KEY` = la clave
+   - `MAIL_FROM` = `ArenaIT <contacto@arenait.co>` (el dominio debe ser el verificado)
+   - `MAIL_TO_OWNER` = el correo de Andrés Arenas, que recibe cada contacto nuevo (puedes poner el tuyo para las pruebas)
+5. **Redeploy** y prueba enviando el formulario marcando la copia.
+
+Qué recibe cada quien: **el dueño** recibe el detalle completo (nombre, empresa, correo, teléfono, servicio y mensaje) y puede **responder directamente al correo**, porque la respuesta va al visitante. **El visitante** (si lo pide) recibe una copia de lo que escribió, con una nota de «si no fuiste tú, ignóralo».
+
+**Política de datos:** el captcha (Cloudflare) y el envío de correo (Resend) son terceros que tratan datos del visitante. Pide al área jurídica que revise si deben nombrarse en la Política de Tratamiento de Datos.
+
 ## Qué administra el cliente desde el panel
 
 | Contenido | Crear / modificar / eliminar | Nota |

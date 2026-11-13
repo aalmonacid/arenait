@@ -120,12 +120,17 @@ test.describe('Contacto page', () => {
     await page.locator('#company').fill('Empresa de Prueba');
     await page.locator('#corporateEmail').fill('test@gmail.com');
     await page.locator('#message').fill('Test message');
+    await page.locator('#policyAccepted').check();
+    await page.locator('#sendCopy').check();
     await page.locator('#leadCaptureForm button[type="submit"]').click();
 
+    // Pantalla de éxito: reemplaza al formulario y saluda por el nombre.
     await expect(page.locator('#formSuccess')).toBeVisible();
-    expect((requestBody as unknown as { corporateEmail?: string } | null)?.corporateEmail).toBe(
-      'test@gmail.com',
-    );
+    await expect(page.locator('#successTitle')).toContainText('Test');
+    await expect(page.locator('#leadCaptureForm')).toBeHidden();
+    const sent = requestBody as unknown as { corporateEmail?: string; sendCopy?: boolean } | null;
+    expect(sent?.corporateEmail).toBe('test@gmail.com');
+    expect(sent?.sendCopy).toBe(true);
   });
 
   test('honeypot field short-circuits without calling the API', async ({ page }) => {
@@ -140,6 +145,7 @@ test.describe('Contacto page', () => {
     await page.locator('#corporateEmail').fill('bot@empresa.com');
     await page.locator('#message').fill('spam');
     await page.locator('#companyWebsite').fill('http://spam.example');
+    await page.locator('#policyAccepted').check();
     await page.locator('#leadCaptureForm button[type="submit"]').click();
 
     await expect(page.locator('#formSuccess')).toBeVisible();

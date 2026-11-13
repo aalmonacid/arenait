@@ -4,6 +4,12 @@ export const prerender = true;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import LeadCaptureForm from '../../components/LeadCaptureForm.astro';
+import { getServices } from '../../lib/services';
+
+// El desplegable "Servicio de interés" usa los mismos servicios del sitio (panel
+// de Sanity con respaldo en el código), para que siga al día si el cliente
+// renombra, agrega o elimina servicios.
+const services = (await getServices()).map((s) => ({ title: s.title }));
 ---
 
 <BaseLayout
@@ -21,7 +27,7 @@ import LeadCaptureForm from '../../components/LeadCaptureForm.astro';
         </p>
       </div>
       <div class="lg:col-span-8">
-        <LeadCaptureForm showServiceDropdown />
+        <LeadCaptureForm showServiceDropdown services={services} />
       </div>
     </div>
   </section>

@@ -8,6 +8,8 @@ import {
   validateLead,
 } from '../../lib/leadValidation';
 import { notifyNewLead } from '../../lib/leadNotify';
+import { verifyTurnstile } from '../../lib/turnstile';
+import { buildCopyEmail, buildOwnerEmail, sendEmail } from '../../lib/mailer';
 
 export const prerender = false;
 
@@ -89,7 +91,22 @@ export const POST: APIRoute = async (context) => {
     return json(400, { ok: false, error: result.error });
   }
 
-  const { lead } = result;
+  const { lead, sendCopy, captchaToken } = result;
+
+  // Captcha (Cloudflare Turnstile): solo se exige si el secreto está
+  // configurado. Se verifica ANTES de escribir en Sanity o enviar correos.
+  const turnstileSecret = import.meta.env.TURNSTILE_SECRET_KEY;
+  if (turnstileSecret) {
+    const human = await verifyTurnstile(turnstileSecret, captchaToken, ip);
+    if (!human) {
+      return json(400, {
+        ok: false,
+        captcha: true,
+        error:
+          'No pudimos verificar que eres una persona. Espera un momento a que termine la verificación e inténtalo de nuevo.',
+      });
+    }
+  }
 
   try {
     const now = new Date().toISOString();
@@ -110,11 +127,23 @@ export const POST: APIRoute = async (context) => {
     });
   }
 
-  // Aviso opcional (no bloquea ni cambia la respuesta si falla). No incluye
-  // datos personales: ver src/lib/leadNotify.ts.
+  // Avisos (ninguno bloquea ni cambia el resultado del envío si falla):
+  // - webhook opcional, sin datos personales (src/lib/leadNotify.ts);
+  // - correo al dueño del sitio con el detalle completo, si MAIL_TO_OWNER existe;
+  // - copia al visitante, solo si la pidió. La respuesta informa si salió o no,
+  //   para que la pantalla de éxito no prometa algo que no ocurrió.
   const studioUrl = new URL('/admin', request.url).toString();
-  await notifyNewLead(import.meta.env.LEAD_NOTIFY_WEBHOOK_URL, lead, studioUrl);
+  const mail = { apiKey: import.meta.env.RESEND_API_KEY, from: import.meta.env.MAIL_FROM };
+  const ownerTo = import.meta.env.MAIL_TO_OWNER;
+
+  const [, , copySent] = await Promise.all([
+    notifyNewLead(import.meta.env.LEAD_NOTIFY_WEBHOOK_URL, lead, studioUrl),
+    ownerTo ? sendEmail(mail, buildOwnerEmail(lead, ownerTo, studioUrl)) : Promise.resolve(false),
+    sendCopy ? sendEmail(mail, buildCopyEmail(lead)) : Promise.resolve(false),
+  ]);
+
+  const copy = !sendCopy ? 'not_requested' : copySent ? 'sent' : 'failed';
 
   // No se devuelve el ID interno del documento: el cliente no lo necesita.
-  return json(201, { ok: true });
+  return json(201, { ok: true, copy });
 };

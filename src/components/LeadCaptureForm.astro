@@ -17,12 +17,19 @@ const {
     { title: 'Mantenimiento y migración de software' },
   ],
 }: Props = Astro.props;
+
+// Clave pública del captcha (Cloudflare Turnstile). Sin ella no se muestra el
+// widget y el servidor tampoco exige captcha (ver src/pages/api/leads.ts).
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
 <div
   class="bg-white p-8 md:p-12 border border-neutral-200 border-t-4 border-t-neutral-900 font-body"
 >
-  <h3 class="text-3xl font-heading font-extrabold mb-8 text-secondary tracking-tight">
+  <h3
+    id="formTitle"
+    class="text-3xl font-heading font-extrabold mb-8 text-secondary tracking-tight"
+  >
     Cuéntanos tu reto
   </h3>
 
@@ -160,6 +167,35 @@ const {
       Debes aceptar la Política de Tratamiento de Datos Personales para continuar.
     </p>
 
+    <!-- Copia opcional del mensaje al propio visitante (la envía el servidor al
+         correo que indicó arriba; el estado real del envío se informa al terminar). -->
+    <div class="flex items-start gap-3">
+      <input
+        type="checkbox"
+        id="sendCopy"
+        class="mt-1 h-5 w-5 shrink-0 rounded-none border-secondary text-secondary focus:ring-interactive"
+      />
+      <label for="sendCopy" class="text-sm text-neutral-900">
+        Enviarme una copia de este mensaje a mi correo.
+      </label>
+    </div>
+
+    {
+      turnstileSiteKey && (
+        <div>
+          <div
+            class="cf-turnstile"
+            data-sitekey={turnstileSiteKey}
+            data-language="es"
+            data-theme="light"
+          />
+          <p id="captchaError" class="text-sm text-red-800 font-bold mt-2 hidden">
+            Completa la verificación para enviar el mensaje.
+          </p>
+        </div>
+      )
+    }
+
     <button
       type="submit"
       class="w-full md:w-auto px-8 py-4 border-2 border-accent bg-accent text-neutral-900 text-xs font-extrabold tracking-label uppercase transition-colors hover:border-neutral-900 hover:bg-neutral-900 hover:text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-interactive disabled:opacity-50 disabled:cursor-not-allowed"
@@ -167,14 +203,51 @@ const {
       Enviar mensaje
     </button>
 
-    <p id="formSuccess" class="text-sm text-green-800 font-bold hidden">
-      Mensaje enviado correctamente. Te respondemos con una propuesta concreta.
-    </p>
-    <p id="formError" class="text-sm text-red-800 font-bold hidden"></p>
+    <p id="formError" role="alert" class="text-sm text-red-800 font-bold hidden"></p>
   </form>
+
+  <!-- Pantalla de éxito: reemplaza al formulario. El texto dinámico (nombre y
+       correo) lo inserta lead-form.js con textContent, nunca como HTML. -->
+  <div
+    id="formSuccess"
+    role="status"
+    aria-live="polite"
+    tabindex="-1"
+    class="hidden border-l-8 border-l-accent bg-neutral-50 p-6 md:p-8 focus:outline-none"
+  >
+    <p class="text-xs font-bold tracking-label uppercase text-secondary mb-3">Mensaje enviado</p>
+    <h3
+      id="successTitle"
+      class="font-heading text-2xl md:text-3xl font-extrabold tracking-tight text-secondary mb-4"
+    >
+      ¡Gracias! Recibimos tu mensaje
+    </h3>
+    <p id="successText" class="text-neutral-900 leading-relaxed mb-6"></p>
+    <p id="successCopy" class="text-neutral-900 font-bold mb-6 hidden"></p>
+
+    <p class="text-xs font-bold tracking-label uppercase text-secondary mb-3">Qué sigue</p>
+    <ol class="list-decimal pl-5 space-y-2 text-neutral-900 mb-8">
+      <li>Revisamos lo que nos cuentas sobre tu operación.</li>
+      <li>Te escribimos con una propuesta concreta.</li>
+      <li>Definimos juntos los siguientes pasos.</li>
+    </ol>
+
+    <button
+      type="button"
+      id="sendAnother"
+      class="inline-flex min-h-11 items-center justify-center border-2 border-neutral-900 px-5 text-xs font-extrabold uppercase tracking-label text-neutral-900 transition-colors hover:border-interactive hover:bg-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-interactive"
+    >
+      Enviar otro mensaje
+    </button>
+  </div>
 </div>
 
 <!-- El script vive en /public/scripts/ (no inline aquí) porque la CSP del
      sitio bloquea scripts inline en producción — este formulario es el
      único flujo real de captura de leads del sitio, ver CONTEXT.md §5. -->
 <script src="/scripts/lead-form.js" is:inline></script>
+{
+  turnstileSiteKey && (
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline />
+  )
+}
