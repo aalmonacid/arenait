@@ -17,6 +17,10 @@ export function getStaticPaths() {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Sanity Studio | ArenaIT</title>
     <style>
+      html,
+      body {
+        height: 100%;
+      }
       body {
         margin: 0;
         padding: 0;
@@ -26,6 +30,14 @@ export function getStaticPaths() {
         overscroll-behavior: none;
         -webkit-font-smoothing: antialiased;
         background-color: #294e6c;
+      }
+      /* El Studio mide el 100% de su contenedor. Sin altura propia en este
+         contenedor, se encogía al alto de su contenido (~370px) y el resto de
+         la ventana mostraba el fondo azul del body, sin poder navegar. */
+      [data-ui='AstroStudioLayout'] {
+        height: 100vh;
+        max-height: 100dvh;
+        overflow: auto;
       }
     </style>
   </head>
