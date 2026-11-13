@@ -22,39 +22,45 @@
 
 ## 3. Cloudflare — crear el sitio y cargar variables
 
-El sitio se despliega como Worker de Cloudflare (páginas estáticas + `/api/leads`). Los nombres exactos de los menús pueden variar; verifícalos en la documentación de Cloudflare.
+El sitio se despliega como **Worker** de Cloudflare (páginas estáticas + `/api/leads`), no como Pages. Los nombres de los menús pueden variar; verifícalos en la documentación de Cloudflare.
 
-1. Cloudflare → **Workers & Pages → Create → Import a repository** → conecta `aalmonacid/arenait`, rama `main`.
-2. Configuración de compilación:
-   - **Build command:** `npm run build`
-   - **Deploy command:** `npx wrangler deploy --config dist/server/wrangler.json`
-   - **Node:** 22 (variable de compilación `NODE_VERSION=22` si hace falta).
-3. **Variables de compilación** (se leen al construir el sitio; Settings → Build → Variables):
+1. **Workers & Pages → Create → Import a repository** → conecta `aalmonacid/arenait` (autoriza solo ese repositorio).
+2. Configuración (después en **Settings → Builds**):
+   - **Nombre del proyecto:** `arenait` (debe coincidir con `wrangler.jsonc`).
+   - **Rama de producción:** `main`.
+   - **Comando de compilación:** `npm run build`
+   - **Comando de implementación:** `npx wrangler deploy --config dist/server/wrangler.json`
+   - **Comando de versión (vista previa):** `npx wrangler versions upload --config dist/server/wrangler.json`
+   - Los dos últimos necesitan `--config`: el adaptador genera la configuración final en `dist/server/`.
+3. **Variables de compilación** (se leen al construir; **Settings → Builds → Variables y secretos**):
 
 | Variable | Valor |
 |---|---|
-| `TURNSTILE_SITE_KEY` | Site Key de Turnstile (paso 7) |
-| `PUBLIC_SITE_URL` / `PUBLIC_ALLOW_INDEXING` | **solo al lanzar** |
+| `TURNSTILE_SITE_KEY` | Site Key de Turnstile (paso 7); es pública |
+| `PUBLIC_SITE_URL`, `PUBLIC_ALLOW_INDEXING` | **solo al lanzar** |
 
-4. **Secretos del Worker** (se leen al ejecutar `/api/leads`; Settings → Variables and Secrets → tipo *Secret*):
+4. **Secretos del Worker** (se leen al ejecutar `/api/leads`; **Settings → Variables y secretos** del Worker, fuera de Builds, tipo *Secreto*):
 
 | Secreto | Valor |
 |---|---|
-| `SANITY_API_WRITE_TOKEN` | el token del paso 2 |
+| `SANITY_API_WRITE_TOKEN` | token del paso 2 (permiso **Editor**) |
 | `TURNSTILE_SECRET_KEY` | Secret Key de Turnstile (paso 7) |
 | `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO_OWNER` | ver paso 8 |
 | `LEAD_NOTIFY_WEBHOOK_URL` | opcional (Slack/Teams) |
 
-Cambiar una variable de **compilación** exige un nuevo despliegue; los **secretos** aplican al siguiente despliegue o versión del Worker.
+**Cuidado con el entorno.** Cloudflare separa *Producción* y *Vista previa*. Los secretos deben existir en **Producción**: si solo están en Vista previa, el formulario falla con «No se pudo guardar la solicitud». Cloudflare puede mostrar un aviso para copiar variables a `wrangler.jsonc`: no lo apliques (los secretos nunca van en el repositorio).
+
+Cambiar una variable de **compilación** exige un build nuevo (**Retry build**); los **secretos** aplican al siguiente despliegue.
 
 ## 4. Publicación automática (Deploy Hook + webhook de Sanity)
 
-1. En Cloudflare, en el proyecto: **Settings → Builds → Deploy hooks → Add** (nombre `Contenido Sanity`, rama `main`). Copia la URL (es un secreto).
+1. En el Worker: **Settings → Builds → Enlaces de implementación → + Agregar.** Nombre `Contenido Sanity`, rama `main`. Copia la URL al crearlo (es un secreto: quien la tenga puede forzar compilaciones).
 2. En Sanity: **API → Webhooks → Create webhook.**
-   - Nombre: `Republicar sitio` · URL: la del Deploy Hook · Dataset: `production`
+   - Nombre: `Republicar sitio` · URL: la del enlace de implementación · Dataset: `production`
    - Eventos: **Create, Update, Delete**
    - **Filtro:** `_type in ["service", "caseStudy", "testimonial"]` — así los contactos (`lead`) no disparan un despliegue.
    - Método: POST · habilitado.
+3. Prueba: edita un servicio, pulsa **Publish** y confirma que arranca una compilación sobre `main` (1–2 minutos).
 
 ## 5. Cargar los 6 servicios en el panel
 
@@ -111,6 +117,33 @@ Sin estas variables no se envía ningún correo; el formulario sigue guardando l
 Qué recibe cada quien: **el dueño** recibe el detalle completo (nombre, empresa, correo, teléfono, servicio y mensaje) y puede **responder directamente al correo**, porque la respuesta va al visitante. **El visitante** (si lo pide) recibe una copia de lo que escribió, con una nota de «si no fuiste tú, ignóralo».
 
 **Política de datos:** el captcha (Cloudflare) y el envío de correo (Resend) son terceros que tratan datos del visitante. Pide al área jurídica que revise si deben nombrarse en la Política de Tratamiento de Datos.
+
+## 9. Límite de envíos (regla del WAF de Cloudflare)
+
+El límite en memoria del código no es global en Cloudflare; la protección real es esta regla, en la **zona** `arenait.co`.
+
+1. **Seguridad → WAF → Reglas de limitación de velocidad → Crear regla.**
+2. Nombre `Limite formulario contacto`. Expresión:
+
+```
+(http.request.uri.path eq "/api/leads" and http.request.method eq "POST")
+```
+
+3. Característica: IP · 5 solicitudes · el periodo más largo que permita el plan gratuito (hoy 10 segundos) · acción **Bloquear**.
+4. **Prueba** (no escribe datos): 10 POST seguidos con captcha inválido deben dar 400 las primeras 5 y luego **429** con `error code: 1015` (bloqueo de Cloudflare). Verificada el 13/11/2026.
+
+El plan gratuito permite una sola regla y ventanas cortas; verifica los límites vigentes en el panel.
+
+## Problemas frecuentes
+
+| Síntoma | Causa y solución |
+|---|---|
+| El formulario dice «No se pudo guardar la solicitud» | Mira **Observability → Logs** del Worker. `403 … permission "create" required`: el Worker no recibe `SANITY_API_WRITE_TOKEN` (secreto en el entorno equivocado, p. ej. solo en Vista previa) o el token no es **Editor**. `401 Unauthorized`: token revocado o mal copiado. |
+| El captcha no se verifica en el servidor | `TURNSTILE_SECRET_KEY` no está en el Worker de **Producción**. Prueba: un captcha inválido debe responder 400, no 502. |
+| El captcha no aparece | `TURNSTILE_SITE_KEY` debe estar como variable de **compilación** y hacerse un build nuevo; el dominio debe estar en los hostnames del widget. |
+| El Studio carga pero no inicia sesión | Falta el dominio en CORS origins de Sanity (con credenciales). |
+| Compila pero falla el despliegue («Could not read file: dist/server/wrangler.json») | El build corrió sobre una rama sin el adaptador de Cloudflare: revisa la **rama de producción**. |
+| Publicar en Sanity no actualiza el sitio | Revisa el registro de intentos del webhook en Sanity y que el filtro incluya el tipo editado. |
 
 ## Qué administra el cliente desde el panel
 

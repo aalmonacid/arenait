@@ -7,11 +7,13 @@
 | Área | Estado | Notas |
 |---|---|---|
 | Código (tipos, lint, build) | Listo | `astro check` 0 errores; ESLint 0 errores (16 warnings de `any` en el borde Sanity/GROQ) |
-| Pruebas unitarias | Listo | 32 tests (validación de leads, rate limiting, aviso de leads) con `npm run test:unit` |
+| Pruebas unitarias | Listo | 55 tests (validación de leads, rate limiting, aviso, correo, captcha, servicios) con `npm run test:unit` |
 | Pruebas e2e | Pendiente de correr | La suite existe (`npm run test:e2e`) pero no corre en este equipo (el Playwright instalado espera otro Chromium); ejecutarla en una máquina normal |
 | Diseño | Listo, pendiente de aprobación | Sistema editorial aplicado a todo el sitio; el cliente debe aprobar botones naranja y titulares nuevos |
 | Seguridad (código) | Listo | CSP única en todo el sitio (excepto `/admin` y `/api`), endpoint de leads endurecido, leads con ID privado |
-| Seguridad (cuentas) | **Pendiente (usted)** | Ver «Acciones en Sanity» y «Acciones en Cloudflare» |
+| Hosting | **Migrado a Cloudflare Workers (13/11/2026)** | Desplegado desde `main` en `dev.arenait.co`; Vercel Hobby no permite uso comercial. Falta asociar el dominio definitivo |
+| Formulario de contacto | Listo y probado en Cloudflare | Captcha Turnstile, guardado en Sanity, correo al dueño y copia al visitante (Resend), regla de límite de envíos en el WAF |
+| Seguridad (cuentas) | **Parcial (usted)** | Rotar claves expuestas en capturas/chat; ver «Acciones en Sanity» y «Cloudflare» |
 | Rendimiento | Medido y mejorado | Lighthouse móvil del home: Performance 94 (88–95) y CLS 0 en 5 de 5 corridas (antes 74–90 y CLS 0.207); LCP ~1.1 s en home, contacto y casos (antes 2.6 s en contacto y casos). TBT variable (88–519 ms), sin tendencia clara. Medido el 12/11/2026 sobre `dev.arenait.co`, en emulación y sin control de CPU |
 | Accesibilidad | AA verificado, AAA parcial | Correcciones aplicadas; ver «Accesibilidad» |
 | SEO | Listo para activar | Indexación por variable de entorno; `noindex` sigue activo hasta que se active |
@@ -26,27 +28,37 @@ Requieren acceso a https://www.sanity.io/manage. No hay forma de hacerlas desde 
    - Opción recomendada: hacer el dataset **privado** (Datasets → `production` → visibilidad privada) y generar un **token de solo lectura** para el build del sitio (variable `SANITY_API_READ_TOKEN`; requiere un pequeño ajuste de código: avíseme y lo hago).
    - Alternativa: crear un dataset aparte (por ejemplo `leads`, privado) y apuntar el cliente de escritura a él (también requiere un ajuste de código).
    - Prueba obligatoria tras crear el primer lead de prueba: consultar sin token `https://xbayv7k2.api.sanity.io/v2024-01-01/data/query/production?query=*[_type=="lead"]` y confirmar que **no** devuelve el lead.
-3. **Token de escritura**: API → Tokens → crear uno con el permiso mínimo necesario (Editor; si solo crea leads, no necesita más) y cargarlo en Vercel como `SANITY_API_WRITE_TOKEN`. No lo comparta por correo ni chat.
-4. **Webhook de contenido** (API → Webhooks): apuntar a la URL del Deploy Hook de Cloudflare (ver abajo), disparador «create, update, delete» sobre los tipos `service`, `caseStudy`, `testimonial`, para que editar contenido republique el sitio.
+3. **Token de escritura**: API → Tokens → crear uno con el permiso mínimo necesario (Editor; si solo crea leads, no necesita más) y cargarlo como secreto del Worker de Cloudflare (Producción) con el nombre `SANITY_API_WRITE_TOKEN`. No lo comparta por correo ni chat.
+4. **Webhook de contenido** (API → Webhooks): apuntar a la URL del Deploy Hook de Cloudflare (ver «Acciones en Cloudflare»), disparador «create, update, delete» sobre los tipos `service`, `caseStudy`, `testimonial`, para que editar contenido republique el sitio.
 5. **Usuarios y roles**: revisar quién tiene acceso al proyecto y con qué rol (principio de mínimo privilegio, alineado con ISO/IEC 27001). Activar autenticación de dos factores si la organización de Sanity lo permite.
 6. **Contenido**: cargar servicios, casos y testimonios en el Studio, **o** aceptar formalmente que el contenido actual del código (`src/lib/fallbackContent.ts`) es el contenido de producción. Hoy el dataset tiene 0 documentos de cada tipo.
 
-## Acciones en Cloudflare (hosting) — las hace usted
+## Acciones en Cloudflare — estado
 
-El sitio se migró de Vercel a Cloudflare Workers (13/11/2026). El paso a paso está en `GUIA-HABILITACION.md` (pasos 3 y 4). Resumen:
+El sitio se migró de Vercel a Cloudflare Workers el 13/11/2026. Paso a paso y solución de problemas: `GUIA-HABILITACION.md`.
 
-1. **Crear el Worker** conectado al repositorio (`npm run build` / `npx wrangler deploy --config dist/server/wrangler.json`).
-2. **Variables de compilación**: `TURNSTILE_SITE_KEY`; el día del lanzamiento `PUBLIC_SITE_URL` y `PUBLIC_ALLOW_INDEXING=true` (solo producción).
-3. **Secretos del Worker**: `SANITY_API_WRITE_TOKEN`, `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO_OWNER` y, opcional, `LEAD_NOTIFY_WEBHOOK_URL`.
-4. **Deploy Hook** del Worker y webhook de Sanity (reemplaza al de Vercel; rotar el anterior).
-5. **Rate limiting**: regla del WAF sobre `/api/leads` (el límite en memoria del código no es global).
-6. **Dominio**: agregar el dominio definitivo al Worker (Domains & Routes). Hoy `arenait.co` redirige a `www.arenait.co`, que sirve el sitio anterior; conservar ese destino hasta confirmar el lanzamiento.
-7. **Analítica**: Web Analytics de Cloudflare (requiere permitir su script en `public/_headers`); hoy no hay ninguna activa.
-8. **Logs**: durante la primera semana revisar los logs del Worker para confirmar respuestas `201` en `/api/leads`.
+**Hecho y verificado**
+- [x] Worker `arenait` conectado a `main`; compila y despliega con `npm run build` y `wrangler deploy --config dist/server/wrangler.json`.
+- [x] Variable de compilación `TURNSTILE_SITE_KEY` y secretos del Worker en **Producción** (`SANITY_API_WRITE_TOKEN`, `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO_OWNER`).
+- [x] Prueba de punta a punta: formulario con captcha, lead en Sanity, correo al dueño y copia al visitante.
+- [x] Enlace de implementación + webhook de Sanity apuntando a `main`.
+- [x] Regla de limitación de velocidad en el WAF sobre `/api/leads` (5 solicitudes, bloqueo corto del plan gratuito; probada: 429 con `error code: 1015`).
+- [x] CORS de Sanity y hostnames de Turnstile para `dev.arenait.co`.
 
-## Acciones en Cloudflare
+**Pendiente (usted)**
+- [ ] Rotar el token de Sanity y la clave de Resend que se pegaron en un chat, y el Deploy Hook de Vercel que se vio en una captura; revocar los anteriores.
+- [ ] Asociar el dominio definitivo al Worker (Domains & Routes). Hoy `arenait.co` redirige a `www.arenait.co`, que sirve el sitio anterior; conservarlo hasta confirmar el lanzamiento.
+- [ ] El día del lanzamiento: `PUBLIC_SITE_URL` y `PUBLIC_ALLOW_INDEXING=true` como variables de **compilación**; dominio definitivo en hostnames de Turnstile y CORS de Sanity; revisar SSL/TLS y la redirección `arenait.co` ↔ `www`.
+- [ ] Analítica: Web Analytics de Cloudflare (requiere permitir su script en `public/_headers`); hoy no hay ninguna activa.
+- [ ] Desconectar el repositorio en Vercel y borrar la rama `migracion/cloudflare`.
+- [ ] Primera semana: revisar los logs del Worker (respuestas `201` en `/api/leads`).
 
-Con acceso confirmado: asociar el dominio definitivo al Worker, revisar el modo SSL/TLS (verificar la documentación vigente de Cloudflare), configurar la redirección `arenait.co` ↔ `www` según el dominio canónico, y conservar el destino del sitio anterior hasta confirmar el lanzamiento para poder revertir.
+**Notas técnicas de la migración**
+- Los secretos del servidor se leen con `astro:env/server` (esquema en `astro.config.mjs`); no existe `import.meta.env` para secretos en Workers.
+- Cabeceras y CSP en `public/_headers` (solo aplican a archivos estáticos; las respuestas de `/api/*` y `/admin` las genera el Worker). Redirecciones 301 en `public/_redirects`.
+- URLs sin barra final (`build.format: 'file'`, `trailingSlash: 'never'`); la canónica se normaliza en `BaseLayout.astro`.
+- `/admin` se renderiza en el Worker (`prerender = false`) para que las rutas internas del Studio funcionen al recargar.
+- Cloudflare separa los secretos de *Producción* y *Vista previa*: deben cargarse en Producción.
 
 ## Lanzamiento (orden sugerido)
 
@@ -54,7 +66,7 @@ Con acceso confirmado: asociar el dominio definitivo al Worker, revisar el modo 
 2. Recibir y publicar los datos legales; revisión jurídica.
 3. Aprobación de diseño por el cliente.
 4. Configurar dominio y DNS; preparar las redirecciones 301 del sitio anterior.
-5. Definir `PUBLIC_ALLOW_INDEXING=true` y `PUBLIC_SITE_URL` en Production y redesplegar.
+5. Definir `PUBLIC_ALLOW_INDEXING=true` y `PUBLIC_SITE_URL` como variables de compilación en Cloudflare y redesplegar.
 6. Registrar el sitio en Google Search Console y enviar `sitemap-index.xml`.
 7. QA final contra el dominio real: consola sin violaciones de CSP, Lighthouse y axe en todas las páginas, formulario, `/admin`, menú móvil y 404.
 8. Plan de reversión: dejar el sitio anterior accesible (o el DNS anterior a mano) hasta confirmar el lanzamiento.

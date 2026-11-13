@@ -218,6 +218,17 @@ Plan, responsables y acciones pendientes: [`PLAN-PRODUCCION.md`](./PLAN-PRODUCCI
 - [ ] **Usuario** (con acceso a Vercel, Sanity y Cloudflare): CORS, token, privacidad del dataset, Deploy Hook, Web Analytics, variables y dominio (ver plan).
 - [ ] **Cliente**: datos legales, aprobaciones de diseño, dominio canónico, contenido.
 
+## Migración de hosting a Cloudflare Workers (13/11/2026)
+
+- [x] Motivo: Vercel Hobby no permite uso comercial. Decisión: Cloudflare Workers (el DNS y Turnstile ya estaban allí).
+- [x] Adaptador `@astrojs/cloudflare`, `wrangler.jsonc`, secretos con `astro:env/server`, `public/_headers` y `public/_redirects`; se eliminó `vercel.json`, `@vercel/analytics` y su script.
+- [x] URLs sin barra final y canónica normalizada; `/admin` renderizado en el Worker.
+- [x] Prueba de punta a punta en `dev.arenait.co` (captcha, Sanity, correos) y regla de límite de envíos en el WAF, verificada.
+- [x] Fusionado a `main`; Cloudflare compila desde `main`.
+- [ ] **Usuario**: rotar claves expuestas, dominio definitivo, variables de lanzamiento, analítica, desconectar Vercel (ver `PLAN-PRODUCCION.md`).
+- [ ] Analítica de producto (Cloudflare Web Analytics u otra) con la CSP ajustada: la de Vercel se retiró.
+- [ ] Revisar `npm audit` tras el cambio de dependencias.
+
 ## Cómo priorizar
 
 1. **Épica A primero, sin excepción.** El sitio hoy puede estar recibiendo tráfico y perdiendo leads silenciosamente porque el formulario no los guarda en ningún lado. Es la pérdida de valor más alta y más fácil de no notar.
