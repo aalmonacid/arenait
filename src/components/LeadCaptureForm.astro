@@ -24,9 +24,7 @@ const {
 // página se genera en el servidor/build, así que no necesita llegar al cliente.
 // PUBLIC_TURNSTILE_SITE_KEY queda como alternativa por compatibilidad.
 const turnstileSiteKey =
-  import.meta.env.TURNSTILE_SITE_KEY ??
-  process.env.TURNSTILE_SITE_KEY ??
-  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+  import.meta.env.TURNSTILE_SITE_KEY ?? import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
 <div
