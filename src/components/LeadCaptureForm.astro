@@ -20,7 +20,13 @@ const {
 
 // Clave pública del captcha (Cloudflare Turnstile). Sin ella no se muestra el
 // widget y el servidor tampoco exige captcha (ver src/pages/api/leads.ts).
-const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+// Se lee TURNSTILE_SITE_KEY (sin prefijo PUBLIC_, que Vercel no deja usar); esta
+// página se genera en el servidor/build, así que no necesita llegar al cliente.
+// PUBLIC_TURNSTILE_SITE_KEY queda como alternativa por compatibilidad.
+const turnstileSiteKey =
+  import.meta.env.TURNSTILE_SITE_KEY ??
+  process.env.TURNSTILE_SITE_KEY ??
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
 <div

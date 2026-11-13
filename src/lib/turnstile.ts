@@ -2,7 +2,7 @@
  * Verificación del captcha Cloudflare Turnstile en el servidor.
  *
  * Turnstile se activa solo si existe la variable `TURNSTILE_SECRET_KEY` (y la
- * pública `PUBLIC_TURNSTILE_SITE_KEY` para mostrar el widget). Sin ellas el
+ * de sitio `TURNSTILE_SITE_KEY` para mostrar el widget). Sin ellas el
  * formulario sigue funcionando sin captcha, así el sitio no se rompe antes de
  * configurar las claves.
  *

@@ -78,7 +78,7 @@ Sin las claves el formulario funciona igual, pero sin captcha. Turnstile es grat
 1. Cloudflare → **Turnstile → Add widget.** Nombre `arenait-contacto`. Hostnames: `dev.arenait.co` (al lanzar, agrega también el dominio definitivo y su `www`). Modo **Managed**. Crea el widget.
 2. Copia la **Site Key** (pública) y la **Secret Key** (secreta).
 3. Vercel → **Environment Variables**, en Production:
-   - `PUBLIC_TURNSTILE_SITE_KEY` = la Site Key
+   - `TURNSTILE_SITE_KEY` = la Site Key (sin prefijo `PUBLIC_`; el código también acepta `PUBLIC_TURNSTILE_SITE_KEY` si algún día se puede)
    - `TURNSTILE_SECRET_KEY` = la Secret Key (márcala como sensible)
 4. **Redeploy.** La clave pública se imprime al construir el sitio, así que sin redespliegue no aparece el widget.
 5. Prueba: en `/contacto` debe verse la verificación; envía un mensaje y confirma que llega. Si pones solo una de las dos variables, el formulario falla: ponlas juntas.

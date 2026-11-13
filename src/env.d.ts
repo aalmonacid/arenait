@@ -13,7 +13,8 @@ interface ImportMetaEnv {
   readonly PUBLIC_ALLOW_INDEXING?: string;
   // Captcha Cloudflare Turnstile. La clave de sitio es pública (se imprime en el
   // formulario al construir); el secreto es server-only. Sin ellas no hay captcha.
-  readonly PUBLIC_TURNSTILE_SITE_KEY?: string;
+  readonly TURNSTILE_SITE_KEY?: string;
+  readonly PUBLIC_TURNSTILE_SITE_KEY?: string; // alternativa heredada
   readonly TURNSTILE_SECRET_KEY?: string;
   // Correo con Resend (server-only). Sin RESEND_API_KEY y MAIL_FROM no se envía nada.
   readonly RESEND_API_KEY?: string;
