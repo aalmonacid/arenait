@@ -20,7 +20,9 @@ const {
 const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === 'true';
 
 const absoluteOgImage = new URL(ogImage, Astro.site).toString();
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+// Ruta canónica sin barra final ni «.html» (el build genera archivos como contacto.html).
+const canonicalPath = Astro.url.pathname.replace(/(^|\/)index(\.html)?$/, '$1').replace(/\.html$/, '').replace(/(.)\/+$/, '$1') || '/';
+const canonicalUrl = new URL(canonicalPath, Astro.site).toString();
 
 const structuredData: Record<string, unknown>[] = Astro.props.structuredData ?? [];
 
@@ -45,7 +47,7 @@ const organizationSchema = {
     <!-- Indexación controlada por variable de entorno: mientras
          PUBLIC_ALLOW_INDEXING no sea 'true' (dev.arenait.co, previews) el sitio
          se marca noindex. Para el lanzamiento NO hay que tocar código: basta
-         definir PUBLIC_ALLOW_INDEXING=true en las variables de Vercel del
+         definir PUBLIC_ALLOW_INDEXING=true en las variables de compilación de Cloudflare del
          entorno de producción y volver a desplegar. Ver PLAN-PRODUCCION.md. -->
     {!allowIndexing && <meta name="robots" content="noindex, nofollow" />}
 
@@ -262,13 +264,5 @@ const organizationSchema = {
     <CookieConsentBanner />
 
     <script type="module" src="/scripts/mobile-menu.js" is:inline></script>
-    <!-- Vercel Analytics, gateado por consentimiento (BACKLOG.md Épica J).
-         Archivo real en /public/scripts/ (nunca inline) — ver el comentario
-         extenso en analytics.js sobre por qué no se usa el componente
-         <Analytics /> de @vercel/analytics/astro (compila a JS inline,
-         bloqueado por la CSP, confirmado empíricamente con un build de
-         prueba) ni un import directo del paquete de npm (public/ no pasa
-         por Vite, un specifier de npm no resuelve en el navegador). -->
-    <script type="module" src="/scripts/analytics.js" is:inline></script>
   </body>
 </html>

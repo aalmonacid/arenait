@@ -1,6 +1,6 @@
-# Guía de habilitación: Sanity y Vercel
+# Guía de habilitación: Sanity y Cloudflare
 
-> Paso a paso para dejar funcionando el panel de contenido, el guardado de contactos y la publicación automática. No contiene secretos: el token y las URL se cargan solo en Vercel/Sanity. Los nombres exactos de los menús pueden variar un poco según la versión de cada consola.
+> Paso a paso para dejar funcionando el panel de contenido, el guardado de contactos y la publicación automática. No contiene secretos: el token y las URL se cargan solo en Cloudflare/Sanity. Los nombres exactos de los menús pueden variar un poco según la versión de cada consola.
 
 **Orden recomendado:** 1 → 2 → 3 → 4 → 5 → 6. Los pasos de dominio e indexación (final) van al lanzamiento, no ahora.
 
@@ -20,29 +20,41 @@
 2. Nombre: `arenait-web-write` · permiso: **Editor** (el mínimo que puede crear documentos).
 3. Copia el token **una sola vez** y guárdalo en un gestor de contraseñas. No lo pegues en chats, correos ni archivos del proyecto.
 
-## 3. Vercel — variables de entorno
+## 3. Cloudflare — crear el sitio y cargar variables
 
-En el proyecto de Vercel: **Settings → Environment Variables.**
+El sitio se despliega como Worker de Cloudflare (páginas estáticas + `/api/leads`). Los nombres exactos de los menús pueden variar; verifícalos en la documentación de Cloudflare.
 
-| Variable | Valor | Entornos |
-|---|---|---|
-| `SANITY_API_WRITE_TOKEN` | el token del paso 2 (márcala como sensible si Vercel lo ofrece) | Production y Preview |
-| `LEAD_NOTIFY_WEBHOOK_URL` | URL de un webhook entrante de Slack/Teams (opcional) | Production |
+1. Cloudflare → **Workers & Pages → Create → Import a repository** → conecta `aalmonacid/arenait`, rama `main`.
+2. Configuración de compilación:
+   - **Build command:** `npm run build`
+   - **Deploy command:** `npx wrangler deploy --config dist/server/wrangler.json`
+   - **Node:** 22 (variable de compilación `NODE_VERSION=22` si hace falta).
+3. **Variables de compilación** (se leen al construir el sitio; Settings → Build → Variables):
 
-Después de guardar, **vuelve a desplegar** (Deployments → último despliegue → ⋯ → Redeploy): las variables solo aplican a despliegues nuevos.
+| Variable | Valor |
+|---|---|
+| `TURNSTILE_SITE_KEY` | Site Key de Turnstile (paso 7) |
+| `PUBLIC_SITE_URL` / `PUBLIC_ALLOW_INDEXING` | **solo al lanzar** |
 
-**No definas todavía** `PUBLIC_ALLOW_INDEXING` ni `PUBLIC_SITE_URL`: son para el día del lanzamiento.
+4. **Secretos del Worker** (se leen al ejecutar `/api/leads`; Settings → Variables and Secrets → tipo *Secret*):
 
-## 4. Vercel y Sanity — publicación automática (Deploy Hook + webhook)
+| Secreto | Valor |
+|---|---|
+| `SANITY_API_WRITE_TOKEN` | el token del paso 2 |
+| `TURNSTILE_SECRET_KEY` | Secret Key de Turnstile (paso 7) |
+| `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO_OWNER` | ver paso 8 |
+| `LEAD_NOTIFY_WEBHOOK_URL` | opcional (Slack/Teams) |
 
-1. En Vercel: **Settings → Git → Deploy Hooks.** Nombre `Contenido Sanity`, rama `main` → **Create.** Copia la URL (es un secreto: quien la tenga puede forzar despliegues).
+Cambiar una variable de **compilación** exige un nuevo despliegue; los **secretos** aplican al siguiente despliegue o versión del Worker.
+
+## 4. Publicación automática (Deploy Hook + webhook de Sanity)
+
+1. En Cloudflare, en el proyecto: **Settings → Builds → Deploy hooks → Add** (nombre `Contenido Sanity`, rama `main`). Copia la URL (es un secreto).
 2. En Sanity: **API → Webhooks → Create webhook.**
-   - Nombre: `Republicar sitio`
-   - URL: la del Deploy Hook
-   - Dataset: `production`
+   - Nombre: `Republicar sitio` · URL: la del Deploy Hook · Dataset: `production`
    - Eventos: **Create, Update, Delete**
-   - **Filtro:** `_type in ["service", "caseStudy", "testimonial"]` — así **los contactos (`lead`) no disparan un despliegue** cada vez que llega uno.
-   - Método: POST · estado: habilitado.
+   - **Filtro:** `_type in ["service", "caseStudy", "testimonial"]` — así los contactos (`lead`) no disparan un despliegue.
+   - Método: POST · habilitado.
 
 ## 5. Cargar los 6 servicios en el panel
 
@@ -64,12 +76,12 @@ Pide a Andrés Arenas que se una al proyecto como **Editor** (Sanity → Members
 
 ## 6. Prueba de punta a punta
 
-1. **Contactos:** envía un formulario real desde `/contacto` y comprueba que aparece como *Lead* en el panel. Revisa en Vercel (**Logs** de la función `/api/leads`) que respondió `201`.
+1. **Contactos:** envía un formulario real desde `/contacto` y comprueba que aparece como *Lead* en el panel. Revisa en Cloudflare (**Workers → Logs**) que `/api/leads` respondió `201`.
 2. **Privacidad del lead (obligatoria):** sin iniciar sesión ni usar token, abre
    `https://xbayv7k2.api.sanity.io/v2024-01-01/data/query/production?query=*[_type=="lead"]`
    y confirma que **no devuelve el lead**. Si lo devuelve, no publiques el formulario: hay que mover los leads a un dataset privado (avísame para ajustar el código).
 3. Borra el lead de prueba desde el panel.
-4. **Servicios:** en el panel edita un servicio de prueba (título, orden o destacado), pulsa **Publish** y espera a que Vercel redespliegue (1–2 minutos); verifica el cambio en el sitio. Crea uno nuevo y elimínalo para comprobar ambos casos.
+4. **Servicios:** en el panel edita un servicio de prueba (título, orden o destacado), pulsa **Publish** y espera a que Cloudflare redespliegue (1–2 minutos); verifica el cambio en el sitio. Crea uno nuevo y elimínalo para comprobar ambos casos.
 
 ## 7. Captcha del formulario (Cloudflare Turnstile)
 
@@ -77,9 +89,7 @@ Sin las claves el formulario funciona igual, pero sin captcha. Turnstile es grat
 
 1. Cloudflare → **Turnstile → Add widget.** Nombre `arenait-contacto`. Hostnames: `dev.arenait.co` (al lanzar, agrega también el dominio definitivo y su `www`). Modo **Managed**. Crea el widget.
 2. Copia la **Site Key** (pública) y la **Secret Key** (secreta).
-3. Vercel → **Environment Variables**, en Production:
-   - `TURNSTILE_SITE_KEY` = la Site Key (sin prefijo `PUBLIC_`; el código también acepta `PUBLIC_TURNSTILE_SITE_KEY` si algún día se puede)
-   - `TURNSTILE_SECRET_KEY` = la Secret Key (márcala como sensible)
+3. Cloudflare (paso 3): `TURNSTILE_SITE_KEY` como variable de **compilación** y `TURNSTILE_SECRET_KEY` como **secreto**.
 4. **Redeploy.** La clave pública se imprime al construir el sitio, así que sin redespliegue no aparece el widget.
 5. Prueba: en `/contacto` debe verse la verificación; envía un mensaje y confirma que llega. Si pones solo una de las dos variables, el formulario falla: ponlas juntas.
 
@@ -92,7 +102,7 @@ Sin estas variables no se envía ningún correo; el formulario sigue guardando l
 1. Crea una cuenta en https://resend.com (revisa en su página los límites y precios vigentes del plan gratuito).
 2. **Domains → Add Domain** con tu dominio (por ejemplo `arenait.co`) y agrega en Cloudflare los registros DNS que Resend indique. **Si ya usan correo en ese dominio, no reemplaces el registro SPF existente:** solo puede haber uno, se combina. Espera a que figure como verificado.
 3. **API Keys → Create** con permiso solo de envío. Cópiala una vez.
-4. Vercel → **Environment Variables**, en Production:
+4. Cloudflare → secretos del Worker (paso 3):
    - `RESEND_API_KEY` = la clave
    - `MAIL_FROM` = `ArenaIT <contacto@arenait.co>` (el dominio debe ser el verificado)
    - `MAIL_TO_OWNER` = el correo de Andrés Arenas, que recibe cada contacto nuevo (puedes poner el tuyo para las pruebas)
@@ -114,8 +124,8 @@ Qué recibe cada quien: **el dueño** recibe el detalle completo (nombre, empres
 
 ## Al lanzar (no antes)
 
-1. Vercel: agregar el dominio definitivo (Settings → Domains) y configurar el DNS en Cloudflare según indique Vercel.
-2. Vercel: definir `PUBLIC_SITE_URL` y `PUBLIC_ALLOW_INDEXING=true` **solo en Production** y redesplegar.
+1. Cloudflare: en el Worker, **Settings → Domains & Routes → Add custom domain** con el dominio definitivo (el DNS ya está en Cloudflare, se crea solo).
+2. Cloudflare: definir `PUBLIC_SITE_URL` y `PUBLIC_ALLOW_INDEXING=true` como variables de **compilación** y volver a desplegar.
 3. Sanity: agregar el dominio definitivo a CORS origins.
 4. Registrar el sitio en Google Search Console y enviar el mapa del sitio.
-5. Vercel: activar **Analytics** (pestaña Analytics → Enable).
+5. Cloudflare: activar **Web Analytics** del sitio (requiere permitir su script en la CSP de `public/_headers`; hoy no hay analítica activa).

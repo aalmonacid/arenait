@@ -1,13 +1,11 @@
 ---
-export const prerender = true;
+// Se renderiza en el Worker (no estático) para que cualquier ruta interna del
+// Studio (/admin/structure/service...) cargue al refrescar la página.
+export const prerender = false;
 
 // Se delega la renderización a un wrapper estricto de React para aislar Vite SSR
 import SanityStudio from '../../components/SanityStudio';
 
-// Generamos la ruta estática base para el SPA
-export function getStaticPaths() {
-  return [{ params: { index: undefined } }, { params: { index: 'structure' } }];
-}
 ---
 
 <!doctype html>

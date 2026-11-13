@@ -1,0 +1,15 @@
+{
+  // Worker de ArenaIT en Cloudflare: sirve los archivos estáticos (páginas
+  // prerenderizadas) y ejecuta /api/leads. Los secretos NO van aquí: se cargan
+  // en el panel de Cloudflare o con `wrangler secret put` (ver GUIA-HABILITACION.md).
+  "name": "arenait",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-06-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist",
+    "html_handling": "drop-trailing-slash"
+  },
+  "observability": { "enabled": true }
+}

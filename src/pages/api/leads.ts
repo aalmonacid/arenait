@@ -1,5 +1,12 @@
 import type { APIRoute } from 'astro';
-import { sanityWriteClient } from '../../lib/sanityWriteClient';
+import {
+  LEAD_NOTIFY_WEBHOOK_URL,
+  MAIL_FROM,
+  MAIL_TO_OWNER,
+  RESEND_API_KEY,
+  TURNSTILE_SECRET_KEY,
+} from 'astro:env/server';
+import { getSanityWriteClient } from '../../lib/sanityWriteClient';
 import { checkRateLimit } from '../../lib/rateLimit';
 import {
   MAX_BODY_BYTES,
@@ -29,8 +36,8 @@ export const POST: APIRoute = async (context) => {
     return json(403, { ok: false, error: 'Origen no permitido.' });
   }
 
-  // clientAddress lo resuelve @astrojs/vercel a partir de x-forwarded-for
-  // (ver getClientIpAddress en @astrojs/internal-helpers). En local
+  // clientAddress lo resuelve el adaptador (en Cloudflare, de la cabecera
+  // cf-connecting-ip). En local
   // (astro dev) cae a la IP del socket. Se accede dentro de un try/catch
   // porque Astro lanza un error si el adaptador en uso no soporta
   // clientAddress; en ese caso (u otro sin IP disponible), 'unknown' agrupa
@@ -95,7 +102,7 @@ export const POST: APIRoute = async (context) => {
 
   // Captcha (Cloudflare Turnstile): solo se exige si el secreto está
   // configurado. Se verifica ANTES de escribir en Sanity o enviar correos.
-  const turnstileSecret = import.meta.env.TURNSTILE_SECRET_KEY;
+  const turnstileSecret = TURNSTILE_SECRET_KEY;
   if (turnstileSecret) {
     const human = await verifyTurnstile(turnstileSecret, captchaToken, ip);
     if (!human) {
@@ -112,7 +119,7 @@ export const POST: APIRoute = async (context) => {
     const now = new Date().toISOString();
     // `_id` con prefijo `lead.`: documento privado para el API público de
     // Sanity (ver leadDocumentId en src/lib/leadValidation.ts).
-    await sanityWriteClient.create({
+    await getSanityWriteClient().create({
       _id: leadDocumentId(),
       _type: 'lead',
       ...lead,
@@ -133,11 +140,11 @@ export const POST: APIRoute = async (context) => {
   // - copia al visitante, solo si la pidió. La respuesta informa si salió o no,
   //   para que la pantalla de éxito no prometa algo que no ocurrió.
   const studioUrl = new URL('/admin', request.url).toString();
-  const mail = { apiKey: import.meta.env.RESEND_API_KEY, from: import.meta.env.MAIL_FROM };
-  const ownerTo = import.meta.env.MAIL_TO_OWNER;
+  const mail = { apiKey: RESEND_API_KEY, from: MAIL_FROM };
+  const ownerTo = MAIL_TO_OWNER;
 
   const [, , copySent] = await Promise.all([
-    notifyNewLead(import.meta.env.LEAD_NOTIFY_WEBHOOK_URL, lead, studioUrl),
+    notifyNewLead(LEAD_NOTIFY_WEBHOOK_URL, lead, studioUrl),
     ownerTo ? sendEmail(mail, buildOwnerEmail(lead, ownerTo, studioUrl)) : Promise.resolve(false),
     sendCopy ? sendEmail(mail, buildCopyEmail(lead)) : Promise.resolve(false),
   ]);

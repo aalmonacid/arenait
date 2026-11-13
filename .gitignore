@@ -33,3 +33,7 @@ Tablero de Marca ArenaIT.pdf
 
 # Dossier comercial (contiene presupuesto): el repo es público, nunca versionar.
 /dossier/
+
+# Cloudflare / Wrangler
+.wrangler/
+.dev.vars

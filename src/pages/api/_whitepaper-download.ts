@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { client } from '../../lib/sanity';
-import { sanityWriteClient } from '../../lib/sanityWriteClient';
+import { getSanityWriteClient } from '../../lib/sanityWriteClient';
 import { checkRateLimit } from '../../lib/rateLimit';
 
 export const prerender = false;
@@ -28,7 +28,7 @@ export const POST: APIRoute = async (context) => {
   const { request } = context;
 
   // Mismo patrón que /api/leads.ts (ver el comentario extenso ahí):
-  // clientAddress lo resuelve @astrojs/vercel a partir de x-forwarded-for.
+  // clientAddress lo resuelve el adaptador de Cloudflare (cf-connecting-ip).
   let ip: string;
   try {
     ip = context.clientAddress || 'unknown';
@@ -130,7 +130,7 @@ export const POST: APIRoute = async (context) => {
   }
 
   try {
-    const doc = await sanityWriteClient.create({
+    const doc = await getSanityWriteClient().create({
       _type: 'lead',
       fullName,
       company,
