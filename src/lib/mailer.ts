@@ -2,7 +2,7 @@
  * Envío de correos transaccionales con Resend (https://resend.com), sin
  * dependencias nuevas: una llamada `fetch` a su API.
  *
- * Variables de entorno (todas server-only, se cargan en Vercel):
+ * Variables de entorno (todas server-only, se cargan como secretos en Cloudflare):
  * - RESEND_API_KEY   clave de la API de Resend.
  * - MAIL_FROM        remitente, por ejemplo `ArenaIT <contacto@arenait.co>`. El
  *                    dominio debe estar verificado en Resend (registros DNS).

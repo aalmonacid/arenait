@@ -3,20 +3,15 @@
  * expuestos públicamente como `/api/leads`.
  *
  * LIMITACIÓN REAL — leer antes de confiar en esto como protección fuerte:
- * Este proyecto corre `/api/leads` como función serverless de Vercel
- * (`prerender = false`, sin Edge Runtime ni Redis/Upstash ni ningún store
- * externo — ver CONTEXT.md §3). El `Map` de abajo vive en memoria del
- * proceso de la función:
- *   - Se reinicia en cada cold start (Vercel puede crear una instancia nueva
- *     en cualquier momento, especialmente tras inactividad).
- *   - NO se comparte entre instancias concurrentes: si Vercel escala a N
- *     instancias en paralelo, un atacante distribuido en el tiempo/carga
- *     puede terminar con hasta N * MAX_REQUESTS solicitudes efectivas.
- * Esto es "best-effort": frena un bot simple que golpea el endpoint en ráfaga
- * contra una misma instancia caliente, pero NO es una defensa robusta contra
- * abuso distribuido o sostenido. Si el volumen de spam lo justifica (ver
- * BACKLOG.md, Épica D/J), la solución real es un store externo compartido
- * (Upstash Redis, Vercel KV, etc.) — evaluar en ese momento, no antes.
+ * Este proyecto corre `/api/leads` como Worker de Cloudflare, sin store externo
+ * (KV, Durable Objects, Redis) — ver CONTEXT.md §3. El `Map` de abajo vive en
+ * la memoria del isolate del Worker:
+ *   - Se reinicia cuando Cloudflare recicla el isolate.
+ *   - NO se comparte entre isolates ni entre centros de datos: la protección
+ *     real debe ser una regla de «Rate limiting» de Cloudflare sobre
+ *     `/api/leads` (WAF → Rate limiting rules), que sí es global.
+ * Esto es "best-effort": frena una ráfaga simple contra un mismo isolate, pero
+ * NO es una defensa robusta contra abuso distribuido o sostenido.
  */
 
 interface RateLimitOptions {

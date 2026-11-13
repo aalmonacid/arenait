@@ -1,7 +1,7 @@
 /**
  * Aviso opcional de lead nuevo a un webhook entrante (Slack, Teams, Make,
  * Zapier, etc.). Se activa solo si existe la variable de entorno
- * `LEAD_NOTIFY_WEBHOOK_URL` en Vercel; sin ella no hace nada.
+ * `LEAD_NOTIFY_WEBHOOK_URL` en Cloudflare; sin ella no hace nada.
  *
  * Privacidad: el mensaje NO incluye correo, teléfono ni el texto del mensaje
  * del lead — solo empresa, servicio de interés y un enlace al Studio donde

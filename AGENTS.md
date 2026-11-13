@@ -26,5 +26,6 @@
 ## Reglas de Arquitectura
 
 - **Stack**: Astro 7 + Sanity.io + Tailwind CSS + TypeScript.
+- **Hosting** (desde 13/11/2026): Cloudflare Workers (`@astrojs/cloudflare`, config en `wrangler.jsonc`). Cabeceras/CSP en `public/_headers` y redirecciones en `public/_redirects` — ya no existe `vercel.json`. Vercel Hobby no permite uso comercial.
 - **Sanity**: Project ID `xbayv7k2`, Dataset `production`.
 - **Enfoque real**: desarrollo de software a la medida, con acompañamiento desde el diseño hasta el mantenimiento en producción. Sin certificaciones (ISO 27001/TOGAF/ISO 25010), SLAs ni ahorros de TCO publicados — no existen o no están verificados. Todo dato de este tipo debe venir confirmado por el cliente antes de publicarse; mientras tanto, se marca `[PENDIENTE]` (renderizado vía el componente `PendingContentTag`, nunca como texto crudo entre corchetes).

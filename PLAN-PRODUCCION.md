@@ -1,6 +1,6 @@
 # Plan a producción — ArenaIT
 
-> Actualizado el 12/11/2026. Resume qué se hizo en el código, qué falta y **quién** debe hacerlo. No contiene secretos: los valores (tokens, URLs de webhook) se cargan directamente en Vercel/Sanity, nunca en el repo.
+> Actualizado el 13/11/2026. Resume qué se hizo en el código, qué falta y **quién** debe hacerlo. No contiene secretos: los valores (tokens, URLs de webhook) se cargan directamente en Cloudflare/Sanity, nunca en el repo.
 
 ## Estado por área
 
@@ -11,7 +11,7 @@
 | Pruebas e2e | Pendiente de correr | La suite existe (`npm run test:e2e`) pero no corre en este equipo (el Playwright instalado espera otro Chromium); ejecutarla en una máquina normal |
 | Diseño | Listo, pendiente de aprobación | Sistema editorial aplicado a todo el sitio; el cliente debe aprobar botones naranja y titulares nuevos |
 | Seguridad (código) | Listo | CSP única en todo el sitio (excepto `/admin` y `/api`), endpoint de leads endurecido, leads con ID privado |
-| Seguridad (cuentas) | **Pendiente (usted)** | Ver «Acciones en Sanity» y «Acciones en Vercel» |
+| Seguridad (cuentas) | **Pendiente (usted)** | Ver «Acciones en Sanity» y «Acciones en Cloudflare» |
 | Rendimiento | Medido y mejorado | Lighthouse móvil del home: Performance 94 (88–95) y CLS 0 en 5 de 5 corridas (antes 74–90 y CLS 0.207); LCP ~1.1 s en home, contacto y casos (antes 2.6 s en contacto y casos). TBT variable (88–519 ms), sin tendencia clara. Medido el 12/11/2026 sobre `dev.arenait.co`, en emulación y sin control de CPU |
 | Accesibilidad | AA verificado, AAA parcial | Correcciones aplicadas; ver «Accesibilidad» |
 | SEO | Listo para activar | Indexación por variable de entorno; `noindex` sigue activo hasta que se active |
@@ -27,66 +27,30 @@ Requieren acceso a https://www.sanity.io/manage. No hay forma de hacerlas desde 
    - Alternativa: crear un dataset aparte (por ejemplo `leads`, privado) y apuntar el cliente de escritura a él (también requiere un ajuste de código).
    - Prueba obligatoria tras crear el primer lead de prueba: consultar sin token `https://xbayv7k2.api.sanity.io/v2024-01-01/data/query/production?query=*[_type=="lead"]` y confirmar que **no** devuelve el lead.
 3. **Token de escritura**: API → Tokens → crear uno con el permiso mínimo necesario (Editor; si solo crea leads, no necesita más) y cargarlo en Vercel como `SANITY_API_WRITE_TOKEN`. No lo comparta por correo ni chat.
-4. **Webhook de contenido** (API → Webhooks): apuntar a la URL del Deploy Hook de Vercel (ver abajo), disparador «create, update, delete» sobre los tipos `service`, `caseStudy`, `testimonial`, para que editar contenido republique el sitio.
+4. **Webhook de contenido** (API → Webhooks): apuntar a la URL del Deploy Hook de Cloudflare (ver abajo), disparador «create, update, delete» sobre los tipos `service`, `caseStudy`, `testimonial`, para que editar contenido republique el sitio.
 5. **Usuarios y roles**: revisar quién tiene acceso al proyecto y con qué rol (principio de mínimo privilegio, alineado con ISO/IEC 27001). Activar autenticación de dos factores si la organización de Sanity lo permite.
 6. **Contenido**: cargar servicios, casos y testimonios en el Studio, **o** aceptar formalmente que el contenido actual del código (`src/lib/fallbackContent.ts`) es el contenido de producción. Hoy el dataset tiene 0 documentos de cada tipo.
 
-## Acciones en Vercel — las hace usted
+## Acciones en Cloudflare (hosting) — las hace usted
 
-Requieren acceso al proyecto de Vercel.
+El sitio se migró de Vercel a Cloudflare Workers (13/11/2026). El paso a paso está en `GUIA-HABILITACION.md` (pasos 3 y 4). Resumen:
 
-1. **Variables de entorno** (Settings → Environment Variables), por entorno:
-
-   | Variable | Entorno | Valor |
-   |---|---|---|
-   | `SANITY_API_WRITE_TOKEN` | Production y Preview | Token del paso 3 de Sanity |
-   | `LEAD_NOTIFY_WEBHOOK_URL` | Production | URL de un webhook entrante (Slack/Teams/Make) — **opcional**, ver «Decisiones» |
-   | `PUBLIC_ALLOW_INDEXING` | **Solo Production**, el día del lanzamiento | `true` |
-   | `PUBLIC_SITE_URL` | Production | Dominio canónico definitivo, por ejemplo `https://arenait.co` |
-
-   `PUBLIC_ALLOW_INDEXING` **no** debe definirse en Preview ni en el dominio de staging.
-2. **Deploy Hook** (Settings → Git → Deploy Hooks): crear uno sobre la rama `main` y pegar su URL en el webhook de Sanity (paso 4 de Sanity).
-3. **Web Analytics**: activarlo en el proyecto (Analytics → Enable). Sin esto `/_vercel/insights/script.js` responde 404.
-4. **Dominios** (Settings → Domains): agregar el dominio definitivo y configurar el DNS en Cloudflare según lo que indique Vercel. Hoy `arenait.co` redirige a `www.arenait.co`, que sirve el sitio anterior.
-5. **Protección del entorno**: confirmar que Preview/staging no sea público si no se desea (Deployment Protection).
-6. **Logs**: durante la primera semana revisar Functions → `/api/leads` para confirmar que llegan solicitudes y respuestas `201`.
-
-## Acciones con el cliente
-
-Todo contenido dirigido al cliente debe ser revisado por una persona del equipo antes de enviarse.
-
-**Bloqueante legal**
-
-1. Razón social completa, NIT y domicilio legal (certificado de existencia y representación legal y RUT).
-2. Correo o canal designado para ejercer los derechos de los titulares (ARCO) y quién lo atiende.
-3. Revisión de la Política de Tratamiento de Datos por el área jurídica. El texto actual es una estructura base conforme a la Ley 1581 de 2012 y el Decreto 1377 de 2013; **no es asesoría legal definitiva**.
-4. Confirmar si el aviso de leads a un tercero (Slack, Teams, etc.) debe declararse en la política. El aviso que implementé no envía datos personales (solo empresa, servicio y enlace al Studio).
-
-**Decisiones**
-
-5. **Dominio canónico**: `arenait.co` o `www.arenait.co` (hoy el sitio anterior vive en `www`, detrás de Cloudflare). Las redirecciones 301 de las páginas `.html` del sitio anterior ya están configuradas en `vercel.json` (`/nosotros.html` → `/nosotros`, `/servicios.html` → `/servicios`, `/contacto.html` → `/contacto`, `/experiencia.html` → `/casos-de-estudio`, `/alianzas.html` → `/nosotros`, `/index.html` → `/`); confirmar el destino de `alianzas.html` y verificarlas una vez el dominio apunte al sitio nuevo.
-6. **¿Quién atiende los leads y en qué plazo?** Y por qué canal quieren el aviso (correo, Slack, Teams).
-7. **Aprobación de diseño**: botones primarios naranja con texto oscuro (el blanco sobre azul `#0075C9` mide 4.8:1 y no cumple AAA), titulares nuevos de cada página, las 5 etapas de «Cómo trabajamos» y la lista de sectores.
-8. **Contacto de seguridad**: un correo para `/.well-known/security.txt` (reporte de vulnerabilidades). No lo creé porque no tengo un correo confirmado.
-
-**Contenido**
-
-9. Capturas reales de Tauruswebs y Oviswebs (con autorización de Sadep y sin datos de sus clientes).
-10. Datos de contacto público (correo, teléfono), dirección física y redes sociales; año de fundación y tamaño del equipo, si desean publicarlos.
-11. Revisión y aprobación de los 2 artículos del blog.
-12. Más casos de estudio y testimonios reales, con permiso escrito de uso.
-
-## Línea base del sitio actual (inspeccionada el 12/11/2026)
-
-El sitio actual (`www.arenait.co`, montado hace meses) no tiene SEO técnico: 6 páginas HTML con el mismo título «ARENA IT», sin meta description, canonical, Open Graph ni datos estructurados, sin mapa del sitio (404), con `lang="en-US"` y H1 solo en 1 de 6 páginas. No hay posicionamiento técnico que preservar; el sitio nuevo es el primer trabajo de SEO del dominio. El posicionamiento orgánico real no se midió (requiere Search Console).
+1. **Crear el Worker** conectado al repositorio (`npm run build` / `npx wrangler deploy --config dist/server/wrangler.json`).
+2. **Variables de compilación**: `TURNSTILE_SITE_KEY`; el día del lanzamiento `PUBLIC_SITE_URL` y `PUBLIC_ALLOW_INDEXING=true` (solo producción).
+3. **Secretos del Worker**: `SANITY_API_WRITE_TOKEN`, `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO_OWNER` y, opcional, `LEAD_NOTIFY_WEBHOOK_URL`.
+4. **Deploy Hook** del Worker y webhook de Sanity (reemplaza al de Vercel; rotar el anterior).
+5. **Rate limiting**: regla del WAF sobre `/api/leads` (el límite en memoria del código no es global).
+6. **Dominio**: agregar el dominio definitivo al Worker (Domains & Routes). Hoy `arenait.co` redirige a `www.arenait.co`, que sirve el sitio anterior; conservar ese destino hasta confirmar el lanzamiento.
+7. **Analítica**: Web Analytics de Cloudflare (requiere permitir su script en `public/_headers`); hoy no hay ninguna activa.
+8. **Logs**: durante la primera semana revisar los logs del Worker para confirmar respuestas `201` en `/api/leads`.
 
 ## Acciones en Cloudflare
 
-Con acceso confirmado: apuntar el dominio definitivo a Vercel con los registros que indique Vercel, decidir si el registro va con proxy de Cloudflare o solo DNS y revisar el modo SSL/TLS (verificar la documentación vigente de ambos proveedores), configurar la redirección `arenait.co` ↔ `www` según el dominio canónico, y conservar el destino del sitio anterior hasta confirmar el lanzamiento para poder revertir.
+Con acceso confirmado: asociar el dominio definitivo al Worker, revisar el modo SSL/TLS (verificar la documentación vigente de Cloudflare), configurar la redirección `arenait.co` ↔ `www` según el dominio canónico, y conservar el destino del sitio anterior hasta confirmar el lanzamiento para poder revertir.
 
 ## Lanzamiento (orden sugerido)
 
-1. Completar privacidad de leads, CORS y token (Sanity/Vercel) y hacer una **prueba real** de punta a punta con un lead de prueba; luego borrarlo del Studio.
+1. Completar privacidad de leads, CORS y token (Sanity/Cloudflare) y hacer una **prueba real** de punta a punta con un lead de prueba; luego borrarlo del Studio.
 2. Recibir y publicar los datos legales; revisión jurídica.
 3. Aprobación de diseño por el cliente.
 4. Configurar dominio y DNS; preparar las redirecciones 301 del sitio anterior.
@@ -105,7 +69,7 @@ Con acceso confirmado: apuntar el dominio definitivo a Vercel con los registros 
 
 ## Después del lanzamiento
 
-- Revisar `npm audit` mensualmente; las 5 vulnerabilidades altas restantes dependen de `@astrojs/vercel` y `sanity` (sin corrección upstream disponible el 12/11/2026).
+- Revisar `npm audit` mensualmente; las 5 vulnerabilidades altas restantes dependen de `sanity` y de sus herramientas de build (revisar tras la migración) (sin corrección upstream disponible el 12/11/2026).
 - Reintroducir CI (retirado a pedido del equipo) cuando se quiera una red de seguridad automática.
-- Rate limiting con almacenamiento externo (Upstash/Vercel KV) solo si el spam lo justifica.
-- Medir con datos reales de Vercel Analytics antes de plantear experimentos de conversión o una versión en inglés.
+- Rate limiting con almacenamiento externo (KV/Durable Objects de Cloudflare) solo si el spam lo justifica.
+- Medir con datos reales de analítica antes de plantear experimentos de conversión o una versión en inglés.
