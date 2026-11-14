@@ -1,7 +1,7 @@
 /**
  * Estado de consentimiento de cookies, persistido en localStorage propio (no
  * cookie de terceros). Vive como archivo estático en /public (no procesado
- * por Astro/Vite) a propósito: la CSP del sitio (`vercel.json`, `script-src
+ * por Astro/Vite) a propósito: la CSP del sitio (`public/_headers`, `script-src
  * 'self'`, sin `unsafe-inline`) bloquea cualquier <script> con contenido
  * inline en producción — Astro inlinea el JS de los componentes compartidos
  * (usados en BaseLayout, o sea en todas las páginas) directamente en el HTML

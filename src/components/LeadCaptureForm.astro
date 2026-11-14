@@ -1,5 +1,6 @@
 ---
 import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
+import { WHATSAPP_URL } from '../lib/contact';
 
 interface Props {
   showServiceDropdown?: boolean;
@@ -18,17 +19,22 @@ const {
   ],
 }: Props = Astro.props;
 
-// Clave pública del captcha (Cloudflare Turnstile). Sin ella no se muestra el
-// widget y el servidor tampoco exige captcha (ver src/pages/api/leads.ts).
-// Se lee TURNSTILE_SITE_KEY (sin prefijo PUBLIC_, que Vercel no deja usar); esta
-// página se genera en el servidor/build, así que no necesita llegar al cliente.
-// PUBLIC_TURNSTILE_SITE_KEY queda como alternativa por compatibilidad.
-const turnstileSiteKey =
-  import.meta.env.TURNSTILE_SITE_KEY ?? import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+// Clave pública del captcha (Cloudflare Turnstile). Es una variable de
+// COMPILACIÓN (se lee al generar la página, sin prefijo PUBLIC_). Sin ella no
+// se muestra el widget y, en producción, el servidor rechaza los envíos (ver
+// src/pages/api/leads.ts). El script de Cloudflare no se carga con la página:
+// lo inyecta /scripts/lead-form.js cuando la persona empieza a usar el formulario.
+const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
+
+const labelClass = 'block text-xs font-bold tracking-label uppercase mb-2 text-secondary';
+const hintClass = 'ml-1 font-normal normal-case tracking-normal text-neutral-900';
+const fieldClass =
+  'w-full rounded-none bg-white border border-secondary px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-2 focus:ring-interactive transition-colors aria-[invalid=true]:border-red-800 aria-[invalid=true]:border-2';
+const errorClass = 'text-sm text-red-800 font-bold mt-2 hidden';
 ---
 
 <div
-  class="bg-white p-8 md:p-12 border border-neutral-200 border-t-4 border-t-neutral-900 font-body"
+  class="bg-white p-5 sm:p-8 md:p-12 border border-neutral-200 border-t-4 border-t-neutral-900 font-body"
 >
   <h3
     id="formTitle"
@@ -37,62 +43,73 @@ const turnstileSiteKey =
     Cuéntanos tu reto
   </h3>
 
-  <form id="leadCaptureForm" class="space-y-6" data-policy-version={POLICY_VERSION}>
+  <!-- novalidate: la validación la hace /scripts/lead-form.js con mensajes
+       propios, asociados a cada campo (aria-describedby / aria-invalid) en
+       lugar de las burbujas nativas del navegador. El servidor valida igual. -->
+  <form id="leadCaptureForm" class="space-y-6" data-policy-version={POLICY_VERSION} novalidate>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <label
-          for="fullName"
-          class="block text-xs font-bold tracking-label uppercase mb-2 text-secondary"
-          >Nombre Completo</label
+        <label for="fullName" class={labelClass}
+          >Nombre completo<span class={hintClass}>(obligatorio)</span></label
         >
         <input
           type="text"
           id="fullName"
+          name="name"
+          autocomplete="name"
           required
-          class="w-full rounded-none bg-white border border-secondary px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-2 focus:ring-interactive transition-colors"
+          maxlength="120"
+          aria-describedby="fullNameError"
+          class={fieldClass}
         />
+        <p id="fullNameError" role="alert" class={errorClass}>Escribe tu nombre.</p>
       </div>
       <div>
-        <label
-          for="company"
-          class="block text-xs font-bold tracking-label uppercase mb-2 text-secondary"
-          >Empresa</label
+        <label for="company" class={labelClass}
+          >Empresa<span class={hintClass}>(opcional)</span></label
         >
         <input
           type="text"
           id="company"
-          class="w-full rounded-none bg-white border border-secondary px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-2 focus:ring-interactive transition-colors"
+          name="organization"
+          autocomplete="organization"
+          maxlength="160"
+          class={fieldClass}
         />
       </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <label
-          for="corporateEmail"
-          class="block text-xs font-bold tracking-label uppercase mb-2 text-secondary">Correo</label
+        <label for="corporateEmail" class={labelClass}
+          >Correo<span class={hintClass}>(obligatorio)</span></label
         >
         <input
           type="email"
           id="corporateEmail"
+          name="email"
+          autocomplete="email"
           required
+          maxlength="254"
           placeholder="nombre@empresa.com"
-          class="w-full rounded-none bg-white border border-secondary px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-2 focus:ring-interactive transition-colors"
+          aria-describedby="emailError"
+          class={fieldClass}
         />
-        <p id="emailError" class="text-sm text-red-800 font-bold mt-2 hidden">
-          Por favor, ingrese un correo válido.
+        <p id="emailError" role="alert" class={errorClass}>
+          Escribe un correo válido, por ejemplo nombre@empresa.com.
         </p>
       </div>
       <div>
-        <label
-          for="phone"
-          class="block text-xs font-bold tracking-label uppercase mb-2 text-secondary"
-          >Teléfono (opcional)</label
+        <label for="phone" class={labelClass}
+          >Teléfono<span class={hintClass}>(opcional)</span></label
         >
         <input
           type="tel"
           id="phone"
-          class="w-full rounded-none bg-white border border-secondary px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-2 focus:ring-interactive transition-colors"
+          name="tel"
+          autocomplete="tel"
+          maxlength="40"
+          class={fieldClass}
         />
       </div>
     </div>
@@ -100,16 +117,10 @@ const turnstileSiteKey =
     {
       showServiceDropdown && (
         <div>
-          <label
-            for="serviceOfInterest"
-            class="block text-xs font-bold tracking-label uppercase mb-2 text-secondary"
-          >
-            Servicio de interés
+          <label for="serviceOfInterest" class={labelClass}>
+            Servicio de interés<span class={hintClass}>(opcional)</span>
           </label>
-          <select
-            id="serviceOfInterest"
-            class="w-full rounded-none bg-white border border-secondary px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-2 focus:ring-interactive transition-colors"
-          >
+          <select id="serviceOfInterest" name="service" class={fieldClass}>
             <option value="" selected>
               Seleccione un servicio...
             </option>
@@ -122,17 +133,21 @@ const turnstileSiteKey =
     }
 
     <div>
-      <label
-        for="message"
-        class="block text-xs font-bold tracking-label uppercase mb-2 text-secondary"
-        >Cuéntanos tu reto</label
+      <label for="message" class={labelClass}
+        >¿Qué necesitas resolver?<span class={hintClass}>(obligatorio)</span></label
       >
       <textarea
         id="message"
+        name="message"
         rows="4"
         required
-        class="w-full rounded-none bg-white border border-secondary px-4 py-3 text-neutral-900 focus:outline-none focus:border-interactive focus:ring-2 focus:ring-interactive transition-colors"
-      ></textarea>
+        maxlength="4000"
+        aria-describedby="messageHint messageError"
+        class={fieldClass}></textarea>
+      <p id="messageHint" class="text-sm text-neutral-900 mt-2">
+        Cuéntanos qué proceso quieres mejorar, quiénes lo usan y para cuándo lo necesitas.
+      </p>
+      <p id="messageError" role="alert" class={errorClass}>Cuéntanos brevemente tu reto.</p>
     </div>
 
     <!-- Honeypot anti-spam: oculto visualmente, no con display:none (bots simples lo detectan). Un humano nunca lo completa. -->
@@ -147,53 +162,58 @@ const turnstileSiteKey =
       />
     </div>
 
-    <div class="flex items-start gap-3">
-      <input
-        type="checkbox"
-        id="policyAccepted"
-        required
-        class="mt-1 h-5 w-5 shrink-0 rounded-none border-secondary text-secondary focus:ring-interactive"
-      />
-      <label for="policyAccepted" class="text-sm text-neutral-900">
-        He leído y acepto la{' '}
-        <a
-          href={POLICY_URL}
-          target="_blank"
-          rel="noopener"
-          class="text-secondary underline decoration-interactive decoration-2 underline-offset-2"
-        >
-          Política de Tratamiento de Datos Personales
-        </a>
-        .
-      </label>
+    <div>
+      <div class="flex items-start gap-3">
+        <input
+          type="checkbox"
+          id="policyAccepted"
+          required
+          aria-describedby="policyError"
+          class="mt-0.5 h-6 w-6 shrink-0 rounded-none border-secondary text-secondary focus:ring-interactive"
+        />
+        <label for="policyAccepted" class="text-sm text-neutral-900 py-0.5">
+          He leído y acepto la{' '}
+          <a
+            href={POLICY_URL}
+            target="_blank"
+            rel="noopener"
+            class="text-secondary underline decoration-interactive decoration-2 underline-offset-2"
+          >
+            Política de Tratamiento de Datos Personales
+          </a>
+          .
+        </label>
+      </div>
+      <p id="policyError" role="alert" class={errorClass}>
+        Debes aceptar la Política de Tratamiento de Datos Personales para continuar.
+      </p>
     </div>
-    <p id="policyError" class="text-sm text-red-800 font-bold hidden">
-      Debes aceptar la Política de Tratamiento de Datos Personales para continuar.
-    </p>
 
-    <!-- Copia opcional del mensaje al propio visitante (la envía el servidor al
-         correo que indicó arriba; el estado real del envío se informa al terminar). -->
+    <!-- Copia opcional al propio visitante: el servidor envía un acuse de recibo
+         fijo (no repite lo que escribió) al correo que indicó arriba. -->
     <div class="flex items-start gap-3">
       <input
         type="checkbox"
         id="sendCopy"
-        class="mt-1 h-5 w-5 shrink-0 rounded-none border-secondary text-secondary focus:ring-interactive"
+        class="mt-0.5 h-6 w-6 shrink-0 rounded-none border-secondary text-secondary focus:ring-interactive"
       />
-      <label for="sendCopy" class="text-sm text-neutral-900">
-        Enviarme una copia de este mensaje a mi correo.
+      <label for="sendCopy" class="text-sm text-neutral-900 py-0.5">
+        Enviarme una confirmación de recibido a mi correo.
       </label>
     </div>
 
     {
       turnstileSiteKey && (
         <div>
+          <!-- data-size lo fija lead-form.js según el ancho de pantalla
+               (flexible, o compact bajo 360 px) antes de que Turnstile cargue. -->
           <div
-            class="cf-turnstile"
+            class="cf-turnstile max-w-full"
             data-sitekey={turnstileSiteKey}
             data-language="es"
             data-theme="light"
           />
-          <p id="captchaError" class="text-sm text-red-800 font-bold mt-2 hidden">
+          <p id="captchaError" role="alert" class={errorClass}>
             Completa la verificación para enviar el mensaje.
           </p>
         </div>
@@ -202,12 +222,24 @@ const turnstileSiteKey =
 
     <button
       type="submit"
-      class="w-full md:w-auto px-8 py-4 border-2 border-accent bg-accent text-neutral-900 text-xs font-extrabold tracking-label uppercase transition-colors hover:border-neutral-900 hover:bg-neutral-900 hover:text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-interactive disabled:opacity-50 disabled:cursor-not-allowed"
+      class="w-full md:w-auto min-h-14 px-8 border-2 border-accent bg-accent text-neutral-900 text-sm font-extrabold tracking-label uppercase transition-colors hover:border-neutral-900 hover:bg-neutral-900 hover:text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-interactive disabled:opacity-50 disabled:cursor-not-allowed"
     >
       Enviar mensaje
     </button>
 
-    <p id="formError" role="alert" class="text-sm text-red-800 font-bold hidden"></p>
+    <div id="formError" role="alert" class="text-sm text-red-800 font-bold hidden">
+      <p id="formErrorText"></p>
+      <p class="mt-2">
+        <a
+          id="formErrorWhatsapp"
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex min-h-11 items-center underline underline-offset-4 decoration-2"
+          >Escríbenos por WhatsApp</a
+        >
+      </p>
+    </div>
   </form>
 
   <!-- Pantalla de éxito: reemplaza al formulario. El texto dinámico (nombre y
@@ -250,8 +282,3 @@ const turnstileSiteKey =
      sitio bloquea scripts inline en producción — este formulario es el
      único flujo real de captura de leads del sitio, ver CONTEXT.md §5. -->
 <script src="/scripts/lead-form.js" is:inline></script>
-{
-  turnstileSiteKey && (
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline />
-  )
-}

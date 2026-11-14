@@ -1,7 +1,6 @@
 ---
 export const prerender = true;
 
-import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ServicesBento from '../components/ServicesBento.astro';
 import Testimonials from '../components/Testimonials.astro';
@@ -11,7 +10,6 @@ import DotsMotif from '../components/DotsMotif.astro';
 import SectorGrid from '../components/SectorGrid.astro';
 import { getServices } from '../lib/services';
 import { fallbackCaseStudies } from '../lib/fallbackContent';
-import heroImage from '../assets/images/hero-facade.jpg';
 
 // Servicios: Sanity con respaldo en el código y orden por el campo `order` (src/lib/services.ts).
 const services = await getServices();
@@ -19,23 +17,17 @@ const services = await getServices();
 // Caso real de Sadep: misma fuente de contenido que /casos-de-estudio.
 const sadep = fallbackCaseStudies[0];
 
-// ogImage (Épica K de BACKLOG.md): se deriva una copia estática 1200x630 de la
-// foto real del hero anterior vía getImage(). El hero rediseñado (12/11/2026)
-// ya no muestra la foto, pero sigue siendo la mejor imagen real para compartir.
-const ogImage = await getImage({
-  src: heroImage,
-  width: 1200,
-  height: 630,
-  fit: 'cover',
-  format: 'jpg',
-  quality: 70,
-});
+// Imagen para compartir: archivo estático 1200x630 (~70 KB) derivado de la foto
+// real del hero anterior con `node scripts/make-images.mjs`. Ya no se genera
+// con getImage(): el adaptador de Cloudflare usa `passthrough` y servía el
+// original de 2,6 MB sin recortar.
+const ogImage = '/og-home.jpg';
 ---
 
 <BaseLayout
   title="Software a la medida para operaciones reales"
   description="Diseñamos, desarrollamos e integramos soluciones tecnológicas que se ajustan a cómo trabaja tu empresa — no al revés."
-  ogImage={ogImage.src}
+  ogImage={ogImage}
 >
   <!-- Hero editorial: tipografía como protagonista sobre una retícula visible.
        Sin foto ni scrim: el motivo gráfico es la fila de puntos del logo. -->

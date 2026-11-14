@@ -5,8 +5,9 @@
  * Reglas (endurecimiento previo a producción, 12/11/2026):
  * - Todos los campos tienen un tope de longitud: sin esto cualquier cliente
  *   podía guardar mensajes de megabytes en el dataset de Sanity.
- * - Se eliminan caracteres de control (salvo salto de línea y tabulación en el
- *   mensaje) para evitar basura invisible en el Studio y en las notificaciones.
+ * - Se eliminan caracteres de control, C1, separadores Unicode de línea y marcas
+ *   bidireccionales. Solo el mensaje conserva saltos de línea y tabulaciones:
+ *   el resto de campos se colapsa a una sola línea.
  * - `source` ya no es libre: solo se aceptan orígenes conocidos.
  */
 
@@ -54,12 +55,26 @@ export type LeadValidation =
       captchaToken: string;
     };
 
-// Caracteres de control C0 salvo \t (9), \n (10) y \r (13), más DEL (127).
-// eslint-disable-next-line no-control-regex
-const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+// Caracteres de control C0 salvo \t (9), \n (10) y \r (13), DEL (127), C1
+// (128-159), separadores de línea/párrafo Unicode (U+2028/2029) y marcas de
+// dirección bidireccional (permiten disfrazar texto en correos y paneles).
+/* eslint-disable no-control-regex */
+const CONTROL_CHARS =
+  /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F\u2028\u2029\u200E\u200F\u202A-\u202E\u2066-\u2069]/g;
+/* eslint-enable no-control-regex */
 
+/** Texto libre multilínea (solo el mensaje): conserva saltos de línea y tabulaciones. */
 function clean(value: unknown): string {
   return typeof value === 'string' ? value.replace(CONTROL_CHARS, '').trim() : '';
+}
+
+/**
+ * Campo de una sola línea (nombre, empresa, teléfono...): colapsa cualquier
+ * salto o espacio repetido. Evita que un valor falsifique líneas completas
+ * ("Correo: ...") en los correos y avisos que se arman con estos campos.
+ */
+function cleanLine(value: unknown): string {
+  return clean(value).replace(/\s+/g, ' ');
 }
 
 const FIELD_LABELS: Record<keyof typeof LIMITS, string> = {
@@ -86,13 +101,13 @@ export function validateLead(body: unknown): LeadValidation {
   }
 
   const fields = {
-    fullName: clean(raw.fullName),
-    company: clean(raw.company),
-    corporateEmail: clean(raw.corporateEmail),
-    phone: clean(raw.phone),
-    serviceOfInterest: clean(raw.serviceOfInterest),
+    fullName: cleanLine(raw.fullName),
+    company: cleanLine(raw.company),
+    corporateEmail: cleanLine(raw.corporateEmail),
+    phone: cleanLine(raw.phone),
+    serviceOfInterest: cleanLine(raw.serviceOfInterest),
     message: clean(raw.message),
-    policyVersion: clean(raw.policyVersion),
+    policyVersion: cleanLine(raw.policyVersion),
   };
 
   for (const key of Object.keys(LIMITS) as (keyof typeof LIMITS)[]) {
@@ -119,7 +134,7 @@ export function validateLead(body: unknown): LeadValidation {
     };
   }
 
-  const requestedSource = clean(raw.source) || 'lead-capture-form';
+  const requestedSource = cleanLine(raw.source) || 'lead-capture-form';
   const source = ALLOWED_SOURCES.has(requestedSource) ? requestedSource : 'lead-capture-form';
 
   return {
@@ -131,19 +146,56 @@ export function validateLead(body: unknown): LeadValidation {
 }
 
 /**
- * Defensa CSRF/abuso desde otros sitios: si el navegador envía `Origin`, debe
- * coincidir con el origen de la propia solicitud. Sin cabecera `Origin`
- * (curl, herramientas de servidor) se acepta: esta comprobación no sustituye
- * al rate limiting ni al honeypot, solo evita formularios ajenos que apunten
- * a este endpoint desde un navegador.
+ * Defensa CSRF/abuso desde otros sitios. Un POST hecho con `fetch` desde el
+ * navegador siempre lleva `Origin`, que debe coincidir con el origen de la
+ * propia solicitud. Si falta `Origin`, solo se acepta cuando el navegador
+ * declara `Sec-Fetch-Site: same-origin` (cabecera que los scripts ajenos no
+ * pueden falsificar desde un navegador). Curl y herramientas de servidor sin
+ * ninguna de las dos cabeceras se rechazan. Esto no sustituye al captcha, al
+ * rate limiting ni al honeypot.
  */
-export function isAllowedOrigin(requestUrl: string, originHeader: string | null): boolean {
-  if (!originHeader) return true;
+export function isAllowedOrigin(
+  requestUrl: string,
+  originHeader: string | null,
+  secFetchSite: string | null = null,
+): boolean {
+  if (!originHeader) return secFetchSite === 'same-origin';
   try {
     return new URL(originHeader).origin === new URL(requestUrl).origin;
   } catch {
     return false;
   }
+}
+
+/**
+ * Lee el cuerpo como texto cortando en cuanto supera `maxBytes` (no depende de
+ * `Content-Length`, que puede faltar o mentir). Devuelve `null` si se excede.
+ */
+export async function readBodyWithLimit(
+  request: Request,
+  maxBytes: number,
+): Promise<string | null> {
+  if (!request.body) return '';
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let received = 0;
+  let text = '';
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    received += value.byteLength;
+    if (received > maxBytes) {
+      await reader.cancel();
+      return null;
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+  return text + decoder.decode();
+}
+
+/** El endpoint solo recibe JSON: cualquier otro tipo de contenido se rechaza. */
+export function isJsonContentType(contentType: string | null): boolean {
+  return /^application\/json(\s*;|$)/i.test(contentType ?? '');
 }
 
 /**

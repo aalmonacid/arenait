@@ -29,6 +29,17 @@ describe('buildNotificationText', () => {
     }
   });
 
+  it('neutraliza enlaces y menciones escritos por el visitante', () => {
+    const text = buildNotificationText(
+      { ...lead, company: '<https://evil.example|clic> @channel & co' },
+      'https://x/admin',
+    );
+    expect(text).not.toContain('<https');
+    expect(text).not.toContain('@channel');
+    expect(text).toContain('&lt;https://evil.example|clic&gt;');
+    expect(text).toContain('&amp; co');
+  });
+
   it('tiene textos de respaldo cuando faltan empresa o servicio', () => {
     const text = buildNotificationText({ ...lead, company: '', serviceOfInterest: '' }, 'x');
     expect(text).toContain('sin empresa indicada');

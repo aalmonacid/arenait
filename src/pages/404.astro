@@ -6,7 +6,7 @@ import Button from '../components/Button.astro';
 import DotsMotif from '../components/DotsMotif.astro';
 ---
 
-<BaseLayout title="404 — Página no encontrada">
+<BaseLayout title="Página no encontrada" noindex>
   <section class="bg-white px-4 md:px-8 py-24 md:py-40">
     <div class="max-w-7xl mx-auto">
       <p
@@ -14,14 +14,38 @@ import DotsMotif from '../components/DotsMotif.astro';
       >
         Error 404
       </p>
-      <h1 class="font-heading text-display max-w-display text-neutral-900 mb-8">
-        404 — Página no encontrada
+      <h1 class="font-heading text-page text-neutral-900 max-w-3xl mb-8">
+        No encontramos esa página
       </h1>
       <p class="text-lead text-neutral-900 max-w-xl mb-10">
-        La dirección que buscas no existe o cambió de lugar. Vuelve al inicio y retoma desde ahí.
+        La dirección que buscas no existe o cambió de lugar. Vuelve al inicio o ve directo a lo que
+        necesitas.
       </p>
       <div class="flex flex-col sm:flex-row sm:items-center gap-8">
         <Button href="/">Volver al inicio</Button>
+        <ul class="flex flex-wrap gap-x-6 gap-y-1 text-sm font-bold uppercase tracking-label">
+          <li>
+            <a
+              href="/servicios"
+              class="inline-flex min-h-11 items-center border-b-2 border-neutral-900 hover:border-interactive"
+              >Servicios</a
+            >
+          </li>
+          <li>
+            <a
+              href="/casos-de-estudio"
+              class="inline-flex min-h-11 items-center border-b-2 border-neutral-900 hover:border-interactive"
+              >Casos de estudio</a
+            >
+          </li>
+          <li>
+            <a
+              href="/contacto"
+              class="inline-flex min-h-11 items-center border-b-2 border-neutral-900 hover:border-interactive"
+              >Contacto</a
+            >
+          </li>
+        </ul>
         <DotsMotif />
       </div>
     </div>

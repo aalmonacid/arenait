@@ -28,6 +28,17 @@ describe('verifyTurnstile', () => {
     expect((f.mock.calls[0][1].body as URLSearchParams).has('remoteip')).toBe(false);
   });
 
+  it('valida el hostname cuando se informa uno esperado', async () => {
+    const f = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, hostname: 'dev.arenait.co' }),
+    });
+    expect(await verifyTurnstile('S', 'T', undefined, f, 'dev.arenait.co')).toBe(true);
+    expect(await verifyTurnstile('S', 'T', undefined, f, 'otro.example')).toBe(false);
+    // sin hostname esperado no se exige
+    expect(await verifyTurnstile('S', 'T', undefined, f)).toBe(true);
+  });
+
   it('rechaza si Cloudflare dice success:false', async () => {
     expect(await verifyTurnstile('S', 'T', undefined, okJson(false))).toBe(false);
   });

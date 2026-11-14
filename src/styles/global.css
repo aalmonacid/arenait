@@ -73,11 +73,11 @@
    funcionando en producción (ver CONTEXT.md §5). No hay plugin de
    Tailwind Typography instalado — estas reglas son manuales. */
 .markdown-content h2 {
-  @apply text-2xl md:text-3xl font-heading text-secondary mt-12 mb-4;
+  @apply text-2xl md:text-3xl font-heading font-extrabold tracking-tight text-secondary mt-12 mb-4;
 }
 
 .markdown-content h3 {
-  @apply text-xl font-heading text-secondary mt-8 mb-3;
+  @apply text-xl font-heading font-extrabold tracking-tight text-secondary mt-8 mb-3;
 }
 
 .markdown-content p {
@@ -123,7 +123,7 @@
 
 @layer base {
   html {
-    @apply antialiased scroll-smooth;
+    @apply antialiased motion-safe:scroll-smooth;
     /* Plus Jakarta Sans: tipografía libre confirmada por el cliente
        (2026-09-04) en vez de licenciar Codec Pro — ver AGENTS.md. */
     font-family: 'Plus Jakarta Sans', Inter, sans-serif;

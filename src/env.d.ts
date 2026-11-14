@@ -2,25 +2,18 @@
 /// <reference types="astro/client" />
 /// <reference types="@sanity/astro/module" />
 
+// Solo variables de COMPILACIÓN (se leen con import.meta.env al generar el sitio).
+// Los secretos de ejecución del Worker (SANITY_API_WRITE_TOKEN, TURNSTILE_SECRET_KEY,
+// RESEND_API_KEY, MAIL_FROM, MAIL_TO_OWNER, LEAD_NOTIFY_WEBHOOK_URL) se declaran en el
+// `env.schema` de astro.config.mjs y se importan desde 'astro:env/server'.
 interface ImportMetaEnv {
-  // Token de escritura de Sanity, solo server-side (usado por src/pages/api/leads.ts).
-  // Nunca prefijar con PUBLIC_ — no debe llegar al bundle de cliente.
-  readonly SANITY_API_WRITE_TOKEN: string;
-  // Webhook entrante opcional (Slack/Teams/Make...) para avisar de leads nuevos.
-  // Server-only. Sin esta variable no se envía ningún aviso.
-  readonly LEAD_NOTIFY_WEBHOOK_URL?: string;
   // 'true' en producción para permitir la indexación (quita noindex y abre robots.txt).
   readonly PUBLIC_ALLOW_INDEXING?: string;
-  // Captcha Cloudflare Turnstile. La clave de sitio es pública (se imprime en el
-  // formulario al construir); el secreto es server-only. Sin ellas no hay captcha.
+  // Dominio canónico del sitio (sitemap, canonical, Open Graph).
+  readonly PUBLIC_SITE_URL?: string;
+  // Clave de SITIO del captcha Cloudflare Turnstile: es pública (se imprime en el
+  // formulario al construir). El secreto es de ejecución y vive en el Worker.
   readonly TURNSTILE_SITE_KEY?: string;
-  readonly PUBLIC_TURNSTILE_SITE_KEY?: string; // alternativa heredada
-  readonly TURNSTILE_SECRET_KEY?: string;
-  // Correo con Resend (server-only). Sin RESEND_API_KEY y MAIL_FROM no se envía nada.
-  readonly RESEND_API_KEY?: string;
-  readonly MAIL_FROM?: string;
-  // Buzón que recibe cada contacto nuevo (opcional).
-  readonly MAIL_TO_OWNER?: string;
 }
 
 interface ImportMeta {

@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Logo from '../components/Logo.astro';
+import Button from '../components/Button.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import CookieConsentBanner from '../components/CookieConsentBanner.astro';
 
@@ -9,20 +10,30 @@ interface Props {
   description?: string;
   structuredData?: Record<string, unknown>[];
   ogImage?: string;
+  /** Fuerza `noindex` aunque el sitio esté abierto a indexación (p. ej. la 404). */
+  noindex?: boolean;
+  ogType?: 'website' | 'article';
 }
 
 const {
   title,
   description = 'Desarrollo de software a la medida para operaciones reales.',
   ogImage = '/og-default.png',
+  noindex = false,
+  ogType = 'website',
 } = Astro.props;
 
-const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === 'true';
+const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === 'true' && !noindex;
 
 const absoluteOgImage = new URL(ogImage, Astro.site).toString();
 // Ruta canónica sin barra final ni «.html» (el build genera archivos como contacto.html).
-const canonicalPath = Astro.url.pathname.replace(/(^|\/)index(\.html)?$/, '$1').replace(/\.html$/, '').replace(/(.)\/+$/, '$1') || '/';
+const canonicalPath =
+  Astro.url.pathname
+    .replace(/(^|\/)index(\.html)?$/, '$1')
+    .replace(/\.html$/, '')
+    .replace(/(.)\/+$/, '$1') || '/';
 const canonicalUrl = new URL(canonicalPath, Astro.site).toString();
+const siteOrigin = new URL('/', Astro.site).toString().replace(/\/$/, '');
 
 const structuredData: Record<string, unknown>[] = Astro.props.structuredData ?? [];
 
@@ -30,9 +41,23 @@ const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'ArenaIT',
-  url: 'https://arenait.co',
+  url: siteOrigin,
   description: 'Desarrollo de software a la medida para operaciones reales.',
 };
+
+// JSON-LD sin «<»: un valor con «</script>» (por ejemplo, desde Sanity) no
+// puede cerrar la etiqueta ni inyectar marcado.
+const jsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c');
+
+const NAV_ITEMS = [
+  { href: '/servicios', label: 'Servicios' },
+  { href: '/casos-de-estudio', label: 'Casos de estudio' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/nosotros', label: 'Nosotros' },
+];
+const CTA = { href: '/contacto', label: 'Cuéntanos tu reto' };
+
+const isActive = (href: string) => canonicalPath === href || canonicalPath.startsWith(`${href}/`);
 ---
 
 <!doctype html>
@@ -48,13 +73,17 @@ const organizationSchema = {
          PUBLIC_ALLOW_INDEXING no sea 'true' (dev.arenait.co, previews) el sitio
          se marca noindex. Para el lanzamiento NO hay que tocar código: basta
          definir PUBLIC_ALLOW_INDEXING=true en las variables de compilación de Cloudflare del
-         entorno de producción y volver a desplegar. Ver PLAN-PRODUCCION.md. -->
+         entorno de producción y volver a desplegar. Ver PLAN-PRODUCCION.md.
+         Las páginas que reciben `noindex` (404) quedan fuera aunque se lance. -->
     {!allowIndexing && <meta name="robots" content="noindex, nofollow" />}
 
-    <!-- OpenGraph -->
+    <!-- OpenGraph. Las imágenes OG son archivos estáticos 1200x630 en /public. -->
     <meta property="og:title" content={`${title} | ArenaIT`} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="ArenaIT" />
+    <meta property="og:locale" content="es_CO" />
     <meta property="og:image" content={absoluteOgImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -81,58 +110,58 @@ const organizationSchema = {
     <meta name="twitter:image" content={absoluteOgImage} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    <script is:inline type="application/ld+json" set:html={jsonLd(organizationSchema)} />
     {
       structuredData.map((schema) => (
-        <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+        <script is:inline type="application/ld+json" set:html={jsonLd(schema)} />
       ))
     }
   </head>
   <body class="min-h-screen flex flex-col">
+    <!-- Enlace de salto (WCAG 2.4.1): invisible hasta recibir foco con Tab. -->
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:bg-accent focus:px-5 focus:py-3 focus:text-sm focus:font-extrabold focus:uppercase focus:tracking-label focus:text-neutral-900 focus:outline focus:outline-4 focus:outline-offset-2 focus:outline-interactive"
+      >Saltar al contenido</a
+    >
+
+    <!-- El aviso de cookies va al inicio del DOM (no al final): así quien navega con
+         teclado o lector de pantalla lo encuentra antes de recorrer toda la página. -->
+    <CookieConsentBanner />
+
     <header class="bg-white border-b-2 border-neutral-200 py-6 px-4 md:px-8">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <Logo variant="light" size="header" />
-        <nav class="hidden md:flex items-center space-x-8" aria-label="Navegación principal">
-          <a
-            href="/servicios"
-            class="text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 border-transparent hover:border-interactive transition-colors"
-            >Servicios</a
+        <!-- El menú de escritorio aparece desde lg (1024 px): entre 768 y 1000 px
+             no cabían logo, enlaces y botón en una sola fila. -->
+        <nav class="hidden lg:flex items-center gap-8" aria-label="Navegación principal">
+          {
+            NAV_ITEMS.map((item) => (
+              <a
+                href={item.href}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                class:list={[
+                  'text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 transition-colors hover:border-interactive',
+                  isActive(item.href) ? 'border-interactive' : 'border-transparent',
+                ]}
+              >
+                {item.label}
+              </a>
+            ))
+          }
+          <Button
+            href={CTA.href}
+            size="sm"
+            aria-current={isActive(CTA.href) ? 'page' : undefined}
           >
-          <a
-            href="/casos-de-estudio"
-            class="text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 border-transparent hover:border-interactive transition-colors"
-            >Casos de Estudio</a
-          >
-          <a
-            href="/blog"
-            class="text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 border-transparent hover:border-interactive transition-colors"
-            >Blog</a
-          >
-          <a
-            href="/nosotros"
-            class="text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 border-transparent hover:border-interactive transition-colors"
-            >Nosotros</a
-          >
-          <a
-            href="/contacto"
-            class="text-sm font-bold tracking-widest uppercase text-neutral-900 py-2 border-b-2 border-transparent hover:border-interactive transition-colors"
-            >Contacto</a
-          >
-          <!-- Bugfix (auditoría 2026-09-04, Épica K): text-neutral-400 medía ~2.52:1
-               contra el fondo blanco del header, falla incluso AA (4.5:1). Mismo
-               fix ya validado en el mockup de nav mobile (Épica J): text-secondary
-               (#294E6C sobre blanco ≈ 8.75:1, cumple AAA) preservando el mismo rol
-               de-enfatizado (texto chico, sin mayúsculas, separador). -->
-          <a
-            href="/politica-de-tratamiento-de-datos"
-            class="text-xs font-medium normal-case text-secondary hover:text-interactive transition-colors border-l border-neutral-200 pl-8"
-            >Política de datos</a
-          >
+            {CTA.label}
+          </Button>
         </nav>
 
-        <!-- Menú mobile (Épica J). Trigger de 44x44 visible solo debajo de md;
+        <!-- Menú mobile (Épica J). Trigger de 44x44 visible solo debajo de lg;
              el overlay de abajo cubre toda la pantalla (z-70, por encima del
              banner de cookies z-60 y WhatsApp z-50) así que el header original no
              necesita alternar su propio ícono — el botón de cerrar vive dentro
@@ -141,7 +170,7 @@ const organizationSchema = {
         <button
           id="mobile-menu-trigger"
           type="button"
-          class="flex md:hidden flex-col items-center justify-center gap-[5px] w-11 h-11 rounded-none outline-none focus-visible:outline focus-visible:outline-4 focus-visible:outline-interactive focus-visible:outline-offset-2"
+          class="flex lg:hidden flex-col items-center justify-center gap-[5px] w-11 h-11 rounded-none outline-none focus-visible:outline focus-visible:outline-4 focus-visible:outline-interactive focus-visible:outline-offset-2"
           aria-expanded="false"
           aria-controls="mobile-menu"
           aria-label="Abrir menú"
@@ -155,7 +184,7 @@ const organizationSchema = {
 
     <div
       id="mobile-menu"
-      class="hidden md:hidden fixed inset-0 z-[70] flex-col bg-white"
+      class="hidden lg:hidden fixed inset-0 z-[70] flex-col bg-white"
       role="dialog"
       aria-modal="true"
       aria-label="Menú de navegación"
@@ -173,40 +202,38 @@ const organizationSchema = {
         </button>
       </div>
       <nav aria-label="Menú principal" class="flex flex-col overflow-y-auto">
-        <a
-          href="/servicios"
-          class="block px-4 py-5 border-b border-neutral-200 text-xl font-bold tracking-wide uppercase text-neutral-900 hover:text-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
-          >Servicios</a
-        >
-        <a
-          href="/casos-de-estudio"
-          class="block px-4 py-5 border-b border-neutral-200 text-xl font-bold tracking-wide uppercase text-neutral-900 hover:text-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
-          >Casos de Estudio</a
-        >
-        <a
-          href="/blog"
-          class="block px-4 py-5 border-b border-neutral-200 text-xl font-bold tracking-wide uppercase text-neutral-900 hover:text-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
-          >Blog</a
-        >
-        <a
-          href="/nosotros"
-          class="block px-4 py-5 border-b border-neutral-200 text-xl font-bold tracking-wide uppercase text-neutral-900 hover:text-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
-          >Nosotros</a
-        >
-        <a
-          href="/contacto"
-          class="block px-4 py-5 border-b border-neutral-200 text-xl font-bold tracking-wide uppercase text-neutral-900 hover:text-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
-          >Contacto</a
-        >
+        {
+          NAV_ITEMS.map((item) => (
+            <a
+              href={item.href}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              class:list={[
+                'block px-4 py-5 border-b border-neutral-200 border-l-4 text-xl font-bold tracking-wide uppercase text-neutral-900 transition-colors hover:border-l-interactive outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]',
+                isActive(item.href) ? 'border-l-interactive' : 'border-l-transparent',
+              ]}
+            >
+              {item.label}
+            </a>
+          ))
+        }
+        <div class="px-4 py-6">
+          <Button
+            href={CTA.href}
+            class="w-full"
+            aria-current={isActive(CTA.href) ? 'page' : undefined}
+          >
+            {CTA.label}
+          </Button>
+        </div>
         <a
           href="/politica-de-tratamiento-de-datos"
-          class="block px-4 py-4 mt-2 border-t-2 border-neutral-200 text-sm font-medium text-secondary hover:text-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
+          class="block px-4 py-4 border-t-2 border-neutral-200 text-sm font-medium text-secondary underline underline-offset-4 decoration-neutral-200 hover:decoration-interactive transition-colors outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-interactive focus-visible:outline-offset-[-2px]"
           >Política de datos</a
         >
       </nav>
     </div>
 
-    <main class="flex-grow">
+    <main id="main" tabindex="-1" class="flex-grow focus:outline-none">
       <slot />
     </main>
 
@@ -221,18 +248,12 @@ const organizationSchema = {
           aria-label="Pie de página"
         >
           {
-            [
-              ['/servicios', 'Servicios'],
-              ['/casos-de-estudio', 'Casos de estudio'],
-              ['/blog', 'Blog'],
-              ['/nosotros', 'Nosotros'],
-              ['/contacto', 'Contacto'],
-            ].map(([href, label]) => (
+            [...NAV_ITEMS, { href: '/contacto', label: 'Contacto' }].map((item) => (
               <a
-                href={href}
-                class="w-fit py-1 text-neutral-200 border-b border-transparent hover:text-white hover:border-accent transition-colors focus-visible:outline focus-visible:outline-4 focus-visible:outline-white"
+                href={item.href}
+                class="inline-flex min-h-11 w-fit items-center text-neutral-200 border-b border-transparent hover:text-white hover:border-accent transition-colors focus-visible:outline focus-visible:outline-4 focus-visible:outline-white"
               >
-                {label}
+                {item.label}
               </a>
             ))
           }
@@ -253,7 +274,7 @@ const organizationSchema = {
         <p>&copy; {new Date().getFullYear()} Arena IT. Todos los derechos reservados.</p>
         <a
           href="/politica-de-tratamiento-de-datos"
-          class="inline-block py-1.5 hover:text-white transition-colors focus-visible:outline-white"
+          class="inline-flex min-h-11 items-center hover:text-white transition-colors focus-visible:outline-white"
         >
           Política de Tratamiento de Datos Personales
         </a>
@@ -261,7 +282,6 @@ const organizationSchema = {
     </footer>
 
     <WhatsAppButton />
-    <CookieConsentBanner />
 
     <script type="module" src="/scripts/mobile-menu.js" is:inline></script>
   </body>

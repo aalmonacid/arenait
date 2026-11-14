@@ -13,9 +13,21 @@
  */
 import type { Lead } from './leadValidation';
 
+/**
+ * Neutraliza el formato que Slack/Teams interpretan en texto libre: enlaces y
+ * menciones (`<...>`, `&`) y arrobas (`@canal`, `@usuario`).
+ */
+export function escapeForChat(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/@/g, '@​');
+}
+
 export function buildNotificationText(lead: Lead, studioUrl: string): string {
-  const company = lead.company || 'sin empresa indicada';
-  const service = lead.serviceOfInterest || 'sin servicio indicado';
+  const company = escapeForChat(lead.company) || 'sin empresa indicada';
+  const service = escapeForChat(lead.serviceOfInterest) || 'sin servicio indicado';
   return `Nuevo lead en ArenaIT: ${company} — ${service}. Detalle en ${studioUrl}`;
 }
 

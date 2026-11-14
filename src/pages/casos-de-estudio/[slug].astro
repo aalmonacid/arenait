@@ -146,40 +146,35 @@ const metaDescription = truncateDescription(
       </div>
     </section>
 
-    <section class="py-16 md:py-24 px-4 md:px-8 bg-neutral-50 border-t border-neutral-200">
-      <div class="max-w-7xl mx-auto">
-        <div class="border-t-2 border-neutral-900 pt-5 mb-10">
-          <h2 class="font-heading text-headline max-w-headline text-balance text-neutral-900">
-            Cómo se ve en producción
-          </h2>
-        </div>
-        {
-          caseStudy.screenshots && caseStudy.screenshots.length > 0 ? (
+    {
+      /* La sección solo existe cuando hay capturas reales. Sin ellas no se
+         muestra ningún aviso de «pendiente»: es lenguaje interno que el
+         visitante no debe ver (mismo criterio que testimonios y datos de
+         contacto en BACKLOG.md). Nunca se rellena con mockups ni renders. */
+      caseStudy.screenshots && caseStudy.screenshots.length > 0 && (
+        <section class="py-16 md:py-24 px-4 md:px-8 bg-neutral-50 border-t border-neutral-200">
+          <div class="max-w-7xl mx-auto">
+            <div class="border-t-2 border-neutral-900 pt-5 mb-10">
+              <h2 class="font-heading text-headline max-w-headline text-balance text-neutral-900">
+                Cómo se ve en producción
+              </h2>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               {caseStudy.screenshots.map((screenshot) => (
                 <img
                   src={urlForImage(screenshot).width(1200).url()}
                   alt={`Captura de pantalla real de la plataforma construida para ${caseStudy?.client}`}
+                  width="1200"
+                  height="750"
                   loading="lazy"
                   decoding="async"
                   class="w-full h-auto border-2 border-neutral-200"
                 />
               ))}
             </div>
-          ) : (
-            <div class="border-2 border-dashed border-secondary bg-white p-10 md:p-16 text-center">
-              <p class="text-xs font-bold uppercase tracking-label text-secondary mb-3">
-                Capturas reales pendientes
-              </p>
-              <p class="text-neutral-900 max-w-xl mx-auto">
-                Todavía no se han recibido capturas reales de {caseStudy.client} para mostrar aquí.
-                Esta sección se completa únicamente con imágenes reales del producto — nunca con
-                mockups o renders genéricos.
-              </p>
-            </div>
-          )
-        }
-      </div>
-    </section>
+          </div>
+        </section>
+      )
+    }
   </article>
 </BaseLayout>

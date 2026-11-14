@@ -35,6 +35,9 @@ const DEFAULT_OPTIONS: RateLimitOptions = {
 // key -> timestamps (ms epoch) de solicitudes dentro de la ventana actual.
 const hits = new Map<string, number[]>();
 
+/** Por encima de este número de claves se purgan las que ya vencieron. */
+const MAX_TRACKED_KEYS = 500;
+
 /**
  * Registra una solicitud para `key` y evalúa si debe limitarse, usando una
  * ventana deslizante: se cuentan las solicitudes de esa clave en los últimos
@@ -51,6 +54,14 @@ export function checkRateLimit(
   const { maxRequests, windowMs } = { ...DEFAULT_OPTIONS, ...options };
   const now = Date.now();
   const windowStart = now - windowMs;
+
+  // Purga perezosa de claves ajenas ya vencidas: sin esto el Map crece con cada
+  // IP distinta que haya pasado por este isolate.
+  if (hits.size > MAX_TRACKED_KEYS) {
+    for (const [otherKey, stamps] of hits) {
+      if (stamps.every((timestamp) => timestamp <= windowStart)) hits.delete(otherKey);
+    }
+  }
 
   const existing = hits.get(key) ?? [];
   const recent = existing.filter((timestamp) => timestamp > windowStart);
