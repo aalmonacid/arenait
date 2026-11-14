@@ -5,6 +5,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import LeadCaptureForm from '../../components/LeadCaptureForm.astro';
 import { getServices } from '../../lib/services';
+import { WHATSAPP_URL } from '../../lib/contact';
 
 // El desplegable "Servicio de interés" usa los mismos servicios del sitio (panel
 // de Sanity con respaldo en el código), para que siga al día si el cliente
@@ -16,7 +17,11 @@ const services = (await getServices()).map((s) => ({ title: s.title }));
   title="Hablemos de tu proyecto"
   description="Cuéntanos tu reto. Te respondemos con una propuesta concreta."
 >
-  <PageHero kicker="Contacto" title="Hablemos de tu proyecto" lead="Cuéntanos tu reto." />
+  <PageHero
+    kicker="Contacto"
+    title="Hablemos de tu proyecto"
+    lead="Te respondemos con una propuesta concreta."
+  />
 
   <section class="py-16 md:py-24 px-4 md:px-8 bg-neutral-50">
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-x-6 gap-y-12 items-start">
@@ -25,6 +30,25 @@ const services = (await getServices()).map((s) => ({ title: s.title }));
         <p class="font-heading text-2xl font-extrabold tracking-tight text-secondary">
           Andrés Arenas — Gerente
         </p>
+        <p class="mt-4 text-neutral-900 leading-relaxed">
+          ¿Prefieres escribir directo? Hazlo por{' '}
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-bold text-secondary underline decoration-interactive decoration-2 underline-offset-4"
+            >WhatsApp</a
+          >.
+        </p>
+
+        <h2 class="mt-10 mb-3 text-xs font-bold uppercase tracking-label text-secondary">
+          Qué pasa después
+        </h2>
+        <ol class="list-decimal pl-5 space-y-2 text-neutral-900">
+          <li>Revisamos lo que nos cuentas sobre tu operación.</li>
+          <li>Te escribimos con una propuesta concreta.</li>
+          <li>Definimos juntos los siguientes pasos.</li>
+        </ol>
       </div>
       <div class="lg:col-span-8">
         <LeadCaptureForm showServiceDropdown services={services} />

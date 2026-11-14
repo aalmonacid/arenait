@@ -47,12 +47,22 @@ if (!caseStudies || caseStudies.length === 0) {
             </p>
           </div>
         ) : (
-          <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-neutral-200 border border-neutral-200 list-none p-0 m-0">
+          <ul
+            class:list={[
+              'grid grid-cols-1 gap-px bg-neutral-200 border border-neutral-200 list-none p-0 m-0',
+              // Con un solo caso la grilla de 3 columnas dejaba un bloque gris
+              // vacío a su lado: con 1 se ocupa todo el ancho.
+              caseStudies.length === 1 ? '' : 'md:grid-cols-2 lg:grid-cols-3',
+            ]}
+          >
             {caseStudies.map((caseStudy) => (
               <li class="bg-white">
                 <a
                   href={`/casos-de-estudio/${caseStudy.slug.current}`}
-                  class="group flex h-full min-h-72 flex-col border-2 border-transparent p-8 transition-colors duration-200 hover:border-primary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-interactive"
+                  class:list={[
+                    'group flex h-full min-h-72 flex-col border-2 border-transparent p-8 transition-colors duration-200 hover:border-primary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-interactive',
+                    caseStudies.length === 1 ? 'md:p-12 md:min-h-64' : '',
+                  ]}
                 >
                   <p class="text-xs font-bold uppercase tracking-label text-secondary mb-4">
                     {caseStudy.industry}

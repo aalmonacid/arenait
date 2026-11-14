@@ -17,6 +17,7 @@ export async function verifyTurnstile(
   token: string,
   remoteIp?: string,
   fetchImpl: typeof fetch = fetch,
+  expectedHostname?: string,
 ): Promise<boolean> {
   if (!token) return false;
 
@@ -31,8 +32,12 @@ export async function verifyTurnstile(
       signal: AbortSignal.timeout(4000),
     });
     if (!response.ok) return false;
-    const data = (await response.json()) as { success?: boolean };
-    return data.success === true;
+    const data = (await response.json()) as { success?: boolean; hostname?: string };
+    if (data.success !== true) return false;
+    // Un token emitido para OTRO sitio (cualquier widget de Turnstile con otra
+    // clave pública no pasaría, pero esto cierra el caso de claves compartidas).
+    if (expectedHostname && data.hostname && data.hostname !== expectedHostname) return false;
+    return true;
   } catch (error) {
     console.error('No se pudo verificar el captcha:', error);
     return false;

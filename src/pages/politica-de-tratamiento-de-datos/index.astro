@@ -16,6 +16,7 @@ import { POLICY_VERSION } from '../../lib/legal';
  * documento legal. Ver BACKLOG.md, Épica G.
  */
 const LAST_UPDATED = '2026-09-04';
+const LAST_UPDATED_DISPLAY = LAST_UPDATED.split('-').reverse().join('/'); // DD/MM/AAAA
 ---
 
 <BaseLayout
@@ -25,7 +26,7 @@ const LAST_UPDATED = '2026-09-04';
   <PageHero
     kicker="Legal"
     title="Política de Tratamiento de Datos Personales"
-    lead={`Versión ${POLICY_VERSION} — Última actualización: ${LAST_UPDATED}`}
+    lead={`Versión ${POLICY_VERSION} — Última actualización: ${LAST_UPDATED_DISPLAY}`}
   />
 
   <section class="py-16 md:py-24 px-4 md:px-8 bg-white">
@@ -37,7 +38,7 @@ const LAST_UPDATED = '2026-09-04';
       </p>
 
       <div>
-        <h2 class="text-2xl font-heading text-secondary mb-4">1. Responsable del tratamiento</h2>
+        <h2 class="text-2xl font-heading font-extrabold tracking-tight text-secondary mb-4">1. Responsable del tratamiento</h2>
         <div class="flex flex-col gap-2">
           <PendingContentTag label="Razón social completa" />
           <PendingContentTag label="NIT" />
@@ -46,7 +47,7 @@ const LAST_UPDATED = '2026-09-04';
       </div>
 
       <div>
-        <h2 class="text-2xl font-heading text-secondary mb-4">2. Datos que recolectamos</h2>
+        <h2 class="text-2xl font-heading font-extrabold tracking-tight text-secondary mb-4">2. Datos que recolectamos</h2>
         <p>
           A través del formulario de contacto de este sitio recolectamos: nombre completo, empresa,
           correo electrónico, teléfono (opcional), servicio de interés y el mensaje que nos
@@ -55,7 +56,7 @@ const LAST_UPDATED = '2026-09-04';
       </div>
 
       <div>
-        <h2 class="text-2xl font-heading text-secondary mb-4">3. Finalidad del tratamiento</h2>
+        <h2 class="text-2xl font-heading font-extrabold tracking-tight text-secondary mb-4">3. Finalidad del tratamiento</h2>
         <p>
           Los datos recolectados se usan exclusivamente para: (i) responder a tu solicitud de
           contacto, (ii) elaborar y dar seguimiento a propuestas comerciales, y (iii) mantener un
@@ -65,7 +66,7 @@ const LAST_UPDATED = '2026-09-04';
       </div>
 
       <div>
-        <h2 class="text-2xl font-heading text-secondary mb-4">4. Derechos del titular</h2>
+        <h2 class="text-2xl font-heading font-extrabold tracking-tight text-secondary mb-4">4. Derechos del titular</h2>
         <p class="mb-4">Como titular de tus datos personales, tienes derecho a:</p>
         <ul class="list-disc list-inside space-y-2">
           <li>
@@ -87,7 +88,7 @@ const LAST_UPDATED = '2026-09-04';
       </div>
 
       <div>
-        <h2 class="text-2xl font-heading text-secondary mb-4">
+        <h2 class="text-2xl font-heading font-extrabold tracking-tight text-secondary mb-4">
           5. Mecanismos para ejercer tus derechos
         </h2>
         <p class="mb-3">
@@ -97,7 +98,7 @@ const LAST_UPDATED = '2026-09-04';
       </div>
 
       <div>
-        <h2 class="text-2xl font-heading text-secondary mb-4">6. Vigencia</h2>
+        <h2 class="text-2xl font-heading font-extrabold tracking-tight text-secondary mb-4">6. Vigencia</h2>
         <p>
           Los datos personales se conservarán mientras exista una relación comercial vigente o
           potencial, o hasta que el titular solicite su supresión conforme a la sección anterior, lo
@@ -106,7 +107,7 @@ const LAST_UPDATED = '2026-09-04';
       </div>
 
       <div id="cookies">
-        <h2 class="text-2xl font-heading text-secondary mb-4">7. Cookies</h2>
+        <h2 class="text-2xl font-heading font-extrabold tracking-tight text-secondary mb-4">7. Cookies</h2>
         <p class="mb-4">
           Este sitio usa únicamente cookies propias esenciales, necesarias para su funcionamiento
           básico (por ejemplo, recordar tu elección sobre este mismo aviso). Hoy no usamos cookies

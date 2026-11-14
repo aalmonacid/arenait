@@ -17,7 +17,9 @@ export const GET: APIRoute = ({ site }) => {
         'User-agent: *',
         'Allow: /',
         'Disallow: /api/',
-        'Disallow: /admin/',
+        // Sin barra final: con trailingSlash 'never' la ruta real es /admin y
+        // «Disallow: /admin/» no la cubriría.
+        'Disallow: /admin',
         '',
         `Sitemap: ${new URL('sitemap-index.xml', site).toString()}`,
         '',

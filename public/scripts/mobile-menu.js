@@ -78,6 +78,13 @@ if (trigger && menu && closeButton) {
 
   closeButton.addEventListener('click', closeMenu);
 
+  // Si la ventana cruza el breakpoint de escritorio (lg) con el menú abierto
+  // (p. ej. al rotar una tablet), el overlay se oculta por CSS pero el body
+  // quedaría con el scroll bloqueado: se cierra el menú explícitamente.
+  window.matchMedia('(min-width: 1024px)').addEventListener('change', (event) => {
+    if (event.matches && !menu.classList.contains('hidden')) closeMenu();
+  });
+
   menu.querySelectorAll('a[href]').forEach((link) => {
     link.addEventListener('click', closeMenu);
   });

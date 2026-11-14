@@ -11,7 +11,9 @@ import { checkRateLimit } from '../../lib/rateLimit';
 import {
   MAX_BODY_BYTES,
   isAllowedOrigin,
+  isJsonContentType,
   leadDocumentId,
+  readBodyWithLimit,
   validateLead,
 } from '../../lib/leadValidation';
 import { notifyNewLead } from '../../lib/leadNotify';
@@ -32,8 +34,18 @@ export const POST: APIRoute = async (context) => {
 
   // Solo se aceptan envíos desde este mismo sitio cuando el navegador informa
   // su origen (evita formularios ajenos apuntando a este endpoint).
-  if (!isAllowedOrigin(request.url, request.headers.get('origin'))) {
+  if (
+    !isAllowedOrigin(
+      request.url,
+      request.headers.get('origin'),
+      request.headers.get('sec-fetch-site'),
+    )
+  ) {
     return json(403, { ok: false, error: 'Origen no permitido.' });
+  }
+
+  if (!isJsonContentType(request.headers.get('content-type'))) {
+    return json(415, { ok: false, error: 'El contenido debe enviarse como JSON.' });
   }
 
   // clientAddress lo resuelve el adaptador (en Cloudflare, de la cabecera
@@ -71,13 +83,13 @@ export const POST: APIRoute = async (context) => {
 
   let rawBody: string;
   try {
-    rawBody = await request.text();
+    const read = await readBodyWithLimit(request, MAX_BODY_BYTES);
+    if (read === null) {
+      return json(413, { ok: false, error: 'La solicitud es demasiado grande.' });
+    }
+    rawBody = read;
   } catch {
     return json(400, { ok: false, error: 'No se pudo leer la solicitud.' });
-  }
-
-  if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
-    return json(413, { ok: false, error: 'La solicitud es demasiado grande.' });
   }
 
   let body: unknown;
@@ -100,11 +112,27 @@ export const POST: APIRoute = async (context) => {
 
   const { lead, sendCopy, captchaToken } = result;
 
-  // Captcha (Cloudflare Turnstile): solo se exige si el secreto está
-  // configurado. Se verifica ANTES de escribir en Sanity o enviar correos.
+  // Captcha (Cloudflare Turnstile). Se verifica ANTES de escribir en Sanity o
+  // enviar correos. En un despliegue real (build de producción) el secreto es
+  // obligatorio: si falta (por ejemplo, cargado en el entorno equivocado del
+  // Worker) se falla cerrado en lugar de aceptar envíos sin captcha. En
+  // `astro dev` sigue siendo opcional para poder trabajar sin claves.
   const turnstileSecret = TURNSTILE_SECRET_KEY;
+  if (!turnstileSecret && import.meta.env.PROD) {
+    console.error('TURNSTILE_SECRET_KEY no está configurada: se rechaza el envío.');
+    return json(503, {
+      ok: false,
+      error: 'El formulario no está disponible por ahora. Escríbenos por WhatsApp.',
+    });
+  }
   if (turnstileSecret) {
-    const human = await verifyTurnstile(turnstileSecret, captchaToken, ip);
+    const human = await verifyTurnstile(
+      turnstileSecret,
+      captchaToken,
+      ip,
+      fetch,
+      new URL(request.url).hostname,
+    );
     if (!human) {
       return json(400, {
         ok: false,
@@ -127,7 +155,10 @@ export const POST: APIRoute = async (context) => {
       policyAcceptedAt: now,
     });
   } catch (error) {
-    console.error('Error al guardar el lead en Sanity:', error);
+    // Solo estado y mensaje: el objeto de error completo puede incluir el
+    // documento enviado (datos personales) y acabaría en Workers Logs.
+    const detail = error as { statusCode?: number; message?: string };
+    console.error('Error al guardar el lead en Sanity:', detail.statusCode, detail.message);
     return json(502, {
       ok: false,
       error: 'No se pudo guardar la solicitud. Intente nuevamente.',

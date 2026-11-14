@@ -51,12 +51,24 @@ describe('buildOwnerEmail', () => {
 });
 
 describe('buildCopyEmail', () => {
-  it('va al visitante, con su mensaje y la nota de "si no fuiste tú"', () => {
+  it('va al visitante como acuse fijo, con la nota de "si no fuiste tú"', () => {
     const m = buildCopyEmail(lead);
     expect(m.to).toBe('ana@empresa.com');
-    expect(m.text).toContain('Necesitamos un tablero.');
     expect(m.text).toContain('Si no fuiste tú');
     expect(m.replyTo).toBeUndefined();
+  });
+
+  it('no repite ningún texto libre del visitante (anti-abuso)', () => {
+    const m = buildCopyEmail({
+      ...lead,
+      fullName: 'Visita ESTE enlace malicioso',
+      company: 'EMPRESA-FALSA',
+      message: 'MENSAJE-ARBITRARIO http://phishing.example',
+    });
+    const all = `${m.subject}\n${m.text}`;
+    for (const piece of ['malicioso', 'EMPRESA-FALSA', 'ARBITRARIO', 'phishing', 'Visita']) {
+      expect(all).not.toContain(piece);
+    }
   });
 });
 

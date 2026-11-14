@@ -210,11 +210,11 @@ Con esto, **Épica J queda cerrada**: los 4 ítems (nav mobile, analítica, audi
 Plan, responsables y acciones pendientes: [`PLAN-PRODUCCION.md`](./PLAN-PRODUCCION.md).
 
 - [x] Endurecimiento de `/api/leads` (topes, límite de cuerpo, Origin, ID privado, sin devolver ID) y aviso opcional de leads sin datos personales.
-- [x] 32 tests unitarios (validación, rate limiting, aviso).
+- [x] 60 tests unitarios (validación, rate limiting, aviso, correo, captcha, servicios).
 - [x] Fuente autoalojada y precargada (objetivo: eliminar el CLS 0.207 del home móvil; **por medir en el deploy**), CSP sin Google Fonts.
 - [x] Accesibilidad: botón de cookies, grises fuera de paleta, errores del formulario, nombre del logo, áreas táctiles y foco global.
 - [x] Indexación y dominio por variables de entorno (`PUBLIC_ALLOW_INDEXING`, `PUBLIC_SITE_URL`) con `robots.txt` generado.
-- [x] Redirecciones 301 de las páginas `.html` del sitio anterior en `vercel.json` (por verificar tras el cambio de dominio). Línea base de SEO del sitio actual documentada en `PLAN-PRODUCCION.md`.
+- [x] Redirecciones 301 de las páginas `.html` del sitio anterior en `public/_redirects` (por verificar tras el cambio de dominio). Línea base de SEO del sitio actual documentada en `PLAN-PRODUCCION.md`.
 - [ ] **Usuario** (con acceso a Vercel, Sanity y Cloudflare): CORS, token, privacidad del dataset, Deploy Hook, Web Analytics, variables y dominio (ver plan).
 - [ ] **Cliente**: datos legales, aprobaciones de diseño, dominio canónico, contenido.
 
@@ -236,3 +236,7 @@ Plan, responsables y acciones pendientes: [`PLAN-PRODUCCION.md`](./PLAN-PRODUCCI
 3. **Épica B y D** son las que realmente "suben de nivel" el proyecto una vez que la base deja de tener fugas.
 4. **Épica E** es expansión, no corrección — no empezarla antes de cerrar A.
 5. **Fase 0 y Épica J** son el siguiente bloqueante real: sin navegación mobile ni analítica ni auditoría de performance/a11y documentada, el sitio no puede llamarse "nivel enterprise" aunque A–I ya estén cerradas. **Épicas K–N** (SEO, contenido, conversión, endurecimiento) son las que efectivamente llevan el sitio al "máximo nivel empresarial" pedido — ver la sección "Modelo multiagente" arriba para los agentes (`.claude/agents/`) que ejecutan cada una.
+
+## Auditoría del 14/11/2026 — plan de mejoras
+
+Revisión de seguridad, rendimiento, accesibilidad, UI/UX, SEO y calidad de código. El detalle, las prioridades y el estado de cada ítem están en [`PLAN-MEJORAS.md`](./PLAN-MEJORAS.md). Lo hecho en la rama `mejoras/auditoria-2026-11` (middleware de cabeceras, acuse fijo en el correo de copia, Turnstile obligatorio en producción, saneo, imágenes OG y de `/nosotros`, formulario accesible, header con CTA, CI, README) está marcado ✅ allí; lo pendiente de la fase 0 y 5 requiere al usuario o al cliente.

@@ -3,6 +3,7 @@ import {
   LIMITS,
   MAX_BODY_BYTES,
   isAllowedOrigin,
+  isJsonContentType,
   leadDocumentId,
   validateLead,
 } from './leadValidation';
@@ -81,6 +82,21 @@ describe('validateLead', () => {
     if (result.kind === 'ok') expect(result.lead.message).toBe('línea 1\nlínea 2');
   });
 
+  it('colapsa saltos de línea en campos de una sola línea y filtra bidi/U+2028', () => {
+    const result = validateLead({
+      ...valid,
+      fullName: 'Ana\nCorreo: falso@x.com',
+      company: 'Empresa\u2028SAS\u202E',
+      message: 'a\u2029b',
+    });
+    expect(result.kind).toBe('ok');
+    if (result.kind === 'ok') {
+      expect(result.lead.fullName).toBe('Ana Correo: falso@x.com');
+      expect(result.lead.company).toBe('EmpresaSAS');
+      expect(result.lead.message).toBe('ab');
+    }
+  });
+
   it('ignora un source desconocido', () => {
     const result = validateLead({ ...valid, source: 'otro-sitio' });
     expect(result.kind).toBe('ok');
@@ -141,8 +157,20 @@ describe('isAllowedOrigin', () => {
     expect(isAllowedOrigin(url, 'no es una url')).toBe(false);
   });
 
-  it('acepta solicitudes sin cabecera Origin', () => {
-    expect(isAllowedOrigin(url, null)).toBe(true);
+  it('sin Origin solo acepta Sec-Fetch-Site: same-origin', () => {
+    expect(isAllowedOrigin(url, null)).toBe(false);
+    expect(isAllowedOrigin(url, null, 'cross-site')).toBe(false);
+    expect(isAllowedOrigin(url, null, 'same-origin')).toBe(true);
+  });
+});
+
+describe('isJsonContentType', () => {
+  it('acepta application/json con o sin charset y rechaza el resto', () => {
+    expect(isJsonContentType('application/json')).toBe(true);
+    expect(isJsonContentType('application/json; charset=utf-8')).toBe(true);
+    expect(isJsonContentType('text/plain')).toBe(false);
+    expect(isJsonContentType('application/x-www-form-urlencoded')).toBe(false);
+    expect(isJsonContentType(null)).toBe(false);
   });
 });
 

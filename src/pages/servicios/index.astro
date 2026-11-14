@@ -27,7 +27,7 @@ const structuredData = [
         provider: {
           '@type': 'Organization',
           name: 'ArenaIT',
-          url: 'https://arenait.co',
+          url: new URL('/', Astro.site).toString().replace(/\/$/, ''),
         },
       },
     })),

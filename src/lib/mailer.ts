@@ -94,23 +94,21 @@ export function buildOwnerEmail(lead: Lead, to: string, studioUrl: string): Outg
   };
 }
 
-/** Copia del mensaje para el visitante que la solicitó. */
-export function buildCopyEmail(lead: Lead): OutgoingEmail {
+/**
+ * Acuse de recibo para el visitante que lo solicitó. Es un texto FIJO: no
+ * repite nada de lo que escribió el visitante (nombre, empresa, mensaje).
+ * Si lo hiciera, el formulario serviría para enviar texto arbitrario, con
+ * remitente de ArenaIT, a cualquier dirección de correo (phishing o spam).
+ */
+export function buildCopyEmail(lead: Pick<Lead, 'corporateEmail'>): OutgoingEmail {
   return {
     to: lead.corporateEmail,
-    subject: 'Copia de tu mensaje a ArenaIT',
+    subject: 'Recibimos tu mensaje en ArenaIT',
     text: [
-      `Hola ${lead.fullName},`,
+      'Hola,',
       '',
       'Recibimos tu mensaje y te escribiremos pronto con una propuesta concreta.',
-      'Esta es la copia de lo que nos enviaste:',
-      '',
-      `Empresa: ${lead.company || '—'}`,
-      `Teléfono: ${lead.phone || '—'}`,
-      `Servicio de interés: ${lead.serviceOfInterest || '—'}`,
-      '',
-      'Mensaje:',
-      lead.message || '—',
+      'No necesitas hacer nada más por ahora.',
       '',
       '—',
       'ArenaIT · Desarrollo de software a la medida',

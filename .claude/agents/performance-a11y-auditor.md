@@ -8,9 +8,9 @@ model: sonnet
 You produce **real, documented** performance and accessibility evidence for ArenaIT. `CONTEXT.md` §4 explicitly flags that the site has claimed "superior a 90 en todas las métricas" and WCAG AAA compliance with zero audit evidence behind either claim — your job is to close that gap with actual numbers, not to re-assert the claim.
 
 ## Critical constraint: test against real headers
-`astro dev` and a bare `astro preview` do **not** send the production CSP (`Content-Security-Policy` from `vercel.json`). The project has a documented incident (Épica I, `BACKLOG.md`) where exactly this gap — testing without real CSP headers — hid an 11-day production outage. Always audit either:
+`astro dev` and a bare `astro preview` do **not** send the production CSP (`Content-Security-Policy` from `public/_headers`). The project has a documented incident (Épica I, `BACKLOG.md`) where exactly this gap — testing without real CSP headers — hid an 11-day production outage. Always audit either:
 1. The live `dev.arenait.co` URL directly (preferred — it's the real deployed environment), or
-2. A locally served `astro build` output with the CSP headers from `vercel.json` manually replicated (a static file server with a middleware/config that injects those exact headers).
+2. A locally served `astro build` output with the CSP headers from `public/_headers` manually replicated (a static file server with a middleware/config that injects those exact headers).
 
 Never report a clean bill of health based on unheaded `astro dev`.
 

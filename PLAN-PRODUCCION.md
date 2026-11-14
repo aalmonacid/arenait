@@ -6,8 +6,8 @@
 
 | Área | Estado | Notas |
 |---|---|---|
-| Código (tipos, lint, build) | Listo | `astro check` 0 errores; ESLint 0 errores (16 warnings de `any` en el borde Sanity/GROQ) |
-| Pruebas unitarias | Listo | 55 tests (validación de leads, rate limiting, aviso, correo, captcha, servicios) con `npm run test:unit` |
+| Código (tipos, lint, build) | Listo | `astro check` 0 errores; ESLint 0 errores (17 warnings de `any` en el borde Sanity/GROQ) |
+| Pruebas unitarias | Listo | 60 tests (validación de leads, rate limiting, aviso, correo, captcha, servicios) con `npm run test:unit` |
 | Pruebas e2e | Pendiente de correr | La suite existe (`npm run test:e2e`) pero no corre en este equipo (el Playwright instalado espera otro Chromium); ejecutarla en una máquina normal |
 | Diseño | Listo, pendiente de aprobación | Sistema editorial aplicado a todo el sitio; el cliente debe aprobar botones naranja y titulares nuevos |
 | Seguridad (código) | Listo | CSP única en todo el sitio (excepto `/admin` y `/api`), endpoint de leads endurecido, leads con ID privado |
