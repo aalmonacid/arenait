@@ -21,3 +21,6 @@ Same logic for any new external domain (an analytics script, a font CDN, etc.): 
 
 ## Before declaring anything done
 Run `npm run lint`, `npm run test:unit`, and `astro build`. For anything involving client-side scripts or CSP, hand off to `qa-release-guardian` to verify against a real CSP header before calling it finished — `astro dev`/`astro preview` without the real `public/_headers` headers is not sufficient verification (this is exactly how the 11-day outage went undetected).
+
+## Project skill rules
+Before building or changing UI, read `.claude/skills/disenador-uiux-suizo-arenait/SKILL.md`, especially its section "Reglas aprendidas en la auditoría del 14/11/2026" (scripts in `public/scripts/`, accessible forms, 44 px touch targets, images served as-is with `passthrough`, no internal "pending" text visible). If an instruction here conflicts with that file, follow the skill and flag the conflict.
