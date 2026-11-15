@@ -5,5 +5,5 @@
  * capturado en ese momento queda con la versión que aceptó, como evidencia
  * de consentimiento.
  */
-export const POLICY_VERSION = '1.0';
+export const POLICY_VERSION = '1.1';
 export const POLICY_URL = '/politica-de-tratamiento-de-datos';

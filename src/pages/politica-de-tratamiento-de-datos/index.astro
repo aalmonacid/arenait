@@ -15,7 +15,7 @@ import { POLICY_VERSION } from '../../lib/legal';
  * tarjeta de presentación sin confirmar que son los correctos para un
  * documento legal. Ver BACKLOG.md, Épica G.
  */
-const LAST_UPDATED = '2026-09-04';
+const LAST_UPDATED = '2026-11-15';
 const LAST_UPDATED_DISPLAY = LAST_UPDATED.split('-').reverse().join('/'); // DD/MM/AAAA
 ---
 
@@ -106,8 +106,34 @@ const LAST_UPDATED_DISPLAY = LAST_UPDATED.split('-').reverse().join('/'); // DD/
         </p>
       </div>
 
+      <div id="encargados">
+        <h2 class="text-2xl font-heading font-extrabold tracking-tight text-secondary mb-4">
+          7. Proveedores que tratan datos por encargo
+        </h2>
+        <p class="mb-4">
+          Para operar este sitio y atender tu solicitud usamos proveedores tecnológicos que tratan
+          datos por cuenta nuestra y solo para esa finalidad:
+        </p>
+        <ul class="list-disc list-inside space-y-2 mb-4">
+          <li><strong>Sanity</strong>: almacenamiento de las solicitudes recibidas por el formulario.</li>
+          <li>
+            <strong>Cloudflare</strong>: alojamiento del sitio, protección contra tráfico abusivo y
+            verificación anti-spam (Turnstile) al enviar el formulario.
+          </li>
+          <li>
+            <strong>Resend</strong>: envío de los correos de aviso interno y de confirmación al
+            visitante.
+          </li>
+        </ul>
+        <p>
+          Algunos de estos proveedores pueden almacenar o procesar datos en servidores ubicados
+          fuera de Colombia. En ese caso la transmisión o transferencia se hace conforme a la Ley
+          1581 de 2012 y sus decretos reglamentarios.
+        </p>
+      </div>
+
       <div id="cookies">
-        <h2 class="text-2xl font-heading font-extrabold tracking-tight text-secondary mb-4">7. Cookies</h2>
+        <h2 class="text-2xl font-heading font-extrabold tracking-tight text-secondary mb-4">8. Cookies</h2>
         <p class="mb-4">
           Este sitio usa únicamente cookies propias esenciales, necesarias para su funcionamiento
           básico (por ejemplo, recordar tu elección sobre este mismo aviso). Hoy no usamos cookies

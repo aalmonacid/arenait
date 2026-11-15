@@ -2,7 +2,7 @@
 
 > Reescrito el 2026-08-24 tras auditoría completa (ver [`CONTEXT.md`](./CONTEXT.md)). El backlog anterior marcaba el proyecto como `READY FOR PRODUCTION`; la auditoría encontró un formulario de contacto que no persiste leads, un webhook de revalidación muerto, contenido 100% de fallback, y páginas de CMS sin UI. Este backlog parte del estado real, no del declarado.
 
-**ESTADO GLOBAL DEL PROYECTO**: `PROTOTIPO FUNCIONAL — NO LISTO PARA PRODUCCIÓN`
+**ESTADO GLOBAL DEL PROYECTO (15/11/2026)**: `TÉCNICAMENTE LISTO EN CLOUDFLARE (dev.arenait.co) — NO LISTO PARA LANZAMIENTO PÚBLICO`. Avance estimado hacia producción: ~72 %. El código, el despliegue y el CI están en verde; lo que bloquea el lanzamiento es de cuentas (claves, dominio), legal (datos de la política) y contenido del cliente. Detalle y responsables en [`PLAN-PRODUCCION.md`](./PLAN-PRODUCCION.md) y [`PLAN-MEJORAS.md`](./PLAN-MEJORAS.md) (fase 7). El historial de abajo conserva el estado de rondas anteriores (Vercel, `vercel.json`): donde contradiga a esta línea, manda esta línea.
 
 ## Épica 0 — Pivote de posicionamiento (cerrada, 2026-08-24)
 
@@ -183,7 +183,7 @@ Con esto, **Épica J queda cerrada**: los 4 ítems (nav mobile, analítica, audi
 ## Épica N — Endurecimiento enterprise
 
 - [x] **Remediación de accesibilidad sobre los hallazgos de la Épica J (2026-09-04).** Ver el ítem de auditoría extendida en Épica K arriba — 0 violaciones axe-core en las 5 páginas principales, confirmado en vivo. `/servicios` sigue con FCP/LCP más lento que el resto (~2.8s) sin causa visible en el código — hallazgo abierto, no forzado; su score de SEO en Lighthouse (66) bajó por el `noindex` temporal deliberado (ver Épica K), no es una regresión real.
-- [ ] Reintroducir CI, resolviendo el fallo no diagnosticado de `astro check` en Linux (ver nota "GitHub Actions removido" arriba) — **no iniciado sin confirmación explícita del usuario**, ya que fue removido a pedido suyo.
+- [x] CI reintroducido el 14/11/2026 (`.github/workflows/ci.yml`: lint, `astro check`, pruebas unitarias, build, `npm audit` informativo). Verificado el 15/11/2026: pasa en `main` y en PR (el fallo de `astro check` en Linux era por Astro 7.4.9; con `astro` fijado en 7.4.8 ya no ocurre). Pendiente: suite e2e (falta Chromium compatible).
 - [x] **Pase con la skill `security-review` (2026-09-04)** sobre el diff completo de blog/ogImage/whitepapers: 0 hallazgos con confianza ≥0.7 (GROQ parametrizado, sin fugas del PDF antes de validar, sin XSS en `whitepaper-gate.js`, CSP de las rutas nuevas idéntica a la política restrictiva existente, separación correcta entre el cliente Sanity de lectura y el de escritura server-only).
 
 ---
@@ -227,7 +227,7 @@ Plan, responsables y acciones pendientes: [`PLAN-PRODUCCION.md`](./PLAN-PRODUCCI
 - [x] Fusionado a `main`; Cloudflare compila desde `main`.
 - [ ] **Usuario**: rotar claves expuestas, dominio definitivo, variables de lanzamiento, analítica, desconectar Vercel (ver `PLAN-PRODUCCION.md`).
 - [ ] Analítica de producto (Cloudflare Web Analytics u otra) con la CSP ajustada: la de Vercel se retiró.
-- [ ] Revisar `npm audit` tras el cambio de dependencias.
+- [x] `npm audit` revisado el 15/11/2026: 14 avisos en producción (12 moderados, 2 altos), todos en la cadena del CLI de Sanity (`smol-toml`, `js-yaml`, `minimatch`), no en el runtime del Worker. El arreglo automático (`--force`) baja Sanity a la v5: no aplicar. Revisar mensualmente.
 
 ## Cómo priorizar
 
@@ -240,3 +240,20 @@ Plan, responsables y acciones pendientes: [`PLAN-PRODUCCION.md`](./PLAN-PRODUCCI
 ## Auditoría del 14/11/2026 — plan de mejoras
 
 Revisión de seguridad, rendimiento, accesibilidad, UI/UX, SEO y calidad de código. El detalle, las prioridades y el estado de cada ítem están en [`PLAN-MEJORAS.md`](./PLAN-MEJORAS.md). Lo hecho en la rama `mejoras/auditoria-2026-11` (middleware de cabeceras, acuse fijo en el correo de copia, Turnstile obligatorio en producción, saneo, imágenes OG y de `/nosotros`, formulario accesible, header con CTA, CI, README) está marcado ✅ allí; lo pendiente de la fase 0 y 5 requiere al usuario o al cliente.
+
+## Revisión integral del 15/11/2026
+
+Revisión completa del estado (código, despliegue en vivo, DNS, GitHub, Sanity). Verificado: lint 0 errores, `astro check` 0 errores, 60 pruebas unitarias, build, CI en verde en `main`, 8 páginas con 200 en `dev.arenait.co`, consola sin errores de CSP, `/api/leads` con 403 sin `Origin`.
+
+Hecho en esa revisión:
+
+- [x] HSTS sin `includeSubDomains` ni `preload` (`public/_headers` y `src/middleware.ts`) hasta inventariar los subdominios del dominio definitivo.
+- [x] Política de datos v1.1: nueva sección «Proveedores que tratan datos por encargo» (Sanity, Cloudflare/Turnstile, Resend) y mención de transmisión internacional; cookies pasa a la sección 8. **Requiere revisión jurídica.** Siguen pendientes razón social, NIT, domicilio y canal ARCO (datos del cliente).
+- [x] Dependencias menores al día (`@astrojs/sitemap`, `@sanity/astro`, `@playwright/test`, `prettier`); carpeta vacía `interstellar-inclination` eliminada.
+- [x] Documentación al día (este archivo, `CONTEXT.md`, `PLAN-PRODUCCION.md`, `PLAN-MEJORAS.md`).
+
+Pendiente, con responsable (resumen; el detalle está en `PLAN-PRODUCCION.md`):
+
+- [ ] **Antonio (cuentas)**: rotar token de Sanity y clave de Resend, desconectar Vercel, protección de `main`, CORS de Sanity, verificar `TURNSTILE_SECRET_KEY` en Producción, SPF/DMARC del dominio.
+- [ ] **Cliente**: datos legales, aprobación de diseño, apex o `www`, capturas y testimonios.
+- [ ] **Antonio + Claude**: prueba real del formulario con lead de prueba, privacidad del dataset, día del corte (variables, Turnstile, CORS, dominio, redirección o baja de `dev`).
