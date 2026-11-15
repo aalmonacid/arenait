@@ -31,7 +31,7 @@ Esfuerzo: S (<2 h), M (medio día a un día), L (varios días).
 | 1.5 | Leads en dataset privado o dataset `production` privado | M | 👤 (decisión + Sanity manage) |
 | 1.6 | Retirar `_whitepaper-download.ts` | S | ✅ |
 | 1.7 | Saneo de saltos de línea, escape en webhook y JSON-LD, `Origin` + `Content-Type`, corte de body, `Disallow: /admin` | S–M | ✅ (idempotencia ⏳). Ojo: ahora `/api/leads` rechaza peticiones sin `Origin` ni `Sec-Fetch-Site` (curl a pelo) |
-| 1.8 | `npm audit fix` sin `--force` y `overrides` | S–M | ◐ `npm audit fix` sin `--force`: 22 → 20 avisos. Faltan `overrides` para `js-yaml`, `smol-toml`, `minimatch` (cadena del CLI de Sanity, no del runtime) |
+| 1.8 | `npm audit fix` sin `--force` y `overrides` | S–M | ◐ 22 → 14 avisos en producción (15/11/2026: 12 moderados, 2 altos). Faltan `overrides` para `js-yaml`, `smol-toml`, `minimatch` (cadena del CLI de Sanity, no del runtime) |
 
 ## Fase 2 — Rendimiento
 
@@ -63,10 +63,10 @@ Esfuerzo: S (<2 h), M (medio día a un día), L (varios días).
 | 4.2 | Fijar `astro` en `7.4.8` exacto | S | ✅ |
 | 4.3 | Fuente única de casos de estudio (Sanity + respaldo) | M | ⏳ |
 | 4.4 | JSON-LD con `Astro.site`, `noindex` en 404, `og:url`/`og:locale`/`og:site_name` | S–M | ✅ (`BlogPosting` y metadatos fuera de rango ⏳) |
-| 4.5 | CI mínimo (lint, check, vitest, build); arreglar e2e | M | ✅ workflow creado (aún no ejecutado en GitHub: puede fallar si `astro check` se comporta distinto en Linux/Node 24, ver BACKLOG) · ⏳ e2e (falta Chromium rev 1254 o fijar `@playwright/test`) |
+| 4.5 | CI mínimo (lint, check, vitest, build); arreglar e2e | M | ✅ workflow creado y verificado el 15/11/2026: pasa en `main` y en PR · ⏳ e2e (falta Chromium rev 1254 o fijar `@playwright/test`) |
 | 4.6 | Pruebas del handler `/api/leads` y de la canónica | M | ◐ pruebas nuevas de saneo, `Origin`, JSON, hostname de Turnstile, acuse fijo y escape del webhook; el handler completo y la canónica siguen sin prueba |
 | 4.7 | Retirar restos de Vercel en agentes y código muerto | S | ✅ (queda el código de analítica opcional en `lead-form.js`, inocuo) |
-| 4.8 | Poner al día `CONTEXT.md`, `BACKLOG.md`, `PLAN-PRODUCCION.md`, `.env.example` | M | ◐ notas de estado y cifras al día; el cuerpo de `CONTEXT.md` §2–§3 y §7–§8 sigue describiendo Vercel |
+| 4.8 | Poner al día `CONTEXT.md`, `BACKLOG.md`, `PLAN-PRODUCCION.md`, `.env.example` | M | ✅ al día el 15/11/2026 (los pasajes históricos sobre Vercel se conservan marcados como tales) |
 
 ## Fase 5 — Depende del cliente
 
@@ -79,3 +79,20 @@ Esfuerzo: S (<2 h), M (medio día a un día), L (varios días).
 
 - Dominio definitivo (Worker, Turnstile, CORS de Sanity incl. `www`), inventario de subdominios antes de HSTS `includeSubDomains`, evitar indexar `dev.arenait.co`, repetir Lighthouse y axe.
 - Destrabar Astro 7.4.12, migrar a Tailwind 4, binding KV `SESSION` sin uso, 17 warnings de lint.
+
+## Fase 7 — Revisión integral del 15/11/2026
+
+Avance estimado hacia producción: ~72 %. Verificado en vivo y en local (ver `BACKLOG.md`, «Revisión integral»).
+
+| # | Hallazgo | Estado |
+|---|---|---|
+| 7.1 | HSTS con `includeSubDomains; preload` en el dominio de pruebas: arriesgado al pasar al apex | ✅ quitado en `public/_headers` y `src/middleware.ts` (volver a ponerlo tras inventariar subdominios) |
+| 7.2 | Política de datos sin encargados ni transferencias | ✅ v1.1 con sección 7 (Sanity, Cloudflare/Turnstile, Resend); 👤 revisión jurídica y datos del cliente |
+| 7.3 | `arenait.co` sin SPF ni DMARC (solo MX de Google); Resend sí tiene SPF/DKIM en su subdominio | 👤 Antonio (DNS) |
+| 7.4 | `dev.arenait.co` quedará indexable si sigue sirviendo el mismo build tras el lanzamiento | 👤 al corte: redirigir o dar de baja |
+| 7.5 | Regla WAF, Turnstile y CORS de Sanity atados a `dev.arenait.co` | 👤 al corte |
+| 7.6 | `main` sin protección de rama; estado rojo «Vercel» en cada commit | 👤 Antonio |
+| 7.7 | Privacidad del dataset sin confirmar (consulta pública devuelve 0 leads, pero no hay ninguno que probar) | 👤 prueba con lead de prueba |
+| 7.8 | Dependencias menores desactualizadas | ✅ `@astrojs/sitemap`, `@sanity/astro`, `@playwright/test`, `prettier` actualizados; Astro 7.4.12, Tailwind 4, Vitest 5, TypeScript 7 y `@astrojs/react` 7 quedan fuera (cambios mayores) |
+| 7.9 | Carpeta vacía local `interstellar-inclination` | ✅ eliminada |
+| 7.10 | Binding KV `SESSION` sin uso (lo agrega el adaptador de Cloudflare) | ⏳ verificar si se puede desactivar en el adaptador |

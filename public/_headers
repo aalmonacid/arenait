@@ -1,8 +1,9 @@
 # Cabeceras para los archivos estáticos (páginas, fuentes, scripts).
 # Las respuestas del Worker (/api/*, /admin) NO pasan por este archivo: sus
 # cabeceras las fija src/middleware.ts.
+# HSTS sin includeSubDomains ni preload hasta inventariar los subdominios del dominio definitivo.
 /*
-  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Strict-Transport-Security: max-age=31536000
   Cross-Origin-Opener-Policy: same-origin
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff

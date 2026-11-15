@@ -1,6 +1,8 @@
 # Plan a producción — ArenaIT
 
-> Actualizado el 13/11/2026. Resume qué se hizo en el código, qué falta y **quién** debe hacerlo. No contiene secretos: los valores (tokens, URLs de webhook) se cargan directamente en Cloudflare/Sanity, nunca en el repo.
+> Actualizado el 15/11/2026. Resume qué se hizo en el código, qué falta y **quién** debe hacerlo. No contiene secretos: los valores (tokens, URLs de webhook) se cargan directamente en Cloudflare/Sanity, nunca en el repo.
+>
+> **Avance estimado hacia producción: ~72 %.** Técnico listo (lint, tipos, 60 pruebas, build y CI en verde; `dev.arenait.co` verificado en vivo el 15/11/2026). El lanzamiento depende de cuentas, datos legales, contenido y dominio: ver «Pendientes por responsable» más abajo.
 
 ## Estado por área
 
@@ -31,7 +33,7 @@ Requieren acceso a https://www.sanity.io/manage. No hay forma de hacerlas desde 
 3. **Token de escritura**: API → Tokens → crear uno con el permiso mínimo necesario (Editor; si solo crea leads, no necesita más) y cargarlo como secreto del Worker de Cloudflare (Producción) con el nombre `SANITY_API_WRITE_TOKEN`. No lo comparta por correo ni chat.
 4. **Webhook de contenido** (API → Webhooks): apuntar a la URL del Deploy Hook de Cloudflare (ver «Acciones en Cloudflare»), disparador «create, update, delete» sobre los tipos `service`, `caseStudy`, `testimonial`, para que editar contenido republique el sitio.
 5. **Usuarios y roles**: revisar quién tiene acceso al proyecto y con qué rol (principio de mínimo privilegio, alineado con ISO/IEC 27001). Activar autenticación de dos factores si la organización de Sanity lo permite.
-6. **Contenido**: cargar servicios, casos y testimonios en el Studio, **o** aceptar formalmente que el contenido actual del código (`src/lib/fallbackContent.ts`) es el contenido de producción. Hoy el dataset tiene 0 documentos de cada tipo.
+6. **Contenido**: el dataset tiene hoy 6 servicios, 0 casos y 0 testimonios (verificado el 15/11/2026). Cargar casos y testimonios en el Studio, **o** aceptar formalmente que el contenido de `src/lib/fallbackContent.ts` es el contenido de producción para los casos.
 
 ## Acciones en Cloudflare — estado
 
@@ -81,7 +83,46 @@ El sitio se migró de Vercel a Cloudflare Workers el 13/11/2026. Paso a paso y s
 
 ## Después del lanzamiento
 
-- Revisar `npm audit` mensualmente; las 5 vulnerabilidades altas restantes dependen de `sanity` y de sus herramientas de build (revisar tras la migración) (sin corrección upstream disponible el 12/11/2026).
-- Reintroducir CI (retirado a pedido del equipo) cuando se quiera una red de seguridad automática.
+- Revisar `npm audit` mensualmente. Al 15/11/2026 quedan 14 avisos en producción (12 moderados, 2 altos), todos en la cadena del CLI de Sanity y no en el runtime del Worker; `npm audit fix --force` baja Sanity a la v5, no aplicarlo.
+- CI ya reintroducido (`.github/workflows/ci.yml`, pasa en `main`). Falta la suite e2e.
 - Rate limiting con almacenamiento externo (KV/Durable Objects de Cloudflare) solo si el spam lo justifica.
 - Medir con datos reales de analítica antes de plantear experimentos de conversión o una versión en inglés.
+
+## Pendientes por responsable (15/11/2026)
+
+### Antonio Almonacid (acceso a Sanity, Cloudflare, GitHub, Vercel)
+
+| # | Acción | Dónde |
+|---|---|---|
+| 1 | Rotar el token de Sanity y la clave de Resend expuestos; revocar los anteriores y cargar los nuevos como secretos del Worker (Producción) | Sanity manage, Resend, Cloudflare |
+| 2 | Desconectar Vercel (Settings → Git, o borrar el proyecto) y quitar la app en GitHub (Settings → Applications) para eliminar el estado rojo «Vercel» de cada commit | Vercel, GitHub |
+| 3 | Proteger `main` (PR obligatorio y CI `verify` requerido) y activar secret scanning | GitHub → Settings |
+| 4 | CORS de Sanity: quitar `arenait.vercel.app` y los `localhost`; dejar `dev.arenait.co` y, al lanzar, el dominio final (con y sin `www`) | Sanity manage |
+| 5 | Confirmar `TURNSTILE_SECRET_KEY` en el entorno **Producción** del Worker (sin él el formulario responde 503) | Cloudflare |
+| 6 | Confirmar en el panel que `workers.dev` y las URLs de vista previa están desactivados (ya está en `wrangler.jsonc`) | Cloudflare |
+| 7 | Publicar **SPF y DMARC** en `arenait.co`. Hoy el apex solo tiene MX de Google y verificaciones: sin SPF ni DMARC se puede suplantar `@arenait.co` y los avisos pueden caer en spam. Sugerido: SPF que incluya Google (`include:_spf.google.com`) y empezar DMARC en `p=none` con reporte, subiendo a `quarantine` cuando los reportes salgan limpios. Validar con quien administre el correo antes de publicar | DNS (Cloudflare) |
+| 8 | Revisar la consola del navegador en `/admin` (logueado): la CSP del Studio va en modo solo-reporte; si no hay violaciones, avisar para pasarla a modo bloqueo | Navegador |
+| 9 | Decidir si el dataset `production` pasa a privado (con token de lectura para el build) o si leads van a un dataset aparte | Sanity manage |
+| 10 | Opcional: registro CAA en el DNS; inventario de subdominios del dominio antes de volver a poner `includeSubDomains` en HSTS | DNS |
+
+### Cliente (Andrés Arenas / Arena IT)
+
+| # | Acción |
+|---|---|
+| 1 | Datos de la política de datos: razón social, NIT, domicilio, canal para ejercer derechos (ARCO); revisión jurídica de la política v1.1 |
+| 2 | Aprobar el diseño (botones naranja, titulares, secciones) |
+| 3 | Decidir dominio canónico: `arenait.co` o `www.arenait.co` |
+| 4 | Contenido: capturas de Tauruswebs/Oviswebs, testimonios, más casos, grafía «ArenaIT» o «Arena IT», correo de contacto y tiempo de respuesta |
+| 5 | Decidir analítica (define el banner de cookies) y qué hacer con el naranja del «IT» del footer (4,45:1, AAA) |
+
+### Antonio + Claude (prueba y corte)
+
+| # | Acción |
+|---|---|
+| 1 | Prueba real del formulario en `dev.arenait.co` (captcha, lead en Sanity, correo al dueño, acuse) con un lead de prueba; consultar sin token que el lead **no** es público; borrar el lead de prueba |
+| 2 | Día del corte: asociar el dominio al Worker; `PUBLIC_SITE_URL` y `PUBLIC_ALLOW_INDEXING=true` como variables de compilación; dominio final en Turnstile y CORS de Sanity; revisar que la regla del WAF sobre `/api/leads` aplica al dominio final; redirigir o dar de baja `dev.arenait.co` para que no quede indexable; redesplegar |
+| 3 | Control de calidad sobre el dominio real: consola sin violaciones de CSP, Lighthouse y axe en todas las páginas, formulario, `/admin`, menú móvil y 404; Search Console y sitemap; mantener el sitio anterior unos días como reversión |
+
+### Claude (cuando se pida)
+
+Rate limit real (binding o KV), pruebas del handler `/api/leads`, e2e, fuente única de casos de estudio, `BlogPosting`, migas visibles, consolidar `Button`/`TextLink`, `overrides` de npm, 17 avisos de lint, analítica con CSP, CSP del Studio en modo bloqueo.
