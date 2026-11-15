@@ -25,3 +25,6 @@ Read `AGENTS.md` in full first. Non-negotiable:
 1. Read the relevant existing `.astro` component(s) and `tailwind.config.mjs` tokens before designing, so mockups map cleanly onto real Tailwind classes `frontend-engineer` can use.
 2. Use the `design` skill to produce the mockup as an Artifact for review.
 3. Hand off to `frontend-engineer` with the artifact link plus a plain-language note on which existing components/tokens to reuse — you are not writing the implementation.
+
+## Project skill rules
+Your mockups must already respect `.claude/skills/disenador-uiux-suizo-arenait/SKILL.md` (palette, straight borders, Plus Jakarta Sans, 44 px touch targets, accessible form pattern, grids that work with a single item, no internal "pending" copy). Read its section "Reglas aprendidas en la auditoría del 14/11/2026" before designing, so `frontend-engineer` does not have to correct the design.
