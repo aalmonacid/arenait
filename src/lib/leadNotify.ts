@@ -12,6 +12,7 @@
  * visitante, así que usa un timeout corto y traga cualquier error.
  */
 import type { Lead } from './leadValidation';
+import { serviceLabel } from './leadOptions';
 
 /**
  * Neutraliza el formato que Slack/Teams interpretan en texto libre: enlaces y
@@ -27,8 +28,8 @@ export function escapeForChat(value: string): string {
 
 export function buildNotificationText(lead: Lead, studioUrl: string): string {
   const company = escapeForChat(lead.company) || 'sin empresa indicada';
-  const service = escapeForChat(lead.serviceOfInterest) || 'sin servicio indicado';
-  return `Nuevo lead en ArenaIT: ${company} — ${service}. Detalle en ${studioUrl}`;
+  const service = escapeForChat(serviceLabel(lead.serviceOfInterest)) || 'sin servicio indicado';
+  return `Nuevo lead en Arena IT: ${company} — ${service}. Detalle en ${studioUrl}`;
 }
 
 export async function notifyNewLead(

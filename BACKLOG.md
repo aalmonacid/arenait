@@ -4,6 +4,24 @@
 
 **ESTADO GLOBAL DEL PROYECTO (15/11/2026)**: `TÉCNICAMENTE LISTO EN CLOUDFLARE (dev.arenait.co) — NO LISTO PARA LANZAMIENTO PÚBLICO`. Avance estimado hacia producción: ~72 %. El código, el despliegue y el CI están en verde; lo que bloquea el lanzamiento es de cuentas (claves, dominio), legal (datos de la política) y contenido del cliente. Detalle y responsables en [`PLAN-PRODUCCION.md`](./PLAN-PRODUCCION.md) y [`PLAN-MEJORAS.md`](./PLAN-MEJORAS.md) (fase 7). El historial de abajo conserva el estado de rondas anteriores (Vercel, `vercel.json`): donde contradiga a esta línea, manda esta línea.
 
+## Épica Q — Contenido final del cliente (22/11/2026)
+
+El cliente entregó el contenido final (`SiteBenchmark`): posicionamiento «Software, Bizagi e IA», 13 servicios en 3 pilares, `/proyectos` con filtros (reemplaza `/casos-de-estudio`), `/nosotros` nuevo, formulario con servicios por slug y «Modelo de interés», marca «Arena IT».
+
+Hecho en código (rama `contenido/final-cliente-2026-11`):
+
+- [x] Modelo de contenido en Sanity: `service` ampliado, `project`, `siteSettings`, `homePage`, `servicesPage`, `aboutPage`, `projectsPage`; Studio con documentos únicos fijos.
+- [x] Respaldo en `src/lib/content/` y lectura en `src/lib/content.ts`; `scripts/seed-content.mjs` (`npm run seed:content`, con `--dry-run`).
+- [x] Páginas: inicio, `/servicios` (JSON-LD `ItemList` y `FAQPage`), `/proyectos` (filtros por servicio y sector con enlace directo), `/nosotros`; redirecciones 301 desde `/casos-de-estudio`.
+- [x] Formulario: `src/lib/leadOptions.ts`, «Modelo de interés», `?servicio=` desconocido cae en «Otro», correo y aviso con etiquetas.
+- [x] Pruebas unitarias y e2e actualizadas.
+
+Pendiente:
+
+- [ ] **Antonio:** carga en Sanity (`--dry-run`, luego real, con el token) y actualizar el filtro del webhook (ver `PLAN-PRODUCCION.md`).
+- [ ] **Cliente:** autorización escrita de los casos pendientes (se publican desde el Studio); PDF del portafolio (no se publica hasta tenerlas); validar el contenido final.
+- [ ] Imágenes OG propias para `/servicios`, `/proyectos` y `/contacto`; demos de IA; evaluar simplificar el formulario; página propia de Bizagi (decisión diferida); confirmar que `dev.arenait.co` no esté indexado.
+
 ## Épica 0 — Pivote de posicionamiento (cerrada, 2026-08-24)
 
 El posicionamiento "Ingeniería de misión crítica para CTO/CIO" (ISO 27001/TOGAF/ISO 25010, SLA 99.999%, TCO -35/40% garantizado) fue confirmado por el cliente como no real. Se reescribió el sitio completo a la posición real acordada ("punto medio", ver `copy-arenait-textos-reales.md`):

@@ -1,17 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { fallbackServices } from './fallbackContent';
+import { fallbackServices } from './content/index.ts';
 import { sortServices } from './serviceOrder';
+import { stripInlineLinks } from './inlineLinks';
 import type { ServiceSchema } from '../types/sanity';
 
-const make = (title: string, order?: number, featured?: boolean): ServiceSchema => ({
+const make = (title: string, order?: number): ServiceSchema => ({
   _id: title,
   title,
   slug: { current: title.toLowerCase() },
   icon: 'code',
   summary: 's',
-  description: 'd',
+  pillar: 'construimos',
+  whenNeeded: 'w',
+  whatWeDo: 'd',
+  deliverables: ['x'],
   order,
-  featured,
 });
 
 describe('sortServices', () => {
@@ -37,51 +40,58 @@ describe('sortServices', () => {
   });
 });
 
+/** Anclas de /servicios acordadas con el cliente (y valores de `?servicio=`). */
+const EXPECTED_SLUGS = [
+  'desarrollo-software-a-la-medida',
+  'integracion-automatizacion-procesos',
+  'modernizacion-migracion-sistemas',
+  'bizagi',
+  'business-intelligence-analitica',
+  'automatizacion-documental-ia',
+  'asistentes-ia',
+  'agentes-ia',
+  'modelos-predictivos',
+  'integracion-ia-sistemas',
+  'mantenimiento-soporte-software',
+  'aseguramiento-calidad-qa',
+  'outsourcing-talento-ti',
+];
+
 describe('fallbackServices (respaldo)', () => {
-  it('tiene los 6 servicios con orden único del 1 al 6', () => {
-    expect(fallbackServices).toHaveLength(6);
-    const orders = fallbackServices.map((s) => s.order).sort();
-    expect(orders).toEqual([1, 2, 3, 4, 5, 6]);
+  it('tiene los 13 servicios con las anclas del cliente, en orden del 1 al 13', () => {
+    expect(fallbackServices).toHaveLength(13);
+    expect(sortServices(fallbackServices).map((s) => s.slug.current)).toEqual(EXPECTED_SLUGS);
+    expect(fallbackServices.map((s) => s.order)).toEqual(
+      Array.from({ length: 13 }, (_, i) => i + 1),
+    );
   });
 
-  it('tiene exactamente 2 destacados (la cuadrícula cierra sin huecos)', () => {
-    expect(fallbackServices.filter((s) => s.featured)).toHaveLength(2);
+  it('reparte los servicios en los tres pilares: 4 + 6 + 3', () => {
+    const count = (pillar: string) => fallbackServices.filter((s) => s.pillar === pillar).length;
+    expect([count('construimos'), count('aplicamos-ia'), count('operamos')]).toEqual([4, 6, 3]);
   });
 
   it('usa solo íconos del set de marca', () => {
     const allowed = ['code', 'deploy', 'tasks', 'chart', 'shield-check', 'wrench', 'refresh'];
-    for (const s of fallbackServices) expect(allowed).toContain(s.icon);
+    for (const s of fallbackServices) expect(allowed, s.slug.current).toContain(s.icon);
   });
-});
 
-describe('scripts/seed/services.json (archivo de carga a Sanity)', () => {
-  it('coincide con el respaldo: mismo contenido, orden y destacados', async () => {
-    const { readFileSync } = await import('node:fs');
-    const seed = JSON.parse(readFileSync('scripts/seed/services.json', 'utf8'));
-    expect(seed).toHaveLength(fallbackServices.length);
-    for (const fb of fallbackServices) {
-      const doc = seed.find(
-        (d: { slug: { current: string } }) => d.slug.current === fb.slug.current,
-      );
-      expect(doc, fb.slug.current).toBeTruthy();
-      expect(doc._type).toBe('service');
-      expect(doc._id).toBe(`service-${fb.slug.current}`);
-      expect(doc._id).not.toContain('.');
-      expect({
-        title: doc.title,
-        icon: doc.icon,
-        order: doc.order,
-        featured: doc.featured,
-        summary: doc.summary,
-        description: doc.description,
-      }).toEqual({
-        title: fb.title,
-        icon: fb.icon,
-        order: fb.order,
-        featured: fb.featured,
-        summary: fb.summary,
-        description: fb.description,
-      });
+  it('cada servicio trae las secciones del modelo (cuándo, qué hacemos, qué recibes)', () => {
+    for (const s of fallbackServices) {
+      expect(s.whenNeeded, s.slug.current).toBeTruthy();
+      expect(s.whatWeDo, s.slug.current).toBeTruthy();
+      expect(s.deliverables.length, s.slug.current).toBeGreaterThan(0);
+      expect(s.summary.length, s.slug.current).toBeLessThanOrEqual(200);
+      expect(s.summary).toBe(s.summary.trim());
+      expect(stripInlineLinks(s.whatWeDo).startsWith(s.summary.slice(0, 30))).toBe(true);
     }
+  });
+
+  it('solo Bizagi lleva bloques de IA, experiencia y casos típicos', () => {
+    const bizagi = fallbackServices.find((s) => s.slug.current === 'bizagi');
+    expect(bizagi?.aiCapabilities).toHaveLength(4);
+    expect(bizagi?.aiNote).toBeTruthy();
+    expect(bizagi?.experience).toContain('/proyectos?servicio=bizagi');
+    expect(bizagi?.typicalCases).toBeTruthy();
   });
 });

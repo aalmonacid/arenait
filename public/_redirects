@@ -2,5 +2,7 @@
 /nosotros.html /nosotros 301
 /servicios.html /servicios 301
 /contacto.html /contacto 301
-/experiencia.html /casos-de-estudio 301
+/experiencia.html /proyectos 301
+/casos-de-estudio /proyectos 301
+/casos-de-estudio/* /proyectos 301
 /alianzas.html /nosotros 301

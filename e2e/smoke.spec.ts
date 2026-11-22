@@ -1,92 +1,138 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 
 test.describe('Home page', () => {
-  test('renders hero and the real services list', async ({ page }) => {
+  test('renders hero, the three pillars and the 6-phase process', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page).toHaveTitle(/ArenaIT/);
+    await expect(page).toHaveTitle(/Arena IT/);
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Software a la medida para operaciones reales',
+      'Software e IA para operaciones reales',
     );
 
     await expect(page.locator('#servicios')).toBeVisible();
-    // Count-based, not content-based: today the 6 services come from
-    // index.astro's hardcoded fallback (Sanity has no real content yet, see
-    // CONTEXT.md §4). If real content lands in Sanity, update alongside it.
-    await expect(page.locator('#servicios article')).toHaveCount(6);
+    await expect(page.locator('#servicios article')).toHaveCount(3);
+    await expect(page.locator('#servicios')).toContainText('Construimos');
+    await expect(page.locator('#servicios')).toContainText('Aplicamos IA');
+    await expect(page.locator('#servicios')).toContainText('Operamos');
+    await expect(page.locator('#como-trabajamos ol > li')).toHaveCount(6);
   });
 
-  test('has the "Cómo trabajamos" process section targeted by the hero CTA', async ({ page }) => {
+  test('shows the 3 featured projects in the client order and links sectors to the filter', async ({
+    page,
+  }) => {
     await page.goto('/');
-    await expect(page.getByRole('link', { name: 'Ver cómo trabajamos' })).toHaveAttribute(
-      'href',
-      '#como-trabajamos',
-    );
-    await expect(page.locator('#como-trabajamos ol > li')).toHaveCount(5);
-    await expect(page.locator('#como-trabajamos')).toContainText('Mantenimiento');
+    const titles = page.locator('#proyectos article h3');
+    await expect(titles).toHaveCount(3);
+    await expect(titles.nth(0)).toContainText('Migración a la nube');
+    await expect(titles.nth(1)).toContainText('entidades públicas');
+    await expect(titles.nth(2)).toContainText('aplicación móvil');
+    await expect(page.locator('#sectores a[href="/proyectos?sector=seguros"]')).toBeVisible();
   });
 
-  test('nav links resolve to real pages', async ({ page }) => {
+  test('does not publish certifications or SLA figures', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByText('ISO 27001')).toHaveCount(0);
+    await expect(page.getByText('99.9')).toHaveCount(0);
+  });
+});
+
+test.describe('Navigation and structured data', () => {
+  test('header links point to the real pages', async ({ page }) => {
     await page.goto('/');
     const nav = page.locator('header nav');
-
     await expect(nav.getByRole('link', { name: 'Servicios' })).toHaveAttribute(
       'href',
       '/servicios',
     );
-    await expect(nav.getByRole('link', { name: 'Casos de Estudio' })).toHaveAttribute(
+    await expect(nav.getByRole('link', { name: 'Proyectos' })).toHaveAttribute(
       'href',
-      '/casos-de-estudio',
+      '/proyectos',
     );
     await expect(nav.getByRole('link', { name: 'Nosotros' })).toHaveAttribute('href', '/nosotros');
-    await expect(nav.getByRole('link', { name: 'Contacto' })).toHaveAttribute('href', '/contacto');
+    await expect(nav.getByRole('link', { name: 'Cuéntanos tu reto' })).toHaveAttribute(
+      'href',
+      '/contacto',
+    );
   });
 
-  test('embeds Organization JSON-LD structured data', async ({ page }) => {
+  test('embeds Organization JSON-LD with the brand "Arena IT"', async ({ page }) => {
     await page.goto('/');
     // textContent, not innerText: <script> isn't part of the rendered layout
     // tree, so innerText (which is layout-aware) reads back empty for it.
     const ldJson = await page.locator('script[type="application/ld+json"]').first().textContent();
     const parsed = JSON.parse(ldJson ?? '');
     expect(parsed['@type']).toBe('Organization');
-    expect(parsed.name).toBe('ArenaIT');
+    expect(parsed.name).toBe('Arena IT');
+  });
+
+  test('legacy case-study routes are redirected (301) to /proyectos', () => {
+    // `astro dev` no aplica public/_redirects: se verifica el archivo que usa Cloudflare.
+    const rules = readFileSync('public/_redirects', 'utf8');
+    for (const from of ['/casos-de-estudio', '/casos-de-estudio/*', '/experiencia.html']) {
+      expect(rules).toContain(`${from} /proyectos 301`);
+    }
   });
 });
 
 test.describe('Servicios page', () => {
-  test('renders all 6 real services, no fake metrics', async ({ page }) => {
+  test('renders the 13 services in 3 pillars with their anchors and contact links', async ({
+    page,
+  }) => {
     await page.goto('/servicios');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Servicios');
-    await expect(page.getByText('Desarrollo de software a la medida')).toBeVisible();
-    await expect(page.getByText('Mantenimiento y migración de software')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Software e IA');
+    await expect(page.locator('li[id] > article')).toHaveCount(13);
+    await expect(page.locator('#bizagi')).toBeVisible();
+    await expect(page.locator('#outsourcing-talento-ti')).toBeVisible();
+    await expect(page.locator('#bizagi a[href="/contacto?servicio=bizagi"]')).toBeVisible();
+    await expect(page.locator('#como-trabajamos tbody tr')).toHaveCount(6);
+    await expect(page.locator('#preguntas-frecuentes details')).toHaveCount(6);
     await expect(page.getByText('ISO 27001')).toHaveCount(0);
-    await expect(page.getByText('SLA')).toHaveCount(0);
+  });
+
+  test('embeds ItemList and FAQPage JSON-LD', async ({ page }) => {
+    await page.goto('/servicios');
+    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const types = blocks.map((b) => JSON.parse(b)['@type']);
+    expect(types).toContain('ItemList');
+    expect(types).toContain('FAQPage');
+  });
+});
+
+test.describe('Proyectos page', () => {
+  test('shows the 9 publishable projects', async ({ page }) => {
+    await page.goto('/proyectos');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'Proyectos que hemos entregado',
+    );
+    await expect(page.locator('[data-project]')).toHaveCount(9);
+  });
+
+  test('filters combine and are shareable by query params', async ({ page }) => {
+    await page.goto('/proyectos?servicio=bizagi&sector=financiero');
+    await expect(page.locator('[data-project]:not([hidden])')).toHaveCount(2);
+    await expect(
+      page.locator('button[data-filter="servicio"][data-value="bizagi"]'),
+    ).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('an empty combination shows the notice with a link to see all', async ({ page }) => {
+    await page.goto('/proyectos?servicio=bizagi&sector=farmaceutico');
+    await expect(page.locator('[data-project]:not([hidden])')).toHaveCount(0);
+    await expect(page.getByText('No hay proyectos con estos filtros.')).toBeVisible();
   });
 });
 
 test.describe('Nosotros page', () => {
-  test('renders verified copy and marks pending content, not raw brackets', async ({ page }) => {
+  test('renders the new copy, principles and manager contact', async ({ page }) => {
     await page.goto('/nosotros');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Quiénes somos');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'Tecnología que funciona en la operación diaria',
+    );
     await expect(page.getByText('Andrés Arenas')).toBeVisible();
+    await expect(page.getByText('Especialización en Bizagi')).toBeVisible();
     await expect(page.getByText('pendiente de confirmar con el cliente')).toHaveCount(0);
     await expect(page.getByText('[PENDIENTE', { exact: false })).toHaveCount(0);
-  });
-});
-
-test.describe('Case studies page', () => {
-  test('shows the real Sadep case study', async ({ page }) => {
-    await page.goto('/casos-de-estudio');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Casos de Estudio');
-    await expect(page.getByText('SADEP LTDA')).toBeVisible();
-  });
-
-  test('renders the Sadep case study detail page', async ({ page }) => {
-    await page.goto('/casos-de-estudio/sadep');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Gestión remota de fincas ganaderas',
-    );
-    await expect(page.getByText('Tauruswebs')).toBeVisible();
   });
 });
 
@@ -99,9 +145,23 @@ test.describe('404 page', () => {
 });
 
 test.describe('Contacto page', () => {
-  test('preselects the service passed via query param', async ({ page }) => {
-    await page.goto('/contacto?servicio=Business%20Intelligence');
-    await expect(page.locator('#serviceOfInterest')).toHaveValue('Business Intelligence');
+  test('preselects the service passed via query param (slug)', async ({ page }) => {
+    await page.goto('/contacto?servicio=bizagi');
+    await expect(page.locator('#serviceOfInterest')).toHaveValue('bizagi');
+  });
+
+  test('an unknown service in the query param falls back to "Otro"', async ({ page }) => {
+    await page.goto('/contacto?servicio=xyz');
+    await expect(page.locator('#serviceOfInterest')).toHaveValue('otro');
+  });
+
+  test('lists the services grouped by pillar (13 + Diagnóstico + Otro) and the interest model', async ({
+    page,
+  }) => {
+    await page.goto('/contacto');
+    await expect(page.locator('#serviceOfInterest optgroup')).toHaveCount(4);
+    await expect(page.locator('#serviceOfInterest option')).toHaveCount(16); // 15 + placeholder
+    await expect(page.locator('#interestModel option')).toHaveCount(7); // 6 + placeholder
   });
 
   test('submits valid data to /api/leads and shows the success message', async ({ page }) => {
@@ -120,6 +180,8 @@ test.describe('Contacto page', () => {
     await page.locator('#company').fill('Empresa de Prueba');
     await page.locator('#corporateEmail').fill('test@gmail.com');
     await page.locator('#message').fill('Test message');
+    await page.locator('#serviceOfInterest').selectOption('bizagi');
+    await page.locator('#interestModel').selectOption('bolsa-de-horas');
     await page.locator('#policyAccepted').check();
     await page.locator('#sendCopy').check();
     await page.locator('#leadCaptureForm button[type="submit"]').click();
@@ -128,8 +190,15 @@ test.describe('Contacto page', () => {
     await expect(page.locator('#formSuccess')).toBeVisible();
     await expect(page.locator('#successTitle')).toContainText('Test');
     await expect(page.locator('#leadCaptureForm')).toBeHidden();
-    const sent = requestBody as unknown as { corporateEmail?: string; sendCopy?: boolean } | null;
+    const sent = requestBody as unknown as {
+      corporateEmail?: string;
+      sendCopy?: boolean;
+      serviceOfInterest?: string;
+      interestModel?: string;
+    } | null;
     expect(sent?.corporateEmail).toBe('test@gmail.com');
+    expect(sent?.serviceOfInterest).toBe('bizagi');
+    expect(sent?.interestModel).toBe('bolsa-de-horas');
     expect(sent?.sendCopy).toBe(true);
   });
 

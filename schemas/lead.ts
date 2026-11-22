@@ -42,6 +42,13 @@ export const leadSchema = {
       readOnly: true,
     },
     {
+      name: 'interestModel',
+      title: 'Modelo de interés',
+      type: 'string',
+      fieldset: 'request',
+      readOnly: true,
+    },
+    {
       name: 'message',
       title: 'Mensaje',
       type: 'text',

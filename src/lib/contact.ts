@@ -11,4 +11,12 @@
 const PHONE_INTERNATIONAL = '573002156898';
 const PREFILLED_MESSAGE = 'Hola, quiero saber más sobre los servicios de Arena IT.';
 
-export const WHATSAPP_URL = `https://wa.me/${PHONE_INTERNATIONAL}?text=${encodeURIComponent(PREFILLED_MESSAGE)}`;
+/** Enlace de WhatsApp con mensaje prellenado (los datos pueden venir de los ajustes del sitio en Sanity). */
+export function buildWhatsappUrl(
+  phoneInternational: string = PHONE_INTERNATIONAL,
+  message: string = PREFILLED_MESSAGE,
+): string {
+  return `https://wa.me/${phoneInternational.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+}
+
+export const WHATSAPP_URL = buildWhatsappUrl();

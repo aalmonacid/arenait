@@ -1,0 +1,104 @@
+---
+/**
+ * Tarjeta de un proyecto en /proyectos. Estructura del cliente: Cliente ·
+ * Sector · Servicio (+ Tecnologías cuando agregan información), Reto, Qué
+ * hicimos y Resultado. Los `data-*` los usa /scripts/project-filters.js; sin
+ * JavaScript todas las tarjetas se ven.
+ */
+import type { ProjectSchema } from '../types/sanity';
+
+interface Props {
+  project: ProjectSchema;
+  sectorLabel: string;
+}
+
+const { project, sectorLabel }: Props = Astro.props;
+
+const labelClass = 'text-xs font-bold uppercase tracking-label text-secondary mb-2';
+const linkClass =
+  'font-bold text-secondary underline decoration-interactive decoration-2 underline-offset-4';
+---
+
+<article
+  data-project
+  data-servicio={project.category}
+  data-sector={project.sector}
+  class="border border-neutral-200 border-t-4 border-t-secondary bg-white p-6 md:p-8"
+  aria-labelledby={`proyecto-${project.slug.current}`}
+>
+  <h3
+    id={`proyecto-${project.slug.current}`}
+    class="font-heading text-xl md:text-2xl font-extrabold tracking-tight leading-tight text-secondary text-balance"
+  >
+    {project.title}
+  </h3>
+
+  <dl
+    class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 my-6 py-5 border-y border-neutral-200 text-sm"
+  >
+    <div>
+      <dt class={labelClass}>Cliente</dt>
+      <dd class="text-neutral-900">{project.client}</dd>
+    </div>
+    {
+      project.intermediary && (
+        <div>
+          <dt class={labelClass}>A través de</dt>
+          <dd class="text-neutral-900">{project.intermediary}</dd>
+        </div>
+      )
+    }
+    <div>
+      <dt class={labelClass}>Sector</dt>
+      <dd class="text-neutral-900">{sectorLabel}</dd>
+    </div>
+    <div>
+      <dt class={labelClass}>Servicio</dt>
+      <dd class="text-neutral-900">
+        <a href={`/servicios#${project.serviceAnchor}`} class={linkClass}>{project.serviceLabel}</a>
+        {
+          project.secondaryServiceLabel && project.secondaryServiceAnchor && (
+            <>
+              {', '}
+              <a href={`/servicios#${project.secondaryServiceAnchor}`} class={linkClass}>
+                {project.secondaryServiceLabel}
+              </a>
+            </>
+          )
+        }
+      </dd>
+    </div>
+    {
+      project.technologies && (
+        <div class="sm:col-span-2">
+          <dt class={labelClass}>Tecnologías</dt>
+          <dd class="text-neutral-900">{project.technologies}</dd>
+        </div>
+      )
+    }
+  </dl>
+
+  <div class="flex flex-col gap-5">
+    <div>
+      <h4 class={labelClass}>Reto</h4>
+      <p class="leading-relaxed text-neutral-900">{project.challenge}</p>
+    </div>
+    <div>
+      <h4 class={labelClass}>Qué hicimos</h4>
+      <ul class="list-none p-0 m-0 flex flex-col gap-2">
+        {
+          project.whatWeDid.map((item) => (
+            <li class="relative pl-6 leading-relaxed text-neutral-900 before:absolute before:left-0 before:top-2.5 before:h-2 before:w-2 before:bg-primary">
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="border-l-8 border-l-accent bg-neutral-50 p-5">
+      <h4 class={labelClass}>Resultado</h4>
+      <p class="leading-relaxed text-neutral-900">{project.result}</p>
+    </div>
+    {project.note && <p class="text-sm text-neutral-900">{project.note}</p>}
+  </div>
+</article>

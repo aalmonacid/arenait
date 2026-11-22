@@ -4,6 +4,7 @@ import Logo from '../components/Logo.astro';
 import Button from '../components/Button.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import CookieConsentBanner from '../components/CookieConsentBanner.astro';
+import { getSiteSettings } from '../lib/content';
 
 interface Props {
   title: string;
@@ -15,9 +16,13 @@ interface Props {
   ogType?: 'website' | 'article';
 }
 
+// Ajustes del sitio (marca, lema del pie, descripción por defecto): Sanity con respaldo.
+const settings = await getSiteSettings();
+const siteName = settings.siteName;
+
 const {
   title,
-  description = 'Desarrollo de software a la medida para operaciones reales.',
+  description = settings.defaultDescription,
   ogImage = '/og-default.png',
   noindex = false,
   ogType = 'website',
@@ -40,9 +45,9 @@ const structuredData: Record<string, unknown>[] = Astro.props.structuredData ?? 
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'ArenaIT',
+  name: siteName,
   url: siteOrigin,
-  description: 'Desarrollo de software a la medida para operaciones reales.',
+  description: settings.defaultDescription,
 };
 
 // JSON-LD sin «<»: un valor con «</script>» (por ejemplo, desde Sanity) no
@@ -51,7 +56,7 @@ const jsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c');
 
 const NAV_ITEMS = [
   { href: '/servicios', label: 'Servicios' },
-  { href: '/casos-de-estudio', label: 'Casos de estudio' },
+  { href: '/proyectos', label: 'Proyectos' },
   { href: '/blog', label: 'Blog' },
   { href: '/nosotros', label: 'Nosotros' },
 ];
@@ -65,7 +70,7 @@ const isActive = (href: string) => canonicalPath === href || canonicalPath.start
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title} | ArenaIT</title>
+    <title>{title} | {siteName}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
 
@@ -78,11 +83,11 @@ const isActive = (href: string) => canonicalPath === href || canonicalPath.start
     {!allowIndexing && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- OpenGraph. Las imágenes OG son archivos estáticos 1200x630 en /public. -->
-    <meta property="og:title" content={`${title} | ArenaIT`} />
+    <meta property="og:title" content={`${title} | ${siteName}`} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:site_name" content="ArenaIT" />
+    <meta property="og:site_name" content={siteName} />
     <meta property="og:locale" content="es_CO" />
     <meta property="og:image" content={absoluteOgImage} />
     <meta property="og:image:width" content="1200" />
@@ -105,7 +110,7 @@ const isActive = (href: string) => canonicalPath === href || canonicalPath.start
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={`${title} | ArenaIT`} />
+    <meta name="twitter:title" content={`${title} | ${siteName}`} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={absoluteOgImage} />
 
@@ -241,7 +246,7 @@ const isActive = (href: string) => canonicalPath === href || canonicalPath.start
       <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <Logo variant="dark" size="footer" link={false} class="mb-4" />
-          <p class="text-neutral-200 max-w-md">Arena IT — Desarrollo de software a la medida.</p>
+          <p class="text-neutral-200 max-w-md">{settings.tagline}</p>
         </div>
         <nav
           class="grid grid-cols-2 gap-x-6 gap-y-1 text-left md:justify-self-end"
@@ -271,7 +276,7 @@ const isActive = (href: string) => canonicalPath === href || canonicalPath.start
       <div
         class="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/40 text-sm text-neutral-200 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
       >
-        <p>&copy; {new Date().getFullYear()} Arena IT. Todos los derechos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} {siteName}. Todos los derechos reservados.</p>
         <a
           href="/politica-de-tratamiento-de-datos"
           class="inline-flex min-h-11 items-center hover:text-white transition-colors focus-visible:outline-white"

@@ -12,7 +12,7 @@
 4. (Opcional, para trabajar en local) agrega `http://localhost:4321` con credenciales.
 5. Al lanzar, repite con el dominio definitivo (`https://arenait.co` o `https://www.arenait.co`).
 
-**Prueba:** abre `https://dev.arenait.co/admin`, inicia sesión y confirma que ves el listado de tipos (Servicio, Caso de estudio, Testimonio, Lead, etc.). Si queda en blanco, revisa la consola del navegador: un error de CORS indica que falta este paso.
+**Prueba:** abre `https://dev.arenait.co/admin`, inicia sesión y confirma que ves el listado de tipos (Ajustes del sitio, Inicio, Servicios, Proyectos, Nosotros, Servicio, Proyecto, Testimonio, Contacto recibido, etc.). Si queda en blanco, revisa la consola del navegador: un error de CORS indica que falta este paso.
 
 ## 2. Sanity — crear el token de escritura
 
@@ -58,25 +58,25 @@ Cambiar una variable de **compilación** exige un build nuevo (**Retry build**);
 2. En Sanity: **API → Webhooks → Create webhook.**
    - Nombre: `Republicar sitio` · URL: la del enlace de implementación · Dataset: `production`
    - Eventos: **Create, Update, Delete**
-   - **Filtro:** `_type in ["service", "caseStudy", "testimonial"]` — así los contactos (`lead`) no disparan un despliegue.
+   - **Filtro:** `_type in ["service", "project", "siteSettings", "homePage", "servicesPage", "aboutPage", "projectsPage", "testimonial"]` — así los contactos (`lead`) no disparan un despliegue.
    - Método: POST · habilitado.
 3. Prueba: edita un servicio, pulsa **Publish** y confirma que arranca una compilación sobre `main` (1–2 minutos).
 
-## 5. Cargar los 6 servicios en el panel
+## 5. Cargar el contenido del sitio en el panel
 
-Requiere haber desplegado el código con los campos nuevos (orden, destacado e ícono desplegable) y tener a mano el token del paso 2.
+Requiere haber desplegado el código con el modelo de contenido nuevo y tener a mano el token del paso 2. Node 22.18 o superior (el script lee el respaldo `src/lib/content/` directamente).
 
 ```powershell
 cd C:\DATOS\ArenaIT
 $env:SANITY_API_WRITE_TOKEN = "<pega aquí el token>"
-node scripts/seed-services.mjs --dry-run     # revisa qué cargaría, sin escribir
-node scripts/seed-services.mjs               # carga los 6 servicios
+npm run seed:content -- --dry-run            # revisa qué cargaría, sin escribir
+npm run seed:content                         # carga ajustes, páginas, 13 servicios y proyectos
 Remove-Item Env:SANITY_API_WRITE_TOKEN       # limpia el token de la sesión
 ```
 
-- Si el panel ya tiene servicios, el script **se detiene** para no pisar lo editado; con `--force` reemplaza solo los de igual ID.
-- Alternativa manual: crear los 6 en el panel con los textos de `scripts/seed/services.json`.
-- **Importante:** el sitio usa el respaldo del código solo mientras el panel tiene **cero** servicios. En cuanto hay uno, usa únicamente los del panel. Por eso se cargan los 6 juntos; y si el cliente borra todos, el sitio vuelve a mostrar los 6 del respaldo.
+- Si algún documento destino ya existe, el script **se detiene** para no pisar lo editado; con `--force` reemplaza solo los de igual ID. Con `--delete-legacy` borra además los 6 servicios del modelo anterior.
+- Los casos pendientes de autorización **no están en el repositorio**: se cargan como borradores desde un archivo local ignorado (`scripts/seed/private/pending-projects.json`, que entrega Antonio). Para autorizar uno, abre el borrador en el Studio y pulsa **Publish**.
+- **Importante:** el sitio usa el respaldo del código solo mientras el panel no tiene servicios (o proyectos) completos. En cuanto hay uno, usa únicamente los del panel; por eso se cargan todos juntos. Los servicios del modelo anterior se ignoran.
 
 Pide a Andrés Arenas que se una al proyecto como **Editor** (Sanity → Members → Invite) para que administre su contenido.
 
@@ -110,7 +110,7 @@ Sin estas variables no se envía ningún correo; el formulario sigue guardando l
 3. **API Keys → Create** con permiso solo de envío. Cópiala una vez.
 4. Cloudflare → secretos del Worker (paso 3):
    - `RESEND_API_KEY` = la clave
-   - `MAIL_FROM` = `ArenaIT <contacto@arenait.co>` (el dominio debe ser el verificado)
+   - `MAIL_FROM` = `Arena IT <contacto@arenait.co>` (el dominio debe ser el verificado)
    - `MAIL_TO_OWNER` = el correo de Andrés Arenas, que recibe cada contacto nuevo (puedes poner el tuyo para las pruebas)
 5. **Redeploy** y prueba enviando el formulario marcando la copia.
 

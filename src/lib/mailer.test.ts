@@ -7,7 +7,8 @@ const lead: Lead = {
   company: 'Empresa SAS',
   corporateEmail: 'ana@empresa.com',
   phone: '3001234567',
-  serviceOfInterest: 'Business Intelligence',
+  serviceOfInterest: 'business-intelligence-analitica',
+  interestModel: 'celula-dedicada',
   message: 'Necesitamos un tablero.\nGracias',
   source: 'lead-capture-form',
   policyAccepted: true,
@@ -33,7 +34,8 @@ describe('buildOwnerEmail', () => {
       'Ana Pérez',
       'ana@empresa.com',
       '3001234567',
-      'Business Intelligence',
+      'Business Intelligence y analítica',
+      'Célula dedicada',
       'Necesitamos un tablero.',
     ]) {
       expect(m.text).toContain(piece);
@@ -73,7 +75,7 @@ describe('buildCopyEmail', () => {
 });
 
 describe('sendEmail', () => {
-  const cfg = { apiKey: 'k', from: 'ArenaIT <contacto@arenait.co>' };
+  const cfg = { apiKey: 'k', from: 'Arena IT <contacto@arenait.co>' };
 
   it('no envía nada sin configuración', async () => {
     const f = vi.fn();

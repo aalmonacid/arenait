@@ -37,3 +37,12 @@ Tablero de Marca ArenaIT.pdf
 # Cloudflare / Wrangler
 .wrangler/
 .dev.vars
+
+# Material enviado por el cliente (SiteBenchmark: copia local del sitio con sus
+# cambios y referencias de clientes sin autorización). No versionar.
+/SiteBenchmark.zip
+/SiteBenchmark/
+
+# Casos de proyectos pendientes de autorización del cliente (se cargan a Sanity
+# como borradores con scripts/seed-content.mjs). Repo público: nunca versionar.
+/scripts/seed/private/

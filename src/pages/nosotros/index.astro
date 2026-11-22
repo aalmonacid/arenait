@@ -5,7 +5,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import SectionHead from '../../components/SectionHead.astro';
 import SectorGrid from '../../components/SectorGrid.astro';
-import Button from '../../components/Button.astro';
+import ClosingCta from '../../components/ClosingCta.astro';
+import { getAboutPage, getSiteSettings } from '../../lib/content';
+
+const [page, settings] = await Promise.all([getAboutPage(), getSiteSettings()]);
 
 // Imágenes derivadas con `node scripts/make-images.mjs` a partir de la misma
 // foto real (scripts/img-src/nosotros-facade.jpg). El adaptador de Cloudflare
@@ -16,21 +19,26 @@ const ogImage = '/og-nosotros.jpg';
 ---
 
 <BaseLayout
-  title="Quiénes somos"
-  description="Arena IT es una empresa colombiana de desarrollo de software, dedicada a diseñar, construir e integrar soluciones tecnológicas a la medida de las necesidades reales de cada negocio."
+  title={page.seoTitle}
+  description={page.seoDescription}
   ogImage={ogImage}
 >
-  <PageHero kicker="Nosotros" title="Quiénes somos" />
+  <PageHero kicker={page.heroEyebrow} title={page.heroTitle} lead={page.heroIntro} />
 
-  <section class="py-16 md:py-28 px-4 md:px-8 bg-white">
+  <section class="py-16 md:py-28 px-4 md:px-8 bg-white" aria-labelledby="quienes-title">
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-x-6 gap-y-12 items-start">
-      <p
-        class="lg:col-span-7 font-heading text-2xl md:text-3xl font-extrabold tracking-tight leading-snug text-secondary"
-      >
-        Arena IT es una empresa colombiana de desarrollo de software, dedicada a diseñar, construir
-        e integrar soluciones tecnológicas a la medida de las necesidades reales de cada negocio.
-      </p>
-      <div class="lg:col-span-5 lg:row-span-2">
+      <div class="lg:col-span-7">
+        <h2
+          id="quienes-title"
+          class="font-heading text-2xl md:text-3xl font-extrabold tracking-tight leading-snug text-secondary text-balance"
+        >
+          {page.whoTitle}
+        </h2>
+        <div class="mt-8 flex flex-col gap-5 text-lg text-neutral-900 leading-relaxed">
+          {page.whoParagraphs.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+      </div>
+      <div class="lg:col-span-5">
         <img
           src="/images/nosotros-800.webp"
           srcset="/images/nosotros-480.webp 480w, /images/nosotros-800.webp 800w, /images/nosotros-1200.webp 1200w"
@@ -43,58 +51,56 @@ const ogImage = '/og-nosotros.jpg';
           class="w-full aspect-square object-cover border border-neutral-200"
         />
       </div>
-      <p class="lg:col-span-7 text-lg text-neutral-900 leading-relaxed">
-        Acompañamos a nuestros clientes desde el diseño de la solución hasta su mantenimiento en
-        producción, con un enfoque en que el software funcione para la operación diaria — no solo en
-        la demo.
-      </p>
     </div>
   </section>
 
   <section class="py-16 md:py-28 px-4 md:px-8 bg-neutral-50" aria-labelledby="mision-title">
     <div class="max-w-7xl mx-auto">
-      <SectionHead id="mision-title" label="Misión y visión" title="Hacia dónde trabajamos." />
+      <SectionHead id="mision-title" label="Misión y visión" title={page.missionVisionTitle} />
       <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-neutral-200 border border-neutral-200">
         <div class="bg-white p-8 md:p-12">
-          <p class="text-xs font-bold uppercase tracking-label text-secondary mb-4">Misión</p>
-          <p class="text-lg text-neutral-900 leading-relaxed">
-            Brindar productos y servicios con alto grado de calidad en el campo de las tecnologías
-            de información.
-          </p>
+          <h3 class="text-xs font-bold uppercase tracking-label text-secondary mb-4">Misión</h3>
+          <p class="text-lg text-neutral-900 leading-relaxed">{page.mission}</p>
         </div>
         <div class="bg-white p-8 md:p-12">
-          <p class="text-xs font-bold uppercase tracking-label text-secondary mb-4">Visión</p>
-          <p class="text-lg text-neutral-900 leading-relaxed">
-            Posicionarnos en el mercado como empresa líder en la provisión de servicios de
-            tecnologías de información, consultorías y en el desarrollo de aplicaciones.
-          </p>
+          <h3 class="text-xs font-bold uppercase tracking-label text-secondary mb-4">Visión</h3>
+          <p class="text-lg text-neutral-900 leading-relaxed">{page.vision}</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="py-16 md:py-28 px-4 md:px-8 bg-white" aria-labelledby="sectores-title">
+  <section class="py-16 md:py-28 px-4 md:px-8 bg-white" aria-labelledby="principios-title">
     <div class="max-w-7xl mx-auto">
-      <SectionHead
-        id="sectores-title"
-        label="Experiencia"
-        title="Sectores con experiencia comprobada."
-      />
-      <SectorGrid />
+      <SectionHead id="principios-title" label="Lo que nos guía" title={page.principlesTitle} />
+      <ul
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 list-none p-0 m-0"
+        aria-label="Principios"
+      >
+        {
+          page.principles.map((principle) => (
+            <li class="border-2 border-neutral-200 border-t-4 border-t-accent bg-white p-6">
+              <h3 class="font-heading text-xl font-extrabold text-secondary mb-3">
+                {principle.title}
+              </h3>
+              <p class="leading-relaxed text-neutral-900">{principle.text}</p>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </section>
 
-  <section class="py-16 md:py-24 px-4 md:px-8 bg-neutral-50 border-t border-neutral-200">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-6 items-center">
-      <div class="md:col-span-8">
-        <p class="text-xs font-bold uppercase tracking-label text-secondary mb-3">Contacto</p>
-        <p class="font-heading text-2xl md:text-3xl font-extrabold tracking-tight text-secondary">
-          Andrés Arenas — Gerente
-        </p>
-      </div>
-      <div class="md:col-span-4 md:text-right">
-        <Button href="/contacto">Cuéntanos tu reto</Button>
-      </div>
+  <section class="py-16 md:py-28 px-4 md:px-8 bg-neutral-50" aria-labelledby="sectores-title">
+    <div class="max-w-7xl mx-auto">
+      <SectionHead id="sectores-title" label="Sectores" title={page.sectorsTitle} />
+      <SectorGrid sectors={settings.sectors} />
     </div>
   </section>
+
+  <ClosingCta
+    title={page.closingTitle}
+    byline={`${settings.managerName} · ${settings.managerRole}`}
+    links={page.closingLinks}
+  />
 </BaseLayout>

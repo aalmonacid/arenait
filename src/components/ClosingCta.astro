@@ -1,0 +1,58 @@
+---
+/**
+ * Cierre de página sobre fondo accent: titular, texto opcional y botones. El
+ * primero es el principal (oscuro); los demás, con borde. El botón de WhatsApp
+ * (enlace externo) solo se muestra si recibe `whatsappLabel`.
+ */
+import Button from './Button.astro';
+import type { LinkItem } from '../types/sanity';
+
+interface Props {
+  title: string;
+  text?: string;
+  /** Línea bajo el titular (por ejemplo, el nombre y cargo del gerente). */
+  byline?: string;
+  links: LinkItem[];
+  whatsappLabel?: string;
+  whatsappUrl?: string;
+  id?: string;
+}
+
+const {
+  title,
+  text,
+  byline,
+  links,
+  whatsappLabel,
+  whatsappUrl,
+  id = 'cierre-title',
+}: Props = Astro.props;
+---
+
+<section class="bg-accent text-neutral-900 py-20 md:py-28 px-4 md:px-8" aria-labelledby={id}>
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-8 items-end">
+    <div class="md:col-span-7">
+      <h2 id={id} class="font-heading text-headline-xl max-w-headline text-balance">{title}</h2>
+      {byline && <p class="mt-6 text-lg font-bold">{byline}</p>}
+    </div>
+    <div class="md:col-span-5 flex flex-col gap-5 items-start">
+      {text && <p class="text-lg">{text}</p>}
+      <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 w-full sm:w-auto">
+        {
+          links.map((link, index) => (
+            <Button href={link.href} variant={index === 0 ? 'dark' : 'line'}>
+              {link.label}
+            </Button>
+          ))
+        }
+        {
+          whatsappLabel && whatsappUrl && (
+            <Button href={whatsappUrl} variant="line" target="_blank" rel="noopener noreferrer">
+              {whatsappLabel}
+            </Button>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
