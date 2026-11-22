@@ -114,7 +114,8 @@ El sitio se migró de Vercel a Cloudflare Workers el 13/11/2026. Paso a paso y s
 
 | # | Acción |
 |---|---|
-| 1 | Datos de la política de datos: razón social, NIT, domicilio, canal para ejercer derechos (ARCO); revisión jurídica de la política v1.1 |
+| 1 | Revisión jurídica de la política v1.2 (ya incluye razón social y NIT del RUT, domicilio a nivel de ciudad y el canal `datos@arenait.co`; por decisión del cliente no se publica la dirección de la sede) |
+| 1b | Crear el alias de correo `datos@arenait.co` (canal para ejercer derechos): debe existir antes de publicar la política v1.2 |
 | 2 | Aprobar el diseño (botones naranja, titulares, secciones) |
 | 3 | Decidir dominio canónico: `arenait.co` o `www.arenait.co` |
 | 4 | Contenido: capturas de Tauruswebs/Oviswebs, testimonios, más casos, grafía de la marca (decidida: «Arena IT»), correo de contacto y tiempo de respuesta |
