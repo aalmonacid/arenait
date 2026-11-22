@@ -1,6 +1,6 @@
-# ArenaIT
+# Arena IT
 
-Sitio web de ArenaIT: desarrollo de software a la medida para operaciones reales, con acompañamiento desde el diseño hasta el mantenimiento en producción.
+Sitio web de Arena IT: software a la medida, procesos en Bizagi e inteligencia artificial para operaciones reales, con acompañamiento desde el diseño hasta el mantenimiento en producción.
 
 > Estado real del proyecto (qué funciona, qué falta, decisiones): [`CONTEXT.md`](./CONTEXT.md). Plan de trabajo priorizado: [`BACKLOG.md`](./BACKLOG.md). Reglas de diseño y arquitectura: [`AGENTS.md`](./AGENTS.md). Plan de mejoras de la auditoría del 14/11/2026: [`PLAN-MEJORAS.md`](./PLAN-MEJORAS.md). Puesta en producción: [`PLAN-PRODUCCION.md`](./PLAN-PRODUCCION.md) y [`GUIA-HABILITACION.md`](./GUIA-HABILITACION.md).
 
@@ -28,6 +28,7 @@ Sitio web de ArenaIT: desarrollo de software a la medida para operaciones reales
 | `npm run test:unit`                               | Pruebas unitarias (Vitest)                |
 | `npm run test:e2e`                                | Pruebas e2e (Playwright)                  |
 | `node scripts/make-images.mjs`                    | Regenera imágenes OG, de `/nosotros` y favicon |
+| `npm run seed:content -- --dry-run`               | Resumen de la carga de contenido a Sanity (sin escribir) |
 
 ## Diseño (Swiss Minimalist)
 

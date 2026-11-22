@@ -2,16 +2,27 @@
 export const prerender = true;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Icon from '../../components/Icon.astro';
 import PageHero from '../../components/PageHero.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import ServiceDetail from '../../components/ServiceDetail.astro';
+import InlineText from '../../components/InlineText.astro';
+import ClosingCta from '../../components/ClosingCta.astro';
 import Button from '../../components/Button.astro';
-import { getServices } from '../../lib/services';
+import { getServices, getServicesPage, getSiteSettings } from '../../lib/content';
+import { buildWhatsappUrl } from '../../lib/contact';
+import { stripInlineLinks } from '../../lib/inlineLinks';
 
-// Servicios: Sanity con respaldo en el código y orden por el campo `order` (src/lib/services.ts).
-const services = await getServices();
+const [services, page, settings] = await Promise.all([
+  getServices(),
+  getServicesPage(),
+  getSiteSettings(),
+]);
 
-// JSON-LD: cada servicio real como Service dentro de un ItemList — sin
-// inventar campos que no existen en el schema (nada de precio/rating/reviews).
+const siteOrigin = new URL('/', Astro.site).toString().replace(/\/$/, '');
+
+// JSON-LD: cada servicio como Service dentro de un ItemList, y las preguntas
+// frecuentes como FAQPage. Solo campos que existen en el contenido (sin precio
+// ni valoraciones inventadas).
 const structuredData = [
   {
     '@context': 'https://schema.org',
@@ -22,58 +33,263 @@ const structuredData = [
       item: {
         '@type': 'Service',
         name: service.title,
-        description: service.description,
-        url: new URL(`/servicios#${service.slug?.current ?? ''}`, Astro.site).toString(),
-        provider: {
-          '@type': 'Organization',
-          name: 'ArenaIT',
-          url: new URL('/', Astro.site).toString().replace(/\/$/, ''),
-        },
+        description: stripInlineLinks(service.whatWeDo),
+        url: new URL(`/servicios#${service.slug.current}`, Astro.site).toString(),
+        provider: { '@type': 'Organization', name: settings.siteName, url: siteOrigin },
       },
     })),
   },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: page.faq.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  },
 ];
+
+const whatsappUrl = buildWhatsappUrl(settings.whatsappNumber, settings.whatsappMessage);
+const servicesOf = (pillarKey: string) => services.filter((s) => s.pillar === pillarKey);
+
+const linkClass = 'border-b-2 border-neutral-900 hover:border-interactive';
 ---
 
-<BaseLayout
-  title="Servicios"
-  description="Trabajamos el ciclo completo de una solución de software: desde el desarrollo a la medida, hasta que quede operando y se mantenga funcionando en el tiempo."
-  structuredData={structuredData}
->
-  <PageHero
-    kicker="Servicios"
-    title="Todo el ciclo de una solución de software."
-    lead="Trabajamos el ciclo completo de una solución de software: desde el desarrollo a la medida, hasta que quede operando y se mantenga funcionando en el tiempo."
-  />
-
-  <section class="py-16 md:py-24 px-4 md:px-8 bg-neutral-50">
-    <div class="max-w-7xl mx-auto">
-      <ul class="list-none p-0 m-0 border-t-2 border-neutral-900">
+<BaseLayout title={page.seoTitle} description={page.seoDescription} structuredData={structuredData}>
+  <PageHero kicker={page.heroEyebrow} title={page.heroTitle} lead={page.heroIntro}>
+    <div class="flex flex-col sm:flex-row gap-3 pb-8">
+      <Button href={page.heroPrimaryCta.href}>{page.heroPrimaryCta.label}</Button>
+      <Button href={page.heroSecondaryCta.href} variant="line">
+        {page.heroSecondaryCta.label}
+      </Button>
+    </div>
+    <nav aria-label="Accesos rápidos" class="border-t-2 border-neutral-900 pb-4">
+      <ul
+        class="flex flex-wrap gap-x-8 gap-y-1 list-none p-0 m-0 pt-2 text-xs font-bold uppercase tracking-label text-secondary"
+      >
         {
-          services.map((service) => (
-            <li id={service.slug?.current} class="border-b border-neutral-200">
-              <article class="grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-5 py-10 md:py-12 items-start">
-                <div class="md:col-span-1 text-primary">
-                  {service.icon && <Icon name={service.icon as any} class="w-10 h-10" />}
-                </div>
-                <h2 class="md:col-span-4 font-heading text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-secondary text-balance">
-                  {service.title}
-                </h2>
-                <p class="md:col-span-5 text-neutral-900 leading-relaxed">{service.description}</p>
-                <div class="md:col-span-2 md:text-right">
-                  <Button
-                    variant="line"
-                    size="sm"
-                    href={`/contacto?servicio=${encodeURIComponent(service.title)}`}
-                  >
-                    Hablemos
-                  </Button>
-                </div>
-              </article>
+          page.quickLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class="inline-flex min-h-11 items-center border-b-2 border-transparent hover:border-interactive"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </PageHero>
+
+  {
+    page.pillars.map((pillar, pillarIndex) => (
+      <section
+        id={pillar.key}
+        class:list={[
+          'scroll-mt-6 py-16 md:py-24 px-4 md:px-8',
+          pillarIndex % 2 === 0 ? 'bg-white' : 'bg-neutral-50',
+        ]}
+        aria-labelledby={`${pillar.key}-title`}
+      >
+        <div class="max-w-7xl mx-auto">
+          <SectionHead
+            id={`${pillar.key}-title`}
+            label={`${pillar.number} · ${pillar.title}`}
+            title={pillar.heading}
+          />
+          <p class="text-lead text-neutral-900 max-w-3xl mb-10">{pillar.intro}</p>
+          <ul class="list-none p-0 m-0 border-t-2 border-neutral-900">
+            {servicesOf(pillar.key).map((service, index) => (
+              <ServiceDetail
+                service={service}
+                code={`${pillar.number}.${index + 1}`}
+                ctaLabel={page.serviceCtaLabel}
+              />
+            ))}
+          </ul>
+        </div>
+      </section>
+    ))
+  }
+
+  <section
+    id="donde-hemos-trabajado"
+    class="scroll-mt-6 py-16 md:py-24 px-4 md:px-8 bg-white"
+    aria-labelledby="sectores-title"
+  >
+    <div class="max-w-7xl mx-auto">
+      <SectionHead id="sectores-title" label="Dónde hemos trabajado" title={page.sectorsTitle} />
+      <ul class="list-none p-0 m-0 border-t-2 border-neutral-900 max-w-4xl">
+        {
+          settings.sectors.map((sector) => (
+            <li class="border-b border-neutral-200 py-5 leading-relaxed text-neutral-900">
+              <a
+                href={`/proyectos?sector=${sector.key}`}
+                class="font-bold text-secondary underline decoration-interactive decoration-2 underline-offset-4"
+              >
+                {sector.gridLabel ?? sector.label}
+              </a>{': '}{sector.description}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-8">
+        <a
+          href={page.sectorsLink.href}
+          class={`inline-flex min-h-11 items-center text-xs font-extrabold uppercase tracking-label text-neutral-900 ${linkClass}`}
+        >
+          {page.sectorsLink.label}
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section
+    id="como-trabajamos"
+    class="scroll-mt-6 py-16 md:py-24 px-4 md:px-8 bg-neutral-50"
+    aria-labelledby="proceso-title"
+  >
+    <div class="max-w-7xl mx-auto">
+      <SectionHead id="proceso-title" label="Cómo trabajamos" title={page.processTitle} />
+      <table class="w-full text-left border-t-2 border-neutral-900">
+        <caption class="sr-only">Fases del proceso de trabajo y su control de calidad</caption>
+        <thead class="sr-only md:not-sr-only">
+          <tr class="border-b border-neutral-200">
+            <th scope="col" class="py-3 pr-6 text-xs font-bold uppercase tracking-label text-secondary md:w-1/5">Fase</th>
+            <th scope="col" class="py-3 pr-6 text-xs font-bold uppercase tracking-label text-secondary md:w-2/5">Qué hacemos</th>
+            <th scope="col" class="py-3 text-xs font-bold uppercase tracking-label text-secondary md:w-2/5">Control de calidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            page.processPhases.map((phase) => (
+              <tr class="block md:table-row border-b border-neutral-200 py-5 md:py-0">
+                <th
+                  scope="row"
+                  class="block md:table-cell md:py-5 md:pr-6 md:align-top font-heading text-xl font-extrabold text-secondary"
+                >
+                  {phase.number} {phase.name}
+                </th>
+                <td class="block md:table-cell md:py-5 md:pr-6 md:align-top pt-3 md:pt-5 leading-relaxed text-neutral-900">
+                  <span class="md:hidden block text-xs font-bold uppercase tracking-label text-secondary mb-1">
+                    Qué hacemos
+                  </span>
+                  {phase.whatWeDo}
+                </td>
+                <td class="block md:table-cell md:py-5 md:align-top pt-3 md:pt-5 leading-relaxed text-neutral-900">
+                  <span class="md:hidden block text-xs font-bold uppercase tracking-label text-secondary mb-1">
+                    Control de calidad
+                  </span>
+                  {phase.quality}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+      <div class="mt-8 max-w-3xl flex flex-col gap-4 leading-relaxed text-neutral-900">
+        {page.processNotes.map((note) => <p>{note}</p>)}
+      </div>
+      <p class="mt-8">
+        <a
+          href={page.processCta.href}
+          class={`inline-flex min-h-11 items-center text-xs font-extrabold uppercase tracking-label text-neutral-900 ${linkClass}`}
+        >
+          {page.processCta.label}
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section
+    id="modelos-de-trabajo"
+    class="scroll-mt-6 py-16 md:py-24 px-4 md:px-8 bg-white"
+    aria-labelledby="modelos-title"
+  >
+    <div class="max-w-7xl mx-auto">
+      <SectionHead id="modelos-title" label="Modelos de trabajo" title={page.modelsTitle} />
+      <ul
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 list-none p-0 m-0"
+      >
+        {
+          page.models.map((model) => (
+            <li class="border-2 border-neutral-200 border-t-4 border-t-accent bg-white p-6">
+              <h3 class="font-heading text-xl font-extrabold text-secondary mb-3">{model.title}</h3>
+              <p class="leading-relaxed text-neutral-900">
+                <InlineText text={model.text} />
+              </p>
             </li>
           ))
         }
       </ul>
     </div>
   </section>
+
+  <section
+    id="seguridad"
+    class="scroll-mt-6 py-16 md:py-24 px-4 md:px-8 bg-neutral-50"
+    aria-labelledby="seguridad-title"
+  >
+    <div class="max-w-7xl mx-auto">
+      <SectionHead
+        id="seguridad-title"
+        label="Seguridad y gobierno de la IA"
+        title={page.securityTitle}
+      />
+      <ul class="list-none p-0 m-0 border-t-2 border-neutral-900 max-w-4xl">
+        {
+          page.securityItems.map((item) => (
+            <li class="border-b border-neutral-200 py-4 leading-relaxed text-neutral-900">
+              <strong class="font-extrabold text-secondary">{item.title}:</strong> {item.text}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section
+    id="preguntas-frecuentes"
+    class="scroll-mt-6 py-16 md:py-24 px-4 md:px-8 bg-white"
+    aria-labelledby="faq-title"
+  >
+    <div class="max-w-7xl mx-auto">
+      <SectionHead id="faq-title" label="Servicios" title="Preguntas frecuentes." />
+      <div class="max-w-4xl border-t-2 border-neutral-900">
+        {
+          page.faq.map((item) => (
+            <details class="group border-b border-neutral-200">
+              <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-4 font-extrabold text-neutral-900">
+                <span>{item.question}</span>
+                <span
+                  class="shrink-0 text-xl font-extrabold text-secondary group-open:hidden"
+                  aria-hidden="true"
+                >
+                  +
+                </span>
+                <span
+                  class="hidden shrink-0 text-xl font-extrabold text-secondary group-open:inline"
+                  aria-hidden="true"
+                >
+                  &minus;
+                </span>
+              </summary>
+              <p class="pb-5 leading-relaxed text-neutral-900 max-w-3xl">{item.answer}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <ClosingCta
+    title={page.closingTitle}
+    text={page.closingText}
+    links={page.closingLinks}
+    whatsappLabel={page.closingWhatsappLabel}
+    whatsappUrl={whatsappUrl}
+  />
 </BaseLayout>

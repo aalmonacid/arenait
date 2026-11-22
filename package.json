@@ -30,7 +30,8 @@
     "test:e2e": "playwright test",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "seed:content": "node scripts/seed-content.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

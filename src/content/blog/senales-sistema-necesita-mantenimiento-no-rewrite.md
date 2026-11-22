@@ -2,7 +2,7 @@
 title: "Señales de que tu sistema necesita evolución, no un rewrite completo"
 description: "Cuando un sistema empieza a doler, la reacción instintiva es reescribirlo desde cero. Casi nunca es la decisión correcta. Cómo distinguir un problema de mantenimiento de uno que sí justifica empezar de nuevo."
 publishDate: 2026-09-04
-author: "Equipo ArenaIT"
+author: "Equipo Arena IT"
 tags: ["mantenimiento", "migración de software", "sistemas legados"]
 ---
 

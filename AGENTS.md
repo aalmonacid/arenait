@@ -6,6 +6,8 @@
 >
 > **Posicionamiento (2026-08-24):** el sitio pivotó de un posicionamiento "Ingeniería de misión crítica para CTO/CIO" (con certificaciones ISO 27001/TOGAF/ISO 25010, SLA 99.999% y ahorros de TCO 35-40%) a uno real, de "punto medio", acordado con el cliente — ver `copy-arenait-textos-reales.md`. Esas certificaciones/cifras nunca fueron reales y fueron eliminadas de todo el sitio (hero, cards de servicio, footer, calculadora FinOps — esta última se eliminó por completo). No reintroducir ese lenguaje ni esas cifras salvo que el cliente las confirme como reales.
 
+> **Posicionamiento confirmado por el cliente (22/11/2026):** «Software, Bizagi e IA». El sitio presenta tres pilares (Construimos, Aplicamos IA, Operamos) con 13 servicios, una página de Proyectos con filtros y la marca escrita **«Arena IT»** (con espacio) en títulos, textos, metadatos y pie. Afirmaciones permitidas: «desde 2013», «profesionales certificados en Bizagi» (nunca «partner» ni el logo oficial de Bizagi) y SLA solo como modalidad de servicio, **sin cifras**. Siguen prohibidas las certificaciones, porcentajes de disponibilidad y ahorros no confirmados. **Casos de clientes:** solo se nombran con autorización escrita del cliente; los pendientes viven únicamente como **borradores en Sanity** (se cargan con `npm run seed:content` desde un archivo local ignorado) y nunca en el repositorio, el respaldo, las pruebas ni la documentación (el repo y el dataset son públicos).
+
 ## Restricciones y Reglas de Diseño (Swiss Minimalist)
 
 - **Prohibido**: Estéticas cyberpunk, gradientes de neón, o fondos oscuros estilo matriz.
@@ -27,5 +29,5 @@
 
 - **Stack**: Astro 7 + Sanity.io + Tailwind CSS + TypeScript.
 - **Hosting** (desde 13/11/2026): Cloudflare Workers (`@astrojs/cloudflare`, config en `wrangler.jsonc`). Cabeceras/CSP en `public/_headers` y redirecciones en `public/_redirects` — ya no existe `vercel.json`. Vercel Hobby no permite uso comercial.
-- **Sanity**: Project ID `xbayv7k2`, Dataset `production`.
+- **Sanity**: Project ID `xbayv7k2`, Dataset `production`. Todo el texto de las páginas (ajustes, inicio, servicios, proyectos, nosotros), los 13 servicios y los proyectos son contenido editable en Sanity, con el código como respaldo (`src/lib/content/`, lectura en `src/lib/content.ts`). Las opciones del formulario de contacto viven en `src/lib/leadOptions.ts` (el `value` de cada servicio es su slug).
 - **Enfoque real**: desarrollo de software a la medida, con acompañamiento desde el diseño hasta el mantenimiento en producción. Sin certificaciones (ISO 27001/TOGAF/ISO 25010), SLAs ni ahorros de TCO publicados — no existen o no están verificados. Todo dato de este tipo debe venir confirmado por el cliente antes de publicarse; mientras tanto, se marca `[PENDIENTE]` (renderizado vía el componente `PendingContentTag`, nunca como texto crudo entre corchetes).

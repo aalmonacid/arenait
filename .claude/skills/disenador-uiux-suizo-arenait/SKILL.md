@@ -55,6 +55,14 @@ Detalle y contexto en `PLAN-MEJORAS.md`. Aplican a todo componente o página nue
 - Toda `<img>` lleva `width` y `height` (evita saltos de diseño) y `loading="lazy"` salvo la imagen principal de la pantalla. Decorativas con `alt=""`.
 - Sin stock genérico (regla de `AGENTS.md`).
 
+### Contenido editable y marca (22/11/2026)
+- La marca se escribe «Arena IT» (con espacio) en todo texto visible, título y metadato.
+- El texto de las páginas, los servicios y los proyectos sale de Sanity con respaldo en `src/lib/content/` (getters en `src/lib/content.ts`). Un componente nuevo recibe los datos por props; no escribas textos fijos de contenido en la página.
+- Los enlaces dentro de un texto editable se escriben `[texto](/ruta)` y se pintan con `InlineText.astro` (solo rutas internas).
+- Los elementos que un script oculta usan el atributo `hidden` (hay una regla global que lo hace ganar sobre `display` de Tailwind). Un control que solo funciona con JavaScript (filtros) parte oculto y lo muestra el script.
+- Nunca nombres en el código, respaldo, pruebas ni docs a clientes sin autorización escrita: esos casos viven solo como borradores en Sanity.
+- Componentes `.astro`: anota las props con `const {...}: Props = Astro.props;` (si no, `astro check` las trata como `any`) y no importes `.ts` con extensión.
+
 ### Contenido pendiente
 - Nada de lenguaje interno visible al visitante («pendiente de confirmar con el cliente», «capturas pendientes»). Si falta contenido real, la sección no se renderiza.
 - Una grilla de tarjetas debe verse bien con 1 elemento (por ejemplo, un solo caso de estudio).

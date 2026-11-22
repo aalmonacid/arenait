@@ -4,13 +4,11 @@ export const prerender = true;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import LeadCaptureForm from '../../components/LeadCaptureForm.astro';
-import { getServices } from '../../lib/services';
-import { WHATSAPP_URL } from '../../lib/contact';
+import { getSiteSettings } from '../../lib/content';
+import { buildWhatsappUrl } from '../../lib/contact';
 
-// El desplegable "Servicio de interés" usa los mismos servicios del sitio (panel
-// de Sanity con respaldo en el código), para que siga al día si el cliente
-// renombra, agrega o elimina servicios.
-const services = (await getServices()).map((s) => ({ title: s.title }));
+const settings = await getSiteSettings();
+const WHATSAPP_URL = buildWhatsappUrl(settings.whatsappNumber, settings.whatsappMessage);
 ---
 
 <BaseLayout
@@ -28,7 +26,7 @@ const services = (await getServices()).map((s) => ({ title: s.title }));
       <div class="lg:col-span-4 border-t-2 border-neutral-900 pt-5">
         <h2 class="text-xs font-bold uppercase tracking-label text-secondary mb-3">Contacto</h2>
         <p class="font-heading text-2xl font-extrabold tracking-tight text-secondary">
-          Andrés Arenas — Gerente
+          {settings.managerName} · {settings.managerRole}
         </p>
         <p class="mt-4 text-neutral-900 leading-relaxed">
           ¿Prefieres escribir directo? Hazlo por{' '}
@@ -51,7 +49,7 @@ const services = (await getServices()).map((s) => ({ title: s.title }));
         </ol>
       </div>
       <div class="lg:col-span-8">
-        <LeadCaptureForm showServiceDropdown services={services} />
+        <LeadCaptureForm showServiceDropdown />
       </div>
     </div>
   </section>

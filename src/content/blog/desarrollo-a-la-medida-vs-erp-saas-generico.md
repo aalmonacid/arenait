@@ -2,7 +2,7 @@
 title: "Desarrollo a la medida vs. ERP/SaaS genérico: cómo decidir"
 description: "Un ERP o SaaS genérico no siempre es la opción rápida y barata que parece, y el desarrollo a la medida no siempre es la respuesta correcta. Una guía práctica para decidir con criterios, no con moda."
 publishDate: 2026-09-04
-author: "Equipo ArenaIT"
+author: "Equipo Arena IT"
 tags: ["desarrollo a la medida", "ERP", "decisiones de TI"]
 ---
 
@@ -37,4 +37,4 @@ Antes de comprometerte con cualquiera de los dos caminos, vale la pena responder
 
 ## La respuesta honesta no siempre es "construyamos algo nuevo"
 
-Vale la pena decirlo con claridad: no toda necesidad de tecnología se resuelve mejor con desarrollo a la medida. Parte de lo que hacemos en ArenaIT es justamente **implementación de aplicaciones** — poner en marcha bien una solución que tu empresa ya eligió o que evaluamos juntos, cuidando que la transición no interrumpa tu operación diaria. A veces la decisión correcta es un SaaS bien implementado y bien integrado; otras veces es un sistema construido desde cero para tu operación. La diferencia la marca el proceso que estás resolviendo, no la moda del momento — y esa es la conversación que vale la pena tener antes de firmar cualquier contrato.
+Vale la pena decirlo con claridad: no toda necesidad de tecnología se resuelve mejor con desarrollo a la medida. Parte de lo que hacemos en Arena IT es justamente **implementación de aplicaciones** — poner en marcha bien una solución que tu empresa ya eligió o que evaluamos juntos, cuidando que la transición no interrumpa tu operación diaria. A veces la decisión correcta es un SaaS bien implementado y bien integrado; otras veces es un sistema construido desde cero para tu operación. La diferencia la marca el proceso que estás resolviendo, no la moda del momento — y esa es la conversación que vale la pena tener antes de firmar cualquier contrato.

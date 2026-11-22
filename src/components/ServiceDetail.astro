@@ -1,0 +1,117 @@
+---
+/**
+ * Bloque de un servicio en /servicios. Estructura uniforme del cliente:
+ * Cuando lo necesitas · Qué hacemos · Qué recibes · botón. Los servicios con
+ * contenido extra (Bizagi) suman IA, experiencia y casos típicos. El `id` es el
+ * slug: es el ancla que usan los enlaces del sitio y de /proyectos.
+ */
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+import InlineText from './InlineText.astro';
+import type { ServiceSchema } from '../types/sanity';
+
+interface Props {
+  service: ServiceSchema;
+  /** Numeración del servicio dentro del pilar (por ejemplo, «01.4»). */
+  code: string;
+  ctaLabel: string;
+}
+
+const { service, code, ctaLabel }: Props = Astro.props;
+const slug = service.slug.current;
+
+const labelClass = 'text-xs font-bold uppercase tracking-label text-secondary mb-2';
+const bulletClass =
+  'relative pl-6 leading-relaxed text-neutral-900 before:absolute before:left-0 before:top-2.5 before:h-2 before:w-2 before:bg-primary';
+---
+
+<li id={slug} class="scroll-mt-6 border-b border-neutral-200 last:border-b-0">
+  <article
+    class="grid grid-cols-1 lg:grid-cols-12 gap-x-6 gap-y-6 py-10 md:py-14 items-start"
+    aria-labelledby={`${slug}-title`}
+  >
+    <header class="lg:col-span-4">
+      <p class="flex items-center gap-3 text-xs font-extrabold tracking-label text-secondary mb-4">
+        {
+          service.icon && (
+            <span class="text-primary">
+              <Icon name={service.icon as any} class="w-8 h-8" />
+            </span>
+          )
+        }
+        <span>{code}</span>
+      </p>
+      <h3
+        id={`${slug}-title`}
+        class="font-heading text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-secondary text-balance"
+      >
+        {service.title}
+      </h3>
+      {service.seoHeading && <p class="mt-3 font-bold text-neutral-900">{service.seoHeading}</p>}
+    </header>
+
+    <div class="lg:col-span-8 flex flex-col gap-7 max-w-3xl">
+      <div>
+        <h4 class={labelClass}>Cuando lo necesitas</h4>
+        <p class="leading-relaxed text-neutral-900"><InlineText text={service.whenNeeded} /></p>
+      </div>
+      <div>
+        <h4 class={labelClass}>Qué hacemos</h4>
+        <p class="leading-relaxed text-neutral-900"><InlineText text={service.whatWeDo} /></p>
+      </div>
+      <div>
+        <h4 class={labelClass}>Qué recibes</h4>
+        <ul class="list-none p-0 m-0 flex flex-col gap-2">
+          {service.deliverables.map((item) => <li class={bulletClass}>{item}</li>)}
+        </ul>
+      </div>
+      {
+        service.aiCapabilities && service.aiCapabilities.length > 0 && (
+          <div>
+            <h4 class={labelClass}>{service.aiTitle ?? 'IA en este servicio'}</h4>
+            <ul class="list-none p-0 m-0 flex flex-col gap-2">
+              {service.aiCapabilities.map((item) => (
+                <li class={bulletClass}>{item}</li>
+              ))}
+            </ul>
+            {service.aiNote && (
+              <p class="mt-4 leading-relaxed text-neutral-900">
+                <InlineText text={service.aiNote} />
+              </p>
+            )}
+          </div>
+        )
+      }
+      {
+        service.experience && (
+          <div>
+            <h4 class={labelClass}>Experiencia</h4>
+            <p class="leading-relaxed text-neutral-900">
+              <InlineText text={service.experience} />
+            </p>
+          </div>
+        )
+      }
+      {
+        service.typicalCases && (
+          <div>
+            <h4 class={labelClass}>Casos típicos</h4>
+            <p class="leading-relaxed text-neutral-900">
+              <InlineText text={service.typicalCases} />
+            </p>
+          </div>
+        )
+      }
+      <div>
+        <Button
+          variant="line"
+          size="sm"
+          href={`/contacto?servicio=${encodeURIComponent(slug)}`}
+          class="w-full sm:w-auto"
+        >
+          {ctaLabel}
+        </Button>
+      </div>
+    </div>
+  </article>
+</li>

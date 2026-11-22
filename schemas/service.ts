@@ -1,9 +1,12 @@
+import { PILLARS } from './options';
+
 /**
- * Servicio de ArenaIT. El cliente puede crear, modificar y eliminar servicios
+ * Servicio de Arena IT. El cliente puede crear, modificar y eliminar servicios
  * desde el Studio (/admin). Reglas que el sitio aplica con estos campos:
- * - `order`: posición en el inicio y en /servicios (menor número = primero).
- * - `featured`: ocupa 2 columnas en el inicio (se recomiendan 2 destacados
- *   entre 6 servicios para que la cuadrícula cierre sin huecos).
+ * - `pillar`: pilar de /servicios en el que aparece el servicio.
+ * - `order`: posición dentro de /servicios (menor número = primero).
+ * - `slug`: ancla del servicio en /servicios y valor de `/contacto?servicio=`
+ *   (debe coincidir con las opciones del formulario de contacto).
  * - `icon`: solo los íconos del set del tablero de marca (lista cerrada).
  */
 export const SERVICE_ICONS = [
@@ -54,30 +57,103 @@ export const serviceSchema = {
       name: 'order',
       title: 'Orden',
       type: 'number',
-      description: 'Posición en el sitio: 1 aparece primero, 2 segundo, y así sucesivamente.',
+      description: 'Posición en /servicios: 1 aparece primero, 2 segundo, y así sucesivamente.',
       validation: (Rule: any) => Rule.required().integer().min(1),
     },
     {
+      name: 'pillar',
+      title: 'Pilar',
+      type: 'string',
+      options: { list: PILLARS, layout: 'dropdown' },
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
       name: 'featured',
-      title: 'Destacado en el inicio',
+      title: 'Destacado',
       type: 'boolean',
-      description:
-        'Si está activo, la tarjeta ocupa el doble de ancho en el inicio. Se recomiendan 2 destacados en total.',
+      description: 'Sin efecto por ahora: el inicio muestra los tres pilares, no servicios sueltos.',
       initialValue: false,
     },
     {
       name: 'summary',
       title: 'Resumen',
       type: 'string',
-      description: 'Una línea de descripción, usada en la tarjeta del inicio.',
+      description:
+        'Una línea (primera oración de «Qué hacemos»). Se usa en los datos para buscadores.',
       validation: (Rule: any) => Rule.required().max(200),
     },
     {
-      name: 'description',
-      title: 'Descripción',
+      name: 'seoHeading',
+      title: 'Subtítulo para buscadores',
+      type: 'string',
+      description:
+        'Opcional. Título alternativo con las palabras que busca la gente (por ejemplo, «Implementación y desarrollo en Bizagi»).',
+    },
+    {
+      name: 'whenNeeded',
+      title: 'Cuando lo necesitas',
       type: 'text',
-      description: 'Descripción completa, usada en la página de Servicios.',
+      rows: 3,
       validation: (Rule: any) => Rule.required(),
+    },
+    {
+      name: 'whatWeDo',
+      title: 'Qué hacemos',
+      type: 'text',
+      rows: 4,
+      description: 'Un enlace interno se escribe [texto](#ancla) o [texto](/ruta).',
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
+      name: 'deliverables',
+      title: 'Qué recibes',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'Una frase corta por elemento, sin punto final.',
+      validation: (Rule: any) => Rule.required().min(1),
+    },
+    {
+      name: 'aiTitle',
+      title: 'IA en este servicio: encabezado',
+      type: 'string',
+      description: 'Opcional (por ejemplo, «IA en tus procesos Bizagi»).',
+    },
+    {
+      name: 'aiCapabilities',
+      title: 'IA en este servicio: capacidades',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'Opcional (se usa en Bizagi).',
+    },
+    {
+      name: 'aiNote',
+      title: 'IA en este servicio: nota',
+      type: 'text',
+      rows: 3,
+      description: 'Opcional. Se muestra bajo las capacidades de IA.',
+    },
+    {
+      name: 'experience',
+      title: 'Experiencia',
+      type: 'text',
+      rows: 3,
+      description: 'Opcional. Puede llevar un enlace interno: [Ver proyectos →](/proyectos?servicio=bizagi).',
+    },
+    {
+      name: 'typicalCases',
+      title: 'Casos típicos',
+      type: 'text',
+      rows: 3,
+      description: 'Opcional.',
+    },
+    {
+      name: 'description',
+      title: 'Descripción (obsoleto)',
+      type: 'text',
+      description:
+        'Obsoleto: lo reemplazan «Cuando lo necesitas» y «Qué hacemos». Ya no se muestra en el sitio.',
+      readOnly: true,
+      hidden: ({ value }: { value?: string }) => !value,
     },
   ],
   orderings: [

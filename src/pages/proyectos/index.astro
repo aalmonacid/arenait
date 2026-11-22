@@ -1,0 +1,183 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import ClosingCta from '../../components/ClosingCta.astro';
+import { getProjects, getProjectsPage, getSiteSettings } from '../../lib/content';
+
+const [projects, page, settings] = await Promise.all([
+  getProjects(),
+  getProjectsPage(),
+  getSiteSettings(),
+]);
+
+const sectorLabel = (key: string) => settings.sectors.find((s) => s.key === key)?.label ?? key;
+
+// Un grupo por categoría (Bizagi, Software a la medida), solo si tiene proyectos.
+const groups = page.serviceFilters
+  .map((filter) => ({
+    ...filter,
+    projects: projects.filter((p) => p.category === filter.key),
+  }))
+  .filter((group) => group.projects.length > 0);
+
+// JSON-LD: lista de proyectos (solo los títulos publicados).
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: page.heroTitle,
+    description: page.seoDescription,
+    url: new URL('/proyectos', Astro.site).toString(),
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: projects.map((project, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: project.title,
+      })),
+    },
+  },
+];
+
+const filterButton =
+  'inline-flex min-h-11 items-center border-2 border-neutral-900 px-4 text-xs font-extrabold uppercase tracking-label text-neutral-900 transition-colors duration-200 hover:border-interactive aria-pressed:border-accent aria-pressed:bg-accent';
+const legendClass = 'text-xs font-bold uppercase tracking-label text-secondary';
+---
+
+<BaseLayout
+  title={page.seoTitle}
+  description={page.seoDescription}
+  structuredData={structuredData}
+>
+  <PageHero kicker="Proyectos" title={page.heroTitle} lead={page.heroIntro} />
+
+  <!-- Filtros: se muestran solo cuando carga /scripts/project-filters.js. Sin
+       JavaScript permanecen ocultos y se ven todos los proyectos. -->
+  <section class="bg-neutral-50 border-b border-neutral-200" aria-label="Filtros de proyectos">
+    <div data-project-filters hidden>
+      <div class="max-w-7xl mx-auto px-4 md:px-8 py-6 grid grid-cols-1 gap-5">
+        <fieldset class="flex flex-wrap items-center gap-2 border-0 p-0 m-0 min-w-0">
+          <legend class:list={[legendClass, 'mb-2 p-0']}>
+            {page.serviceFilterLabel}
+          </legend>
+          <button
+            type="button"
+            data-filter="servicio"
+            data-value=""
+            aria-pressed="true"
+            class={filterButton}
+          >
+            {page.allLabel}
+          </button>
+          {
+            page.serviceFilters.map((filter) => (
+              <button
+                type="button"
+                data-filter="servicio"
+                data-value={filter.key}
+                aria-pressed="false"
+                class={filterButton}
+              >
+                {filter.label}
+              </button>
+            ))
+          }
+        </fieldset>
+        <fieldset class="flex flex-wrap items-center gap-2 border-0 p-0 m-0 min-w-0">
+          <legend class:list={[legendClass, 'mb-2 p-0']}>
+            {page.sectorFilterLabel}
+          </legend>
+          <button
+            type="button"
+            data-filter="sector"
+            data-value=""
+            aria-pressed="true"
+            class={filterButton}
+          >
+            {page.allLabel}
+          </button>
+          {
+            settings.sectors.map((sector) => (
+              <button
+                type="button"
+                data-filter="sector"
+                data-value={sector.key}
+                aria-pressed="false"
+                class={filterButton}
+              >
+                {sector.label}
+              </button>
+            ))
+          }
+        </fieldset>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12 md:py-16 px-4 md:px-8 bg-white border-b border-neutral-200" aria-label="Experiencia">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+      <div class="border-t-2 border-neutral-900 pt-5">
+        <h2 class={legendClass}>{page.experienceBizagiTitle}</h2>
+        <p class="mt-3 leading-relaxed text-neutral-900">
+          {page.experienceBizagiItems.join(' · ')}
+        </p>
+      </div>
+      <div class="border-t-2 border-neutral-900 pt-5">
+        <h2 class={legendClass}>{page.experienceTechTitle}</h2>
+        <p class="mt-3 leading-relaxed text-neutral-900">
+          {page.experienceTechItems.join(' · ')}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="bg-neutral-50">
+    {
+      groups.map((group, index) => (
+        <section
+          data-project-group
+          class:list={[
+            'py-12 md:py-16 px-4 md:px-8',
+            index % 2 === 0 ? 'bg-neutral-50' : 'bg-white',
+          ]}
+          aria-labelledby={`grupo-${group.key}`}
+        >
+          <div class="max-w-7xl mx-auto">
+            <h2
+              id={`grupo-${group.key}`}
+              class="font-heading text-2xl md:text-3xl font-extrabold tracking-tight text-secondary mb-8"
+            >
+              {group.groupTitle}
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+              {group.projects.map((project) => (
+                <ProjectCard project={project} sectorLabel={sectorLabel(project.sector)} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ))
+    }
+
+    <div data-project-empty hidden role="status" class="px-4 md:px-8 py-16 bg-white">
+      <div class="max-w-7xl mx-auto">
+        <p class="text-lg font-bold text-neutral-900">{page.emptyMessage}</p>
+        <p class="mt-3">
+          <a
+            href="/proyectos"
+            class="inline-flex min-h-11 items-center border-b-2 border-neutral-900 text-xs font-extrabold uppercase tracking-label text-neutral-900 hover:border-interactive"
+          >
+            {page.emptyLinkLabel}
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <ClosingCta title={page.closingTitle} text={page.closingText} links={page.closingLinks} />
+
+  <script type="module" src="/scripts/project-filters.js" is:inline></script>
+</BaseLayout>

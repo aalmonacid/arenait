@@ -1,0 +1,59 @@
+---
+/**
+ * Los tres pilares del inicio (Construimos · Aplicamos IA · Operamos). Reemplaza
+ * al bento de servicios: el detalle de los 13 servicios vive en /servicios.
+ * Retícula de reglas finas (gap-px sobre neutral-200); cada tarjeta es un enlace
+ * al pilar (ancla de /servicios). Sin JavaScript: microinteracciones con
+ * utilidades de Tailwind. Contraste: texto secondary/neutral-900 sobre claro;
+ * primary solo en íconos y bordes.
+ */
+import Icon from './Icon.astro';
+import type { PillarIntro } from '../types/sanity';
+
+interface Props {
+  pillars: PillarIntro[];
+  linkLabel: string;
+}
+
+const { pillars, linkLabel }: Props = Astro.props;
+
+const PILLAR_ICONS = {
+  construimos: 'code',
+  'aplicamos-ia': 'chart',
+  operamos: 'wrench',
+} as const;
+---
+
+<ul
+  class="grid grid-cols-1 md:grid-cols-3 gap-px bg-neutral-200 border border-neutral-200 list-none p-0 m-0"
+  aria-label="Pilares de servicio de Arena IT"
+>
+  {
+    pillars.map((pillar) => (
+      <li class="bg-white">
+        <a
+          href={`/servicios#${pillar.key}`}
+          class="group block h-full rounded-none border-2 border-transparent bg-white text-neutral-900 transition-colors duration-200 hover:border-primary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-interactive"
+        >
+          <article class="flex h-full min-h-72 flex-col p-8 md:p-10">
+            <header class="flex items-center justify-between">
+              <span class="text-primary">
+                <Icon name={PILLAR_ICONS[pillar.key] ?? 'code'} class="w-12 h-12" />
+              </span>
+              <span class="text-xs font-extrabold tracking-label text-secondary">
+                {pillar.number}
+              </span>
+            </header>
+            <h3 class="font-heading text-3xl font-extrabold tracking-tight leading-tight mt-7 mb-3 text-secondary text-balance">
+              {pillar.title}
+            </h3>
+            <p class="leading-relaxed max-w-prose">{pillar.text}</p>
+            <span class="mt-auto pt-8 inline-flex min-h-11 items-center gap-3 text-xs font-extrabold uppercase tracking-label text-neutral-900 after:block after:h-0.5 after:w-6 after:bg-current after:transition-all after:duration-200 group-hover:after:w-14">
+              {linkLabel}
+            </span>
+          </article>
+        </a>
+      </li>
+    ))
+  }
+</ul>

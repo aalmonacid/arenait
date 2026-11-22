@@ -9,7 +9,12 @@
  *   bidireccionales. Solo el mensaje conserva saltos de línea y tabulaciones:
  *   el resto de campos se colapsa a una sola línea.
  * - `source` ya no es libre: solo se aceptan orígenes conocidos.
+ * - `serviceOfInterest` es una lista cerrada (src/lib/leadOptions.ts): un valor
+ *   desconocido se normaliza a `otro`. `interestModel` también es cerrada, pero
+ *   un valor inválido se rechaza.
  */
+
+import { isKnownInterestModel, isKnownService } from './leadOptions';
 
 export const LIMITS = {
   fullName: 120,
@@ -17,6 +22,7 @@ export const LIMITS = {
   corporateEmail: 254, // máximo práctico de una dirección de correo (RFC 5321)
   phone: 40,
   serviceOfInterest: 120,
+  interestModel: 40,
   message: 4000,
   policyVersion: 40,
 } as const;
@@ -37,6 +43,8 @@ export interface Lead {
   corporateEmail: string;
   phone: string;
   serviceOfInterest: string;
+  /** Código del modelo de interés (opcional); vacío si no lo eligió. */
+  interestModel: string;
   message: string;
   source: string;
   policyAccepted: true;
@@ -83,6 +91,7 @@ const FIELD_LABELS: Record<keyof typeof LIMITS, string> = {
   corporateEmail: 'El correo',
   phone: 'El teléfono',
   serviceOfInterest: 'El servicio de interés',
+  interestModel: 'El modelo de interés',
   message: 'El mensaje',
   policyVersion: 'La versión de la política',
 };
@@ -106,6 +115,7 @@ export function validateLead(body: unknown): LeadValidation {
     corporateEmail: cleanLine(raw.corporateEmail),
     phone: cleanLine(raw.phone),
     serviceOfInterest: cleanLine(raw.serviceOfInterest),
+    interestModel: cleanLine(raw.interestModel),
     message: clean(raw.message),
     policyVersion: cleanLine(raw.policyVersion),
   };
@@ -125,6 +135,15 @@ export function validateLead(body: unknown): LeadValidation {
 
   if (!EMAIL_RE.test(fields.corporateEmail)) {
     return { kind: 'invalid', error: 'El correo no tiene un formato válido.' };
+  }
+
+  if (fields.interestModel && !isKnownInterestModel(fields.interestModel)) {
+    return { kind: 'invalid', error: 'El modelo de interés no es válido.' };
+  }
+
+  // Valor de servicio desconocido (enlace viejo o manipulado): se guarda como «otro».
+  if (fields.serviceOfInterest && !isKnownService(fields.serviceOfInterest)) {
+    fields.serviceOfInterest = 'otro';
   }
 
   if (raw.policyAccepted !== true) {

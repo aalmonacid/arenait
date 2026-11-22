@@ -4,7 +4,7 @@
  *
  * Variables de entorno (todas server-only, se cargan como secretos en Cloudflare):
  * - RESEND_API_KEY   clave de la API de Resend.
- * - MAIL_FROM        remitente, por ejemplo `ArenaIT <contacto@arenait.co>`. El
+ * - MAIL_FROM        remitente, por ejemplo `Arena IT <contacto@arenait.co>`. El
  *                    dominio debe estar verificado en Resend (registros DNS).
  * - MAIL_TO_OWNER    buzón que recibe cada contacto nuevo (opcional).
  *
@@ -13,6 +13,7 @@
  * visitante nunca se interpreta como marcado.
  */
 import type { Lead } from './leadValidation';
+import { interestModelLabel, serviceLabel } from './leadOptions';
 
 export interface MailConfig {
   apiKey?: string;
@@ -73,7 +74,7 @@ export function buildOwnerEmail(lead: Lead, to: string, studioUrl: string): Outg
   const who = lead.company || lead.fullName;
   return {
     to,
-    subject: oneLine(`Nuevo contacto en ArenaIT: ${who}`),
+    subject: oneLine(`Nuevo contacto en Arena IT: ${who}`),
     replyTo: lead.corporateEmail,
     text: [
       'Recibiste un nuevo contacto desde el formulario de arenait.co.',
@@ -82,7 +83,8 @@ export function buildOwnerEmail(lead: Lead, to: string, studioUrl: string): Outg
       `Empresa: ${lead.company || '—'}`,
       `Correo: ${lead.corporateEmail}`,
       `Teléfono: ${lead.phone || '—'}`,
-      `Servicio de interés: ${lead.serviceOfInterest || '—'}`,
+      `Servicio de interés: ${lead.serviceOfInterest ? serviceLabel(lead.serviceOfInterest) : '—'}`,
+      `Modelo de interés: ${lead.interestModel ? interestModelLabel(lead.interestModel) : '—'}`,
       '',
       'Mensaje:',
       lead.message || '—',
@@ -98,12 +100,12 @@ export function buildOwnerEmail(lead: Lead, to: string, studioUrl: string): Outg
  * Acuse de recibo para el visitante que lo solicitó. Es un texto FIJO: no
  * repite nada de lo que escribió el visitante (nombre, empresa, mensaje).
  * Si lo hiciera, el formulario serviría para enviar texto arbitrario, con
- * remitente de ArenaIT, a cualquier dirección de correo (phishing o spam).
+ * remitente de Arena IT, a cualquier dirección de correo (phishing o spam).
  */
 export function buildCopyEmail(lead: Pick<Lead, 'corporateEmail'>): OutgoingEmail {
   return {
     to: lead.corporateEmail,
-    subject: 'Recibimos tu mensaje en ArenaIT',
+    subject: 'Recibimos tu mensaje en Arena IT',
     text: [
       'Hola,',
       '',
@@ -111,9 +113,9 @@ export function buildCopyEmail(lead: Pick<Lead, 'corporateEmail'>): OutgoingEmai
       'No necesitas hacer nada más por ahora.',
       '',
       '—',
-      'ArenaIT · Desarrollo de software a la medida',
+      'Arena IT · Tecnología para la operación diaria.',
       '',
-      'Recibes este correo porque alguien indicó esta dirección en el formulario de contacto de ArenaIT. Si no fuiste tú, puedes ignorarlo.',
+      'Recibes este correo porque alguien indicó esta dirección en el formulario de contacto de Arena IT. Si no fuiste tú, puedes ignorarlo.',
     ].join('\n'),
   };
 }

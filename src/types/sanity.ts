@@ -1,3 +1,43 @@
+/**
+ * Tipos de los documentos de Sanity que consume el sitio. Deben mantenerse
+ * alineados con los esquemas de `schemas/` y con el respaldo de
+ * `src/lib/content/` (la misma forma, el mismo contenido).
+ */
+
+export type PillarKey = 'construimos' | 'aplicamos-ia' | 'operamos';
+export type SectorKey = 'seguros' | 'financiero' | 'publico' | 'farmaceutico' | 'agropecuario';
+export type ProjectCategory = 'bizagi' | 'software-a-la-medida';
+export type ProjectAuthorization = 'autorizado' | 'entidad-publica' | 'anonimo' | 'pendiente';
+
+/** Texto + enlace (botones y accesos rápidos). */
+export interface LinkItem {
+  _key?: string;
+  label: string;
+  href: string;
+}
+
+/** Título + texto (tarjetas, principios, modelos de trabajo). */
+export interface TitleText {
+  _key?: string;
+  title: string;
+  text: string;
+}
+
+export interface SeoFields {
+  /** Sin la marca: el layout agrega « | Arena IT ». */
+  seoTitle: string;
+  seoDescription: string;
+}
+
+/** Cierre de página (CTA final). */
+export interface ClosingFields {
+  closingTitle: string;
+  closingText?: string;
+  closingLinks: LinkItem[];
+  /** Si existe, se agrega el botón de WhatsApp (el número viene de los ajustes). */
+  closingWhatsappLabel?: string;
+}
+
 export interface ServiceSchema {
   _id: string;
   title: string;
@@ -5,22 +45,179 @@ export interface ServiceSchema {
   icon?: string;
   /** Posición en el sitio (1 = primero). Sin orden, va al final. */
   order?: number;
-  /** Ocupa 2 columnas en el inicio. */
+  /** Sin efecto visible por ahora (el inicio muestra los tres pilares). */
   featured?: boolean;
   summary: string;
-  description: string;
+  /** Obsoleto: lo reemplazan `whenNeeded` y `whatWeDo`. */
+  description?: string;
+  pillar: PillarKey;
+  /** H2 alternativo para buscadores (por ejemplo, en Bizagi). */
+  seoHeading?: string;
+  whenNeeded: string;
+  whatWeDo: string;
+  deliverables: string[];
+  /** Encabezado del bloque de IA («IA en tus procesos Bizagi»). */
+  aiTitle?: string;
+  aiCapabilities?: string[];
+  aiNote?: string;
+  experience?: string;
+  typicalCases?: string;
 }
 
-export interface CaseStudySchema {
+export interface ProjectSchema {
   _id: string;
   title: string;
   slug: { current: string };
+  order?: number;
   client: string;
-  industry: string;
+  /** Consultora o intermediario por el que se hizo el proyecto. */
+  intermediary?: string;
+  sector: SectorKey;
+  category: ProjectCategory;
+  serviceLabel: string;
+  serviceAnchor: string;
+  /** Segundo servicio relacionado (solo si el caso aplica a dos). */
+  secondaryServiceLabel?: string;
+  secondaryServiceAnchor?: string;
+  technologies?: string;
   challenge: string;
-  solution: string;
-  results: string[];
-  screenshots?: unknown[];
+  whatWeDid: string[];
+  result: string;
+  note?: string;
+  authorization: ProjectAuthorization;
+  featuredOnHome?: boolean;
+  /** Posición entre los destacados del inicio (1 = primero). */
+  homeOrder?: number;
+  homeSummary?: string;
+}
+
+export interface SectorSchema {
+  _key?: string;
+  key: SectorKey;
+  /** Etiqueta corta (filtros y tarjetas): «Público». */
+  label: string;
+  /** Etiqueta cuando va sola (cuadrículas): «Sector público». Si falta, usa `label`. */
+  gridLabel?: string;
+  /** Qué hemos hecho en el sector (bloque «Dónde hemos trabajado»). */
+  description: string;
+}
+
+export interface SiteSettings {
+  siteName: string;
+  tagline: string;
+  defaultDescription: string;
+  whatsappNumber: string;
+  whatsappMessage: string;
+  managerName: string;
+  managerRole: string;
+  sectors: SectorSchema[];
+}
+
+export interface PillarIntro {
+  _key?: string;
+  key: PillarKey;
+  number: string;
+  title: string;
+  text: string;
+}
+
+export interface HomePage extends SeoFields, ClosingFields {
+  heroEyebrow: string;
+  heroTitle: string;
+  /** Fragmento final del titular que se subraya (debe ser el final de `heroTitle`). */
+  heroTitleHighlight?: string;
+  heroIntro: string;
+  heroPrimaryCta: LinkItem;
+  heroSecondaryCta: LinkItem;
+  quickLinks: LinkItem[];
+  servicesTitle: string;
+  pillars: PillarIntro[];
+  pillarLinkLabel: string;
+  allServicesLink: LinkItem;
+  processTitle: string;
+  processSteps: TitleText[];
+  processLink: LinkItem;
+  projectsTitle: string;
+  projectsLink: LinkItem;
+  sectorsTitle: string;
+}
+
+export interface ServicesPillar {
+  _key?: string;
+  key: PillarKey;
+  number: string;
+  title: string;
+  heading: string;
+  intro: string;
+}
+
+export interface ProcessPhase {
+  _key?: string;
+  number: string;
+  name: string;
+  whatWeDo: string;
+  quality: string;
+}
+
+export interface ServicesPage extends SeoFields, ClosingFields {
+  heroEyebrow: string;
+  heroTitle: string;
+  heroIntro: string;
+  heroPrimaryCta: LinkItem;
+  heroSecondaryCta: LinkItem;
+  quickLinks: LinkItem[];
+  pillars: ServicesPillar[];
+  /** Texto del botón de cada servicio (lleva a /contacto?servicio=<slug>). */
+  serviceCtaLabel: string;
+  sectorsTitle: string;
+  sectorsLink: LinkItem;
+  processTitle: string;
+  processPhases: ProcessPhase[];
+  processNotes: string[];
+  processCta: LinkItem;
+  modelsTitle: string;
+  models: TitleText[];
+  securityTitle: string;
+  /** `title` = tema («Tu infraestructura»), `text` = lo que hacemos (minúscula inicial). */
+  securityItems: TitleText[];
+  faq: { _key?: string; question: string; answer: string }[];
+}
+
+export interface AboutPage extends SeoFields, ClosingFields {
+  heroEyebrow: string;
+  heroTitle: string;
+  heroIntro: string;
+  whoTitle: string;
+  whoParagraphs: string[];
+  missionVisionTitle: string;
+  mission: string;
+  vision: string;
+  principlesTitle: string;
+  principles: TitleText[];
+  sectorsTitle: string;
+}
+
+export interface ProjectFilterOption {
+  _key?: string;
+  key: ProjectCategory;
+  label: string;
+  /** Encabezado del grupo de proyectos de esa categoría. */
+  groupTitle: string;
+}
+
+export interface ProjectsPage extends SeoFields, ClosingFields {
+  heroTitle: string;
+  heroIntro: string;
+  serviceFilterLabel: string;
+  sectorFilterLabel: string;
+  allLabel: string;
+  serviceFilters: ProjectFilterOption[];
+  experienceBizagiTitle: string;
+  experienceBizagiItems: string[];
+  experienceTechTitle: string;
+  experienceTechItems: string[];
+  emptyMessage: string;
+  emptyLinkLabel: string;
 }
 
 export interface TestimonialSchema {

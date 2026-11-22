@@ -20,6 +20,7 @@ const emailInput = document.getElementById('corporateEmail');
 const companyInput = document.getElementById('company');
 const phoneInput = document.getElementById('phone');
 const serviceOfInterestInput = document.getElementById('serviceOfInterest');
+const interestModelInput = document.getElementById('interestModel');
 const messageInput = document.getElementById('message');
 const fullNameInput = document.getElementById('fullName');
 const honeypotInput = document.getElementById('companyWebsite');
@@ -46,11 +47,15 @@ const GENERIC_ERROR = 'No pudimos enviar tu mensaje. Inténtalo de nuevo en unos
 if (serviceOfInterestInput) {
   const preselected = new URLSearchParams(window.location.search).get('servicio');
   if (preselected) {
-    const match = Array.from(serviceOfInterestInput.options).find(
-      (option) => option.value === preselected,
-    );
+    // `?servicio=` trae el slug del servicio (ancla de /servicios). Un valor
+    // que no está en la lista deja el campo en «Otro».
+    const options = Array.from(serviceOfInterestInput.options);
+    const match = options.find((option) => option.value === preselected);
+    const fallback = options.find((option) => option.value === 'otro');
     if (match) {
-      serviceOfInterestInput.value = preselected;
+      serviceOfInterestInput.value = match.value;
+    } else if (fallback) {
+      serviceOfInterestInput.value = fallback.value;
     }
   }
 }
@@ -262,6 +267,7 @@ if (form && emailInput && submitButton && successPanel && formError) {
           corporateEmail: email,
           phone: phoneInput?.value ?? '',
           serviceOfInterest: serviceOfInterestInput?.value ?? '',
+          interestModel: interestModelInput?.value ?? '',
           message: messageInput?.value ?? '',
           source: 'lead-capture-form',
           companyWebsite: honeypotInput?.value ?? '',

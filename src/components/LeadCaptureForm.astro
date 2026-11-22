@@ -1,23 +1,15 @@
 ---
 import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
 import { WHATSAPP_URL } from '../lib/contact';
+import { INTEREST_MODEL_OPTIONS, SERVICE_OPTION_GROUPS } from '../lib/leadOptions';
 
 interface Props {
   showServiceDropdown?: boolean;
-  services?: { title: string }[];
 }
 
-const {
-  showServiceDropdown = false,
-  services = [
-    { title: 'Desarrollo de software a la medida' },
-    { title: 'Implementación de aplicaciones' },
-    { title: 'Gestión de proyectos de TI' },
-    { title: 'Business Intelligence' },
-    { title: 'Aseguramiento de la calidad (QA / Testing)' },
-    { title: 'Mantenimiento y migración de software' },
-  ],
-}: Props = Astro.props;
+// Las opciones de «Servicio de interés» y «Modelo de interés» salen de
+// src/lib/leadOptions.ts (misma lista que valida el servidor).
+const { showServiceDropdown = false }: Props = Astro.props;
 
 // Clave pública del captcha (Cloudflare Turnstile). Es una variable de
 // COMPILACIÓN (se lee al generar la página, sin prefijo PUBLIC_). Sin ella no
@@ -124,8 +116,30 @@ const errorClass = 'text-sm text-red-800 font-bold mt-2 hidden';
             <option value="" selected>
               Seleccione un servicio...
             </option>
-            {services.map((service) => (
-              <option value={service.title}>{service.title}</option>
+            {SERVICE_OPTION_GROUPS.map((group) => (
+              <optgroup label={group.group}>
+                {group.options.map((option) => (
+                  <option value={option.value}>{option.label}</option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </div>
+      )
+    }
+
+    {
+      showServiceDropdown && (
+        <div>
+          <label for="interestModel" class={labelClass}>
+            Modelo de interés<span class={hintClass}>(opcional)</span>
+          </label>
+          <select id="interestModel" name="interestModel" class={fieldClass}>
+            <option value="" selected>
+              Seleccione un modelo...
+            </option>
+            {INTEREST_MODEL_OPTIONS.map((option) => (
+              <option value={option.value}>{option.label}</option>
             ))}
           </select>
         </div>

@@ -33,6 +33,18 @@
    mide ~6.7:1 sobre blanco. Las clases de Tailwind de cada componente tienen
    prioridad sobre esta regla (ej. el footer usa blanco sobre fondo navy). */
 @layer base {
+  /* Los filtros de /proyectos ocultan tarjetas con el atributo `hidden`; las
+     utilidades de display de Tailwind no deben anularlo. */
+  [hidden] {
+    display: none !important;
+  }
+
+  /* Resumen de las preguntas frecuentes: sin el triángulo nativo (Safari), el
+     indicador +/- lo dibuja el propio componente. */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
   a:focus-visible,
   button:focus-visible,
   summary:focus-visible {

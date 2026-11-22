@@ -7,13 +7,15 @@ import {
   leadDocumentId,
   validateLead,
 } from './leadValidation';
+import { INTEREST_MODEL_OPTIONS, SERVICE_OPTIONS } from './leadOptions';
 
 const valid = {
   fullName: 'Ana Pérez',
   company: 'Empresa SAS',
   corporateEmail: 'ana@empresa.com',
   phone: '3001234567',
-  serviceOfInterest: 'Business Intelligence',
+  serviceOfInterest: 'business-intelligence-analitica',
+  interestModel: 'bolsa-de-horas',
   message: 'Necesitamos un tablero de indicadores.',
   source: 'lead-capture-form',
   companyWebsite: '',
@@ -29,6 +31,35 @@ describe('validateLead', () => {
       expect(result.lead.fullName).toBe('Ana Pérez');
       expect(result.lead.policyAccepted).toBe(true);
     }
+  });
+
+  it('normaliza a «otro» un servicio que no está en la lista (por ejemplo, un título anterior)', () => {
+    const result = validateLead({ ...valid, serviceOfInterest: 'Business Intelligence' });
+    expect(result.kind).toBe('ok');
+    if (result.kind === 'ok') expect(result.lead.serviceOfInterest).toBe('otro');
+  });
+
+  it('acepta el servicio vacío y los 15 valores de la lista', () => {
+    for (const option of SERVICE_OPTIONS) {
+      const r = validateLead({ ...valid, serviceOfInterest: option.value });
+      expect(r.kind === 'ok' && r.lead.serviceOfInterest).toBe(option.value);
+    }
+    const empty = validateLead({ ...valid, serviceOfInterest: '' });
+    expect(empty.kind === 'ok' && empty.lead.serviceOfInterest).toBe('');
+  });
+
+  it('acepta el modelo de interés de la lista y el vacío', () => {
+    for (const option of INTEREST_MODEL_OPTIONS) {
+      const r = validateLead({ ...valid, interestModel: option.value });
+      expect(r.kind === 'ok' && r.lead.interestModel).toBe(option.value);
+    }
+    const empty = validateLead({ ...valid, interestModel: '' });
+    expect(empty.kind === 'ok' && empty.lead.interestModel).toBe('');
+  });
+
+  it('rechaza un modelo de interés que no está en la lista', () => {
+    const r = validateLead({ ...valid, interestModel: 'gratis' });
+    expect(r).toEqual({ kind: 'invalid', error: 'El modelo de interés no es válido.' });
   });
 
   it('acepta correos de dominios personales (ya no se bloquean)', () => {

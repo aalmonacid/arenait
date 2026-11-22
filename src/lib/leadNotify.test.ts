@@ -7,7 +7,8 @@ const lead: Lead = {
   company: 'Empresa SAS',
   corporateEmail: 'ana@empresa.com',
   phone: '3001234567',
-  serviceOfInterest: 'Business Intelligence',
+  serviceOfInterest: 'business-intelligence-analitica',
+  interestModel: '',
   message: 'Texto privado del visitante',
   source: 'lead-capture-form',
   policyAccepted: true,
@@ -18,7 +19,8 @@ describe('buildNotificationText', () => {
   it('incluye empresa, servicio y enlace al Studio', () => {
     const text = buildNotificationText(lead, 'https://dev.arenait.co/admin');
     expect(text).toContain('Empresa SAS');
-    expect(text).toContain('Business Intelligence');
+    expect(text).toContain('Business Intelligence y analítica');
+    expect(text).not.toContain('business-intelligence-analitica');
     expect(text).toContain('https://dev.arenait.co/admin');
   });
 
@@ -38,6 +40,11 @@ describe('buildNotificationText', () => {
     expect(text).not.toContain('@channel');
     expect(text).toContain('&lt;https://evil.example|clic&gt;');
     expect(text).toContain('&amp; co');
+  });
+
+  it('muestra tal cual un valor que no está en la lista (contactos anteriores)', () => {
+    const text = buildNotificationText({ ...lead, serviceOfInterest: 'Business Intelligence' }, 'x');
+    expect(text).toContain('Business Intelligence');
   });
 
   it('tiene textos de respaldo cuando faltan empresa o servicio', () => {
