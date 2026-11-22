@@ -275,3 +275,17 @@ Pendiente, con responsable (resumen; el detalle está en `PLAN-PRODUCCION.md`):
 - [ ] **Antonio (cuentas)**: rotar token de Sanity y clave de Resend, desconectar Vercel, protección de `main`, CORS de Sanity, verificar `TURNSTILE_SECRET_KEY` en Producción, SPF/DMARC del dominio.
 - [ ] **Cliente**: datos legales, aprobación de diseño, apex o `www`, capturas y testimonios.
 - [ ] **Antonio + Claude**: prueba real del formulario con lead de prueba, privacidad del dataset, día del corte (variables, Turnstile, CORS, dominio, redirección o baja de `dev`).
+
+## Épica O — Blog y política de datos editables en Sanity (22/11/2026)
+
+Rama `contenido/blog-politica-sanity`. Objetivo: que actualizar un artículo o la política (por ejemplo, al activar analítica) no requiera cambiar código ni desplegar a mano: publicar en el Studio reconstruye el sitio por el webhook.
+
+- [x] Esquemas `post` y `privacyPolicy` (una versión por documento, para conservar el texto que aceptó cada contacto), con «Blog» y «Política de datos» en el Studio.
+- [x] Conversión de Portable Text a HTML (`src/lib/portableText.ts`) con enlaces e imágenes saneados; pruebas unitarias.
+- [x] Respaldo de los 2 artículos y de la política v1.1 en `src/lib/content/`; regla «todo o nada»; la colección `src/content/blog/` se eliminó.
+- [x] Páginas `/politica-de-tratamiento-de-datos` (vigente) y `/politica-de-tratamiento-de-datos/version-<n>`; `data-policy-version` del formulario sale de la versión vigente del mismo build.
+- [x] Script de carga: `post-<slug>` y `privacyPolicy-1-1` (`npm run seed:content -- --dry-run`).
+- [ ] **Antonio**: agregar `post` y `privacyPolicy` al filtro del webhook de Sanity y cargar el contenido junto con la carga pendiente.
+- [ ] **Antonio**: probar en el Studio real el bloqueo de solo lectura de versiones ya publicadas y la validación de versión única (no se pudo verificar sin sesión).
+- [ ] **Jurídico**: revisar el texto de la política antes de la primera versión nueva; el cliente debe confirmar razón social, NIT, domicilio y canal ARCO (quedan como «pendiente» hasta entonces).
+- Fuera de alcance: banner de cookies en Sanity (cambia con la analítica, que requiere código), RSS, autores como documentos, comentarios, programar publicaciones por fecha futura.

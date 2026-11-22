@@ -58,7 +58,7 @@ Cambiar una variable de **compilación** exige un build nuevo (**Retry build**);
 2. En Sanity: **API → Webhooks → Create webhook.**
    - Nombre: `Republicar sitio` · URL: la del enlace de implementación · Dataset: `production`
    - Eventos: **Create, Update, Delete**
-   - **Filtro:** `_type in ["service", "project", "siteSettings", "homePage", "servicesPage", "aboutPage", "projectsPage", "testimonial"]` — así los contactos (`lead`) no disparan un despliegue.
+   - **Filtro:** `_type in ["service", "project", "siteSettings", "homePage", "servicesPage", "aboutPage", "projectsPage", "testimonial", "post", "privacyPolicy"]` — así los contactos (`lead`) no disparan un despliegue. `post` (artículos del blog) y `privacyPolicy` (versiones de la política de datos) se agregaron el 22/11/2026: si el webhook ya existía, edita el filtro.
    - Método: POST · habilitado.
 3. Prueba: edita un servicio, pulsa **Publish** y confirma que arranca una compilación sobre `main` (1–2 minutos).
 

@@ -1,0 +1,178 @@
+---
+/**
+ * Una versión de la Política de Tratamiento de Datos Personales (Ley 1581 de
+ * 2012 y Decreto 1377 de 2013). Se usa en la ruta de la versión vigente y en
+ * una ruta por cada versión. El texto sale de Sanity (documentos
+ * `privacyPolicy`) con respaldo en `src/lib/content/privacyPolicy.ts`.
+ *
+ * Los datos del responsable (razón social, NIT, domicilio, canal para ejercer
+ * derechos) no están confirmados: si el campo está vacío se muestra con
+ * `PendingContentTag`, nunca con valores inventados. Ver BACKLOG.md, Épica G.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from './PageHero.astro';
+import PendingContentTag from './PendingContentTag.astro';
+import { renderBody } from '../lib/renderBody';
+import { POLICY_URL } from '../lib/legal';
+import { formatIsoDate, policyVersionPath } from '../lib/contentRules';
+import type { PolicySection, PrivacyPolicy } from '../types/sanity';
+
+interface Props {
+  policy: PrivacyPolicy;
+  /** La versión que rige hoy. */
+  current: PrivacyPolicy;
+  /** Todas las versiones, para el historial. */
+  all: PrivacyPolicy[];
+  /** Fecha del build (AAAA-MM-DD). */
+  today: string;
+  /** Páginas por versión (/version-n): no se indexan. */
+  noindex?: boolean;
+}
+
+const { policy, current, all, today, noindex = false } = Astro.props;
+
+const isCurrent = policy.version === current.version;
+const isFuture = policy.effectiveDate > today;
+const responsible = policy.responsible ?? {};
+const others = all.filter((p: PrivacyPolicy) => p.version !== policy.version);
+
+const responsibleData = [
+  { label: 'Razón social completa', value: responsible.legalName },
+  { label: 'NIT', value: responsible.nit },
+  { label: 'Domicilio legal', value: responsible.address },
+];
+const rightsChannel = {
+  label: 'Correo o canal designado para ejercer derechos ARCO',
+  value: responsible.rightsChannel,
+};
+---
+
+<BaseLayout
+  title="Política de Tratamiento de Datos Personales"
+  description="Política de tratamiento de datos personales de Arena IT, conforme a la Ley 1581 de 2012 y el Decreto 1377 de 2013 de Colombia."
+  noindex={noindex || !isCurrent}
+>
+  <PageHero
+    kicker="Legal"
+    title="Política de Tratamiento de Datos Personales"
+    lead={`Versión ${policy.version} — Última actualización: ${formatIsoDate(policy.effectiveDate)}`}
+  />
+
+  <section class="py-16 md:py-24 px-4 md:px-8 bg-white">
+    <div class="max-w-4xl mx-auto space-y-12 text-neutral-900 leading-relaxed">
+      {
+        !isCurrent && (
+          <div
+            class="border-2 border-neutral-900 border-l-8 border-l-accent bg-neutral-50 p-6"
+            role="note"
+          >
+            <p class="font-bold text-secondary mb-2">
+              {isFuture
+                ? `Esta versión aún no rige: entra en vigor el ${formatIsoDate(policy.effectiveDate)}.`
+                : 'Esta versión ya no está vigente.'}
+            </p>
+            <p>
+              Se conserva como referencia del texto que aplicó en su momento. La política vigente es
+              la{' '}
+              <a
+                href={POLICY_URL}
+                class="font-bold text-secondary underline decoration-interactive decoration-2 underline-offset-4"
+              >
+                versión {current.version}
+              </a>
+              .
+            </p>
+          </div>
+        )
+      }
+
+      {
+        policy.changeSummary && (
+          <div class="border-l-4 border-neutral-900 pl-5">
+            <p class="text-xs font-bold uppercase tracking-label text-secondary mb-2">
+              Cambios frente a la versión anterior
+            </p>
+            <p>{policy.changeSummary}</p>
+          </div>
+        )
+      }
+
+      {
+        policy.intro && policy.intro.length > 0 && (
+          <div class="policy-content" set:html={renderBody(policy.intro)} />
+        )
+      }
+
+      {
+        policy.sections.map((section: PolicySection) => (
+          <div id={section.anchor || undefined}>
+            <h2 class="text-2xl font-heading font-extrabold tracking-tight text-secondary mb-4">
+              {section.title}
+            </h2>
+            {section.body && section.body.length > 0 && (
+              <div class="policy-content" set:html={renderBody(section.body)} />
+            )}
+            {section.showData === 'responsible' && (
+              <div class="flex flex-col gap-2">
+                {responsibleData.map((item) =>
+                  item.value ? (
+                    <p>
+                      {item.label}: {item.value}
+                    </p>
+                  ) : (
+                    <PendingContentTag label={item.label} />
+                  ),
+                )}
+              </div>
+            )}
+            {section.showData === 'rightsChannel' && (
+              <div class="mt-3">
+                {rightsChannel.value ? (
+                  <p>{rightsChannel.value}</p>
+                ) : (
+                  <PendingContentTag label={rightsChannel.label} />
+                )}
+              </div>
+            )}
+          </div>
+        ))
+      }
+
+      <div class="border-t border-neutral-200 pt-8">
+        <p class="text-sm text-secondary">
+          Al enviar el formulario de contacto de este sitio, aceptas el tratamiento de tus datos
+          personales conforme a lo descrito en esta política, versión {policy.version}.
+        </p>
+      </div>
+
+      {
+        others.length > 0 && (
+          <nav aria-labelledby="policyHistory" class="border-t border-neutral-200 pt-8">
+            <h2
+              id="policyHistory"
+              class="text-xs font-bold uppercase tracking-label text-secondary mb-4"
+            >
+              Otras versiones de esta política
+            </h2>
+            <ul class="space-y-2">
+              {others.map((p: PrivacyPolicy) => (
+                <li>
+                  <a
+                    href={policyVersionPath(p.version)}
+                    class="font-bold text-secondary underline decoration-interactive decoration-2 underline-offset-4"
+                  >
+                    Versión {p.version}
+                  </a>{' '}
+                  <span class="text-sm">
+                    (desde el {formatIsoDate(p.effectiveDate)}
+                    {p.version === current.version ? ', vigente' : ''})
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>

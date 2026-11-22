@@ -1,0 +1,22 @@
+---
+export const prerender = true;
+
+import PolicyView from '../../components/PolicyView.astro';
+import { getPolicies } from '../../lib/content';
+import { policyVersionSlug } from '../../lib/contentRules';
+
+// Una página por versión (/politica-de-tratamiento-de-datos/version-1-1), también las
+// anteriores: así se conserva el texto exacto que aceptó cada contacto. Todas van
+// con noindex (la vigente se indexa en /politica-de-tratamiento-de-datos).
+export async function getStaticPaths() {
+  const { all, current, today } = await getPolicies();
+  return all.map((policy) => ({
+    params: { version: policyVersionSlug(policy.version) },
+    props: { policy, current, all, today },
+  }));
+}
+
+const { policy, current, all, today } = Astro.props;
+---
+
+<PolicyView policy={policy} current={current} all={all} today={today} noindex />

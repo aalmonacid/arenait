@@ -45,7 +45,15 @@ export default defineConfig({
       // (src/pages/admin/[...index].astro) y sin este filtro aparecía publicado en
       // sitemap-0.xml real de producción — confirmado en vivo. No es contenido
       // público, se excluye explícitamente.
-      filter: (page) => !new URL(page).pathname.startsWith('/admin'),
+      // Las páginas por versión de la política (/politica-de-tratamiento-de-datos/version-n)
+      // van con noindex: la vigente se indexa en /politica-de-tratamiento-de-datos.
+      filter: (page) => {
+        const { pathname } = new URL(page);
+        return (
+          !pathname.startsWith('/admin') &&
+          !pathname.startsWith('/politica-de-tratamiento-de-datos/version-')
+        );
+      },
     }),
   ],
   vite: {

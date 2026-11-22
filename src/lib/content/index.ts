@@ -14,3 +14,5 @@ export { fallbackServicesPage } from './servicesPage.ts';
 export { fallbackAboutPage } from './about.ts';
 export { fallbackProjects } from './projects.ts';
 export { fallbackProjectsPage } from './projectsPage.ts';
+export { fallbackPosts } from './posts.ts';
+export { fallbackPrivacyPolicies } from './privacyPolicy.ts';
