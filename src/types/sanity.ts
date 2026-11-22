@@ -246,3 +246,92 @@ export interface WhitepaperSchema {
   // renderizar el valor literal en UI pública, ver PendingContentTag.
   targetRole?: string;
 }
+
+/* ---------- Texto enriquecido (Portable Text) ---------- */
+
+/** Fragmento de texto con sus marcas: `strong`, `em` o la clave de un enlace de `markDefs`. */
+export interface PortableTextSpan {
+  _type: 'span';
+  _key?: string;
+  text: string;
+  marks?: string[];
+}
+
+export interface PortableTextLinkDef {
+  _key: string;
+  _type: 'link';
+  href?: string;
+}
+
+/** Párrafo, título (h2, h3), cita o ítem de lista (`listItem`). */
+export interface PortableTextBlockNode {
+  _type: 'block';
+  _key?: string;
+  style?: 'normal' | 'h2' | 'h3' | 'blockquote';
+  listItem?: 'bullet' | 'number';
+  level?: number;
+  children: PortableTextSpan[];
+  markDefs?: PortableTextLinkDef[];
+}
+
+/** Imagen dentro del texto: sin `alt` no se publica. */
+export interface PortableTextImage {
+  _type: 'image';
+  _key?: string;
+  alt?: string;
+  caption?: string;
+  asset?: { _ref?: string };
+}
+
+export type PortableTextContent = (PortableTextBlockNode | PortableTextImage)[];
+
+/* ---------- Blog ---------- */
+
+export interface PostSchema {
+  _id?: string;
+  title: string;
+  slug: { current: string };
+  /** Resumen del listado y descripción para buscadores. */
+  description: string;
+  /** Fecha de publicación en formato AAAA-MM-DD. */
+  publishDate: string;
+  author?: string;
+  tags?: string[];
+  coverImage?: { alt?: string; asset?: { _ref?: string } };
+  body: PortableTextContent;
+}
+
+/* ---------- Política de tratamiento de datos (una versión por documento) ---------- */
+
+export type PolicySectionData = 'none' | 'responsible' | 'rightsChannel';
+
+export interface PolicySection {
+  _key?: string;
+  /** Con su numeración: «1. Responsable del tratamiento». */
+  title: string;
+  /** Ancla de la sección (`#cookies`); opcional. */
+  anchor?: string;
+  body?: PortableTextContent;
+  /** Datos del responsable o canal de derechos que se muestran bajo el texto. */
+  showData?: PolicySectionData;
+}
+
+export interface PolicyResponsible {
+  legalName?: string;
+  nit?: string;
+  address?: string;
+  rightsChannel?: string;
+}
+
+export interface PrivacyPolicy {
+  _id?: string;
+  /** Número de versión, solo dígitos y puntos (`1.1`). Único entre versiones. */
+  version: string;
+  /** Fecha desde la que rige, AAAA-MM-DD. */
+  effectiveDate: string;
+  responsible?: PolicyResponsible;
+  intro?: PortableTextContent;
+  sections: PolicySection[];
+  /** Qué cambió frente a la versión anterior. */
+  changeSummary?: string;
+}

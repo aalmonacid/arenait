@@ -1,6 +1,7 @@
 /**
  * Carga el contenido del sitio en Sanity (dataset `production`): ajustes, las
- * cuatro páginas, los 13 servicios y los proyectos.
+ * cuatro páginas, los 13 servicios, los proyectos, los artículos del blog y la
+ * versión vigente de la política de datos.
  *
  * El contenido sale de los MISMOS módulos que usa el sitio como respaldo
  * (src/lib/content/), así que lo cargado y el respaldo no se pueden desfasar.
@@ -22,8 +23,9 @@
  * - Sin --force, si algún documento destino ya existe el script se detiene y no
  *   escribe nada (así no se pisan los cambios hechos en el Studio).
  * - Los IDs de contenido público no llevan punto (los IDs con punto son privados
- *   en Sanity): `service-<slug>`, `project-<slug>` y el nombre del tipo para los
- *   documentos únicos.
+ *   en Sanity): `service-<slug>`, `project-<slug>`, `post-<slug>`,
+ *   `privacyPolicy-<versión con guiones>` (1.1 → privacyPolicy-1-1) y el nombre
+ *   del tipo para los documentos únicos.
  * - Los proyectos pendientes de autorización NO están en el código (repo
  *   público). Se leen de scripts/seed/private/pending-projects.json (archivo
  *   local, ignorado por git) y se cargan como BORRADORES (`drafts.project-*`):
@@ -39,6 +41,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import {
   fallbackAboutPage,
   fallbackHomePage,
+  fallbackPosts,
+  fallbackPrivacyPolicies,
   fallbackProjects,
   fallbackProjectsPage,
   fallbackServices,
@@ -101,6 +105,27 @@ function project(content, { draft = false } = {}) {
   };
 }
 
+function post(content) {
+  const { slug, ...rest } = content;
+  delete rest._id; // el _id definitivo es determinista (post-<slug>)
+  return {
+    _id: `post-${slug.current}`,
+    _type: 'post',
+    slug: { _type: 'slug', current: slug.current },
+    ...withKeys(rest),
+  };
+}
+
+function privacyPolicy(content) {
+  const { ...rest } = content;
+  delete rest._id; // el _id definitivo sale de la versión (sin puntos)
+  return {
+    _id: `privacyPolicy-${content.version.replaceAll('.', '-')}`,
+    _type: 'privacyPolicy',
+    ...withKeys(rest),
+  };
+}
+
 const publicDocs = [
   singleton('siteSettings', fallbackSiteSettings),
   singleton('homePage', fallbackHomePage),
@@ -109,6 +134,8 @@ const publicDocs = [
   singleton('aboutPage', fallbackAboutPage),
   ...fallbackServices.map(service),
   ...fallbackProjects.map((p) => project(p)),
+  ...fallbackPosts.map(post),
+  ...fallbackPrivacyPolicies.map(privacyPolicy),
 ];
 
 let pendingDocs = [];
@@ -144,6 +171,16 @@ for (const d of byType('service')) console.log(`  ${String(d.order).padStart(2)}
 console.log(`\nProyectos publicados (${byType('project').length}):`);
 for (const d of byType('project')) {
   console.log(`  ${String(d.order).padStart(2)}. ${d._id}${d.featuredOnHome ? '  [inicio]' : ''}`);
+}
+console.log(`\nArtículos del blog (${byType('post').length}):`);
+for (const d of byType('post')) {
+  console.log(`  ${d.publishDate}  ${d._id}  (${d.body.length} bloques)`);
+}
+console.log(`\nVersiones de la política de datos (${byType('privacyPolicy').length}):`);
+for (const d of byType('privacyPolicy')) {
+  console.log(
+    `  v${d.version}  rige desde ${d.effectiveDate}  ${d._id}  (${d.sections.length} secciones)`,
+  );
 }
 console.log(
   `\nProyectos pendientes de autorización: ${pendingDocs.length} borrador(es)` +

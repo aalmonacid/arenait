@@ -1,38 +1,83 @@
 ---
 export const prerender = true;
 
-import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import Button from '../../components/Button.astro';
+import { getPosts, getSiteSettings } from '../../lib/content';
+import { renderBody } from '../../lib/renderBody';
+import { formatLongDate } from '../../lib/contentRules';
+import { imageDimensions } from '../../lib/portableText';
+import { urlForImage } from '../../lib/imageBuilder';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-
-  return posts.map((post: CollectionEntry<'blog'>) => ({
-    params: { slug: post.id },
+  const posts = await getPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug.current },
     props: { post },
   }));
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const settings = await getSiteSettings();
+const bodyHtml = renderBody(post.body);
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
-}
+const tags = post.tags ?? [];
+const kicker = tags.length > 0 ? tags.join(' · ') : 'Blog';
+const byline = `${formatLongDate(post.publishDate)}${post.author ? ` · ${post.author}` : ''}`;
 
-const kicker = post.data.tags.length > 0 ? post.data.tags.join(' · ') : 'Blog';
-const byline = `${formatDate(post.data.publishDate)}${post.data.author ? ` · ${post.data.author}` : ''}`;
+// Portada (opcional): requiere texto alternativo y una referencia de imagen válida.
+const coverSize = imageDimensions(post.coverImage?.asset?._ref);
+const cover =
+  post.coverImage?.alt?.trim() && coverSize
+    ? {
+        alt: post.coverImage.alt.trim(),
+        width: Math.min(coverSize.width, 1200),
+        height: Math.round((coverSize.height * Math.min(coverSize.width, 1200)) / coverSize.width),
+        src: urlForImage(post.coverImage).width(Math.min(coverSize.width, 1200)).url(),
+      }
+    : undefined;
+
+const siteOrigin = new URL('/', Astro.site).toString().replace(/\/$/, '');
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: post.description,
+  datePublished: post.publishDate,
+  author: { '@type': 'Organization', name: post.author || settings.siteName },
+  publisher: { '@type': 'Organization', name: settings.siteName, url: siteOrigin },
+  mainEntityOfPage: `${siteOrigin}/blog/${post.slug.current}`,
+  ...(cover ? { image: cover.src } : {}),
+};
 ---
 
-<BaseLayout title={post.data.title} description={post.data.description}>
+<BaseLayout
+  title={post.title}
+  description={post.description}
+  ogType="article"
+  ogImage={cover?.src}
+  structuredData={[articleSchema]}
+>
   <article class="bg-white">
-    <PageHero kicker={kicker} title={post.data.title} lead={byline} />
+    <PageHero kicker={kicker} title={post.title} lead={byline} />
 
     <section class="py-16 md:py-24 px-4 md:px-8">
       <div class="max-w-3xl mx-auto markdown-content">
-        <Content />
+        {
+          cover && (
+            <figure>
+              <img
+                src={cover.src}
+                alt={cover.alt}
+                width={cover.width}
+                height={cover.height}
+                decoding="async"
+              />
+            </figure>
+          )
+        }
+        <Fragment set:html={bodyHtml} />
       </div>
     </section>
 

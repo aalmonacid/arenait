@@ -31,12 +31,12 @@ Requieren acceso a https://www.sanity.io/manage. No hay forma de hacerlas desde 
    - Alternativa: crear un dataset aparte (por ejemplo `leads`, privado) y apuntar el cliente de escritura a él (también requiere un ajuste de código).
    - Prueba obligatoria tras crear el primer lead de prueba: consultar sin token `https://xbayv7k2.api.sanity.io/v2024-01-01/data/query/production?query=*[_type=="lead"]` y confirmar que **no** devuelve el lead.
 3. **Token de escritura**: API → Tokens → crear uno con el permiso mínimo necesario (Editor; si solo crea leads, no necesita más) y cargarlo como secreto del Worker de Cloudflare (Producción) con el nombre `SANITY_API_WRITE_TOKEN`. No lo comparta por correo ni chat.
-4. **Webhook de contenido** (API → Webhooks): apuntar a la URL del Deploy Hook de Cloudflare (ver «Acciones en Cloudflare»), disparador «create, update, delete» sobre los tipos `service, project, siteSettings, homePage, servicesPage, aboutPage, projectsPage, testimonial`, para que editar contenido republique el sitio (los contactos `lead` no deben dispararlo).
+4. **Webhook de contenido** (API → Webhooks): apuntar a la URL del Deploy Hook de Cloudflare (ver «Acciones en Cloudflare»), disparador «create, update, delete» sobre los tipos `service, project, siteSettings, homePage, servicesPage, aboutPage, projectsPage, testimonial, post, privacyPolicy`, para que editar contenido republique el sitio (los contactos `lead` no deben dispararlo).
 5. **Usuarios y roles**: revisar quién tiene acceso al proyecto y con qué rol (principio de mínimo privilegio, alineado con ISO/IEC 27001). Activar autenticación de dos factores si la organización de Sanity lo permite.
 6. **Contenido (22/11/2026)**: el contenido final del cliente vive en `src/lib/content/` (respaldo) y se carga al dataset con el script. Pasos, tras desplegar el código de la rama:
-   1. `npm run seed:content -- --dry-run` y revisar el resumen (5 documentos únicos, 13 servicios, 9 proyectos publicados y los borradores pendientes).
+   1. `npm run seed:content -- --dry-run` y revisar el resumen (5 documentos únicos, 13 servicios, 9 proyectos publicados, 2 artículos del blog, la versión 1.1 de la política de datos y los borradores pendientes).
    2. Con el token en `SANITY_API_WRITE_TOKEN` (solo en la sesión): `npm run seed:content` (se detiene si algún documento ya existe; `--force` los reemplaza; `--delete-legacy` borra los 6 servicios del modelo anterior).
-   3. Actualizar el filtro del webhook de Sanity a `service, project, siteSettings, homePage, servicesPage, aboutPage, projectsPage, testimonial` y reconstruir el sitio.
+   3. Actualizar el filtro del webhook de Sanity a `service, project, siteSettings, homePage, servicesPage, aboutPage, projectsPage, testimonial, post, privacyPolicy` y reconstruir el sitio.
    4. Verificar sin token que la consulta pública devuelve 9 proyectos y 0 pendientes, y que el Studio muestra los borradores.
    Autorizar un caso pendiente = publicar su borrador en el Studio (previa autorización escrita del cliente).
 

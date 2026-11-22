@@ -19,6 +19,8 @@ export const structure: StructureResolver = (S) =>
       S.divider(),
       S.documentTypeListItem('service').title('Servicios'),
       S.documentTypeListItem('project').title('Proyectos'),
+      S.documentTypeListItem('post').title('Blog'),
+      S.documentTypeListItem('privacyPolicy').title('Política de datos'),
       S.documentTypeListItem('testimonial').title('Testimonios'),
       S.documentTypeListItem('lead').title('Contactos (lead)'),
       S.documentTypeListItem('whitepaper').title('Whitepapers'),

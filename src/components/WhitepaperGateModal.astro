@@ -1,5 +1,6 @@
 ---
-import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
+import { POLICY_URL } from '../lib/legal';
+import { getCurrentPolicy } from '../lib/content';
 
 /**
  * Modal de descarga gated para /recursos. Instancia única en la página,
@@ -11,6 +12,8 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
  * mismo lenguaje visual (clases de input, patrón de checkbox, botón
  * bg-primary/hover:bg-interactive).
  */
+
+const policy = await getCurrentPolicy();
 ---
 
 <div
@@ -56,7 +59,7 @@ import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
       contactes primero.
     </p>
 
-    <form id="whitepaperGateForm" class="space-y-6" data-policy-version={POLICY_VERSION}>
+    <form id="whitepaperGateForm" class="space-y-6" data-policy-version={policy.version}>
       <input type="hidden" id="whitepaperGateId" name="whitepaperId" />
 
       <div>

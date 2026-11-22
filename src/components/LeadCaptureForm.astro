@@ -1,5 +1,6 @@
 ---
-import { POLICY_URL, POLICY_VERSION } from '../lib/legal';
+import { POLICY_URL } from '../lib/legal';
+import { getCurrentPolicy } from '../lib/content';
 import { WHATSAPP_URL } from '../lib/contact';
 import { INTEREST_MODEL_OPTIONS, SERVICE_OPTION_GROUPS } from '../lib/leadOptions';
 
@@ -10,6 +11,10 @@ interface Props {
 // Las opciones de «Servicio de interés» y «Modelo de interés» salen de
 // src/lib/leadOptions.ts (misma lista que valida el servidor).
 const { showServiceDropdown = false }: Props = Astro.props;
+
+// Versión vigente de la política (la misma que muestra /politica-de-tratamiento-de-datos en
+// este build): queda guardada con el contacto como evidencia de lo que aceptó.
+const policy = await getCurrentPolicy();
 
 // Clave pública del captcha (Cloudflare Turnstile). Es una variable de
 // COMPILACIÓN (se lee al generar la página, sin prefijo PUBLIC_). Sin ella no
@@ -38,7 +43,7 @@ const errorClass = 'text-sm text-red-800 font-bold mt-2 hidden';
   <!-- novalidate: la validación la hace /scripts/lead-form.js con mensajes
        propios, asociados a cada campo (aria-describedby / aria-invalid) en
        lugar de las burbujas nativas del navegador. El servidor valida igual. -->
-  <form id="leadCaptureForm" class="space-y-6" data-policy-version={POLICY_VERSION} novalidate>
+  <form id="leadCaptureForm" class="space-y-6" data-policy-version={policy.version} novalidate>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <label for="fullName" class={labelClass}

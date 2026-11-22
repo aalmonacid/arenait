@@ -8,6 +8,8 @@ import { projectsPageSchema } from './projectsPage';
 import { whitepaperSchema } from './whitepaper';
 import { leadSchema } from './lead';
 import { testimonialSchema } from './testimonial';
+import { postSchema } from './post';
+import { privacyPolicySchema } from './privacyPolicy';
 
 /**
  * Documentos únicos (singletons): uno solo por tipo, con `_id` igual al nombre
@@ -32,6 +34,8 @@ export const schemaTypes = [
   serviceSchema,
   projectSchema,
   testimonialSchema,
+  postSchema,
+  privacyPolicySchema,
   leadSchema,
   whitepaperSchema,
 ];
