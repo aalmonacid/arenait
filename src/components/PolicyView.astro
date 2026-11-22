@@ -87,17 +87,6 @@ const rightsChannel = {
       }
 
       {
-        policy.changeSummary && (
-          <div class="border-l-4 border-neutral-900 pl-5">
-            <p class="text-xs font-bold uppercase tracking-label text-secondary mb-2">
-              Cambios frente a la versión anterior
-            </p>
-            <p>{policy.changeSummary}</p>
-          </div>
-        )
-      }
-
-      {
         policy.intro && policy.intro.length > 0 && (
           <div class="policy-content" set:html={renderBody(policy.intro)} />
         )
