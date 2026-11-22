@@ -62,10 +62,10 @@ export const privacyPolicySchema = {
     },
     {
       name: 'changeSummary',
-      title: 'Qué cambió frente a la versión anterior',
+      title: 'Nota interna: qué cambió frente a la versión anterior',
       type: 'text',
       rows: 3,
-      description: 'Se muestra al inicio de esta versión. Opcional en la primera.',
+      description: 'Solo para el equipo: no se muestra en el sitio. Opcional.',
     },
     {
       name: 'responsible',
