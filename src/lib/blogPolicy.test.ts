@@ -93,7 +93,7 @@ describe('política: versión vigente', () => {
   });
 
   it('el respaldo es la v1.1 del 15/11/2026 con las anclas #cookies y #encargados', () => {
-    const [v11] = pickPolicies([], fallbackPrivacyPolicies);
+    const v11 = pickPolicies([], fallbackPrivacyPolicies).find((p) => p.version === '1.1')!;
     expect(v11.version).toBe('1.1');
     expect(formatIsoDate(v11.effectiveDate)).toBe('15/11/2026');
     const anchors = v11.sections.map((s) => s.anchor).filter(Boolean);
@@ -102,10 +102,25 @@ describe('política: versión vigente', () => {
     expect(selectCurrentPolicy([v11], '2026-11-22')?.version).toBe('1.1');
   });
 
+  it('la v1.2 completa los datos del responsable sin publicar la dirección de la sede', () => {
+    const list = pickPolicies([], fallbackPrivacyPolicies);
+    const v12 = list.find((p) => p.version === '1.2')!;
+    expect(v12.responsible).toEqual({
+      legalName: 'ARENA IT SAS',
+      nit: '900.604.701-2',
+      address: 'Bogotá D.C., Colombia',
+      rightsChannel: 'datos@arenait.co',
+    });
+    expect(JSON.stringify(v12)).not.toMatch(/\bCR\b|\bAP\b|carrera|apartamento/i);
+    expect(v12.sections).toEqual(list.find((p) => p.version === '1.1')!.sections);
+    expect(selectCurrentPolicy(list, '2026-11-22')?.version).toBe('1.2');
+    expect(selectCurrentPolicy(list, '2026-11-21')?.version).toBe('1.1');
+  });
+
   it('pickPolicies: todo o nada, descarta incompletas y repetidas', () => {
-    expect(pickPolicies([], fallbackPrivacyPolicies)).toHaveLength(1);
+    expect(pickPolicies([], fallbackPrivacyPolicies)).toHaveLength(2);
     const incompleta = { version: '9.9', effectiveDate: '2026-12-01', sections: [] };
-    expect(pickPolicies([incompleta], fallbackPrivacyPolicies)[0].version).toBe('1.1');
+    expect(pickPolicies([incompleta], fallbackPrivacyPolicies)[0].version).toBe('1.2');
     const result = pickPolicies(
       [policy('2.0', '2026-12-01'), policy('2.0', '2026-12-05'), policy('1.0', '2026-01-01')],
       fallbackPrivacyPolicies,

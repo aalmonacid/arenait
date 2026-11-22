@@ -14,8 +14,7 @@ import type { PrivacyPolicy } from '../../types/sanity';
 import { FALLBACK_POLICY_VERSION } from '../legal.ts';
 import { pt } from './ptBuilder.ts';
 
-export const fallbackPrivacyPolicies: PrivacyPolicy[] = [
-  {
+const v11: PrivacyPolicy = {
     _id: 'privacyPolicy-1-1',
     version: FALLBACK_POLICY_VERSION,
     effectiveDate: '2026-11-15',
@@ -119,5 +118,29 @@ export const fallbackPrivacyPolicies: PrivacyPolicy[] = [
         ]),
       },
     ],
+};
+
+/**
+ * Versión 1.2 (22/11/2026): igual a la 1.1 con los datos del responsable
+ * completados a partir del RUT (razón social y NIT). Por decisión del cliente
+ * no se publica la dirección de la sede (es una vivienda): el domicilio se
+ * indica a nivel de ciudad. El canal para ejercer derechos es un alias de
+ * empresa (`datos@arenait.co`), que el cliente debe crear antes de publicar.
+ * Antes de fusionar a main, ajustar `effectiveDate` al día de la publicación.
+ */
+const v12: PrivacyPolicy = {
+  ...v11,
+  _id: 'privacyPolicy-1-2',
+  version: '1.2',
+  effectiveDate: '2026-11-22',
+  responsible: {
+    legalName: 'ARENA IT SAS',
+    nit: '900.604.701-2',
+    address: 'Bogotá D.C., Colombia',
+    rightsChannel: 'datos@arenait.co',
   },
-];
+  changeSummary:
+    'Se completan los datos del responsable del tratamiento (razón social, NIT y domicilio) y el canal para ejercer los derechos de los titulares.',
+};
+
+export const fallbackPrivacyPolicies: PrivacyPolicy[] = [v11, v12];
