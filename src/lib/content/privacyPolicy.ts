@@ -126,7 +126,7 @@ const v11: PrivacyPolicy = {
  * no se publica la dirección de la sede (es una vivienda): el domicilio se
  * indica a nivel de ciudad. El canal para ejercer derechos es un alias de
  * empresa (`datos@arenait.co`), que el cliente debe crear antes de publicar.
- * Antes de fusionar a main, ajustar `effectiveDate` al día de la publicación.
+ * Fecha de vigencia = día de la publicación.
  */
 const v12: PrivacyPolicy = {
   ...v11,
