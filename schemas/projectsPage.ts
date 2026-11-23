@@ -1,3 +1,4 @@
+import type { Rule as SanityRule } from 'sanity';
 import { PROJECT_CATEGORIES } from './options';
 import { closingFields, inGroup, seoFields, stringField, stringList, textField } from './helpers';
 
@@ -27,7 +28,7 @@ export const projectsPageSchema = {
         name: 'serviceFilters',
         title: 'Filtro de servicio: opciones',
         type: 'array',
-        validation: (Rule: any) => Rule.required().min(1),
+        validation: (Rule: SanityRule) => Rule.required().min(1),
         of: [
           {
             type: 'object',
@@ -37,7 +38,7 @@ export const projectsPageSchema = {
                 title: 'Categoría',
                 type: 'string',
                 options: { list: PROJECT_CATEGORIES, layout: 'dropdown' },
-                validation: (Rule: any) => Rule.required(),
+                validation: (Rule: SanityRule) => Rule.required(),
               },
               stringField('label', 'Texto del filtro'),
               stringField('groupTitle', 'Encabezado del grupo de proyectos'),

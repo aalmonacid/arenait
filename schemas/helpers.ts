@@ -1,10 +1,11 @@
+import type { Rule as SanityRule } from 'sanity';
 /**
  * Constructores de campos para los documentos de página (singletons). Se usan
  * objetos y arreglos simples (sin Portable Text): el texto se edita tal cual se
  * publica. Los enlaces dentro de un texto se escriben como [texto](/ruta) o
  * [texto](#ancla); solo se aceptan rutas internas.
  */
-const required = (Rule: any) => Rule.required();
+const required = (Rule: SanityRule) => Rule.required();
 
 type Extra = Record<string, unknown>;
 
@@ -107,7 +108,7 @@ export const closingFields = (opts: { whatsapp?: boolean } = {}) => [
   textField('closingText', 'Cierre: texto', { validation: undefined }, 2),
   linkListField('closingLinks', 'Cierre: botones', {
     description: 'El primero es el botón principal.',
-    validation: (Rule: any) => Rule.required().min(1),
+    validation: (Rule: SanityRule) => Rule.required().min(1),
   }),
   ...(opts.whatsapp
     ? [

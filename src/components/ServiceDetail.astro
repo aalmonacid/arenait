@@ -8,7 +8,10 @@
 import Button from './Button.astro';
 import Icon from './Icon.astro';
 import InlineText from './InlineText.astro';
+import type { ComponentProps } from 'astro/types';
 import type { ServiceSchema } from '../types/sanity';
+
+type IconName = ComponentProps<typeof Icon>['name'];
 
 interface Props {
   service: ServiceSchema;
@@ -35,7 +38,7 @@ const bulletClass =
         {
           service.icon && (
             <span class="text-primary">
-              <Icon name={service.icon as any} class="w-8 h-8" />
+              <Icon name={service.icon as IconName} class="w-8 h-8" />
             </span>
           )
         }
