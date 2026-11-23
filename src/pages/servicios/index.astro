@@ -11,6 +11,12 @@ import Button from '../../components/Button.astro';
 import { getServices, getServicesPage, getSiteSettings } from '../../lib/content';
 import { buildWhatsappUrl } from '../../lib/contact';
 import { stripInlineLinks } from '../../lib/inlineLinks';
+import {
+  absoluteUrl,
+  breadcrumbSchema,
+  faqPageSchema,
+  serviceListSchema,
+} from '../../lib/structuredData';
 
 const [services, page, settings] = await Promise.all([
   getServices(),
@@ -20,34 +26,24 @@ const [services, page, settings] = await Promise.all([
 
 const siteOrigin = new URL('/', Astro.site).toString().replace(/\/$/, '');
 
-// JSON-LD: cada servicio como Service dentro de un ItemList, y las preguntas
-// frecuentes como FAQPage. Solo campos que existen en el contenido (sin precio
-// ni valoraciones inventadas).
+// JSON-LD: cada servicio como Service dentro de un ItemList, las preguntas
+// frecuentes como FAQPage y la ruta de migas. Solo campos que existen en el
+// contenido (sin precio ni valoraciones inventadas).
+const provider = { name: settings.siteName, url: siteOrigin };
 const structuredData = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    itemListElement: services.map((service, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': 'Service',
-        name: service.title,
-        description: stripInlineLinks(service.whatWeDo),
-        url: new URL(`/servicios#${service.slug.current}`, Astro.site).toString(),
-        provider: { '@type': 'Organization', name: settings.siteName, url: siteOrigin },
-      },
+  serviceListSchema(
+    services.map((service) => ({
+      name: service.title,
+      description: stripInlineLinks(service.whatWeDo),
+      url: absoluteUrl(siteOrigin, `/servicios#${service.slug.current}`),
     })),
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: page.faq.map((item) => ({
-      '@type': 'Question',
-      name: item.question,
-      acceptedAnswer: { '@type': 'Answer', text: item.answer },
-    })),
-  },
+    provider,
+  ),
+  faqPageSchema(page.faq),
+  breadcrumbSchema([
+    { name: 'Inicio', url: absoluteUrl(siteOrigin, '/') },
+    { name: 'Servicios', url: absoluteUrl(siteOrigin, '/servicios') },
+  ]),
 ];
 
 const whatsappUrl = buildWhatsappUrl(settings.whatsappNumber, settings.whatsappMessage);
@@ -56,7 +52,12 @@ const servicesOf = (pillarKey: string) => services.filter((s) => s.pillar === pi
 const linkClass = 'border-b-2 border-neutral-900 hover:border-interactive';
 ---
 
-<BaseLayout title={page.seoTitle} description={page.seoDescription} structuredData={structuredData}>
+<BaseLayout
+  title={page.seoTitle}
+  description={page.seoDescription}
+  structuredData={structuredData}
+  ogImage="/og-servicios.jpg"
+>
   <PageHero kicker={page.heroEyebrow} title={page.heroTitle} lead={page.heroIntro}>
     <div class="flex flex-col sm:flex-row gap-3 pb-8">
       <Button href={page.heroPrimaryCta.href}>{page.heroPrimaryCta.label}</Button>
@@ -131,7 +132,9 @@ const linkClass = 'border-b-2 border-neutral-900 hover:border-interactive';
                 class="font-bold text-secondary underline decoration-interactive decoration-2 underline-offset-4"
               >
                 {sector.gridLabel ?? sector.label}
-              </a>{': '}{sector.description}
+              </a>
+              {': '}
+              {sector.description}
             </li>
           ))
         }
@@ -158,9 +161,21 @@ const linkClass = 'border-b-2 border-neutral-900 hover:border-interactive';
         <caption class="sr-only">Fases del proceso de trabajo y su control de calidad</caption>
         <thead class="sr-only md:not-sr-only">
           <tr class="border-b border-neutral-200">
-            <th scope="col" class="py-3 pr-6 text-xs font-bold uppercase tracking-label text-secondary md:w-1/5">Fase</th>
-            <th scope="col" class="py-3 pr-6 text-xs font-bold uppercase tracking-label text-secondary md:w-2/5">Qué hacemos</th>
-            <th scope="col" class="py-3 text-xs font-bold uppercase tracking-label text-secondary md:w-2/5">Control de calidad</th>
+            <th
+              scope="col"
+              class="py-3 pr-6 text-xs font-bold uppercase tracking-label text-secondary md:w-1/5"
+              >Fase</th
+            >
+            <th
+              scope="col"
+              class="py-3 pr-6 text-xs font-bold uppercase tracking-label text-secondary md:w-2/5"
+              >Qué hacemos</th
+            >
+            <th
+              scope="col"
+              class="py-3 text-xs font-bold uppercase tracking-label text-secondary md:w-2/5"
+              >Control de calidad</th
+            >
           </tr>
         </thead>
         <tbody>
@@ -211,9 +226,7 @@ const linkClass = 'border-b-2 border-neutral-900 hover:border-interactive';
   >
     <div class="max-w-7xl mx-auto">
       <SectionHead id="modelos-title" label="Modelos de trabajo" title={page.modelsTitle} />
-      <ul
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 list-none p-0 m-0"
-      >
+      <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 list-none p-0 m-0">
         {
           page.models.map((model) => (
             <li class="border-2 border-neutral-200 border-t-4 border-t-accent bg-white p-6">

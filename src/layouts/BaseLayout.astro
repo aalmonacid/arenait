@@ -5,11 +5,13 @@ import Button from '../components/Button.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import CookieConsentBanner from '../components/CookieConsentBanner.astro';
 import { getSiteSettings } from '../lib/content';
+import { absoluteUrl, jsonLdString, organizationSchema } from '../lib/structuredData';
+import type { JsonLdObject } from '../lib/structuredData';
 
 interface Props {
   title: string;
   description?: string;
-  structuredData?: Record<string, unknown>[];
+  structuredData?: JsonLdObject[];
   ogImage?: string;
   /** Fuerza `noindex` aunque el sitio esté abierto a indexación (p. ej. la 404). */
   noindex?: boolean;
@@ -40,19 +42,18 @@ const canonicalPath =
 const canonicalUrl = new URL(canonicalPath, Astro.site).toString();
 const siteOrigin = new URL('/', Astro.site).toString().replace(/\/$/, '');
 
-const structuredData: Record<string, unknown>[] = Astro.props.structuredData ?? [];
+const structuredData: JsonLdObject[] = Astro.props.structuredData ?? [];
 
-const organizationSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
+// Organization en todas las páginas. El logo es el isotipo real de /public;
+// «desde 2013» ya figura en la descripción del sitio. Sin `sameAs`: el sitio
+// aún no publica perfiles oficiales de redes.
+const organization = organizationSchema({
   name: siteName,
   url: siteOrigin,
   description: settings.defaultDescription,
-};
-
-// JSON-LD sin «<»: un valor con «</script>» (por ejemplo, desde Sanity) no
-// puede cerrar la etiqueta ni inyectar marcado.
-const jsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c');
+  logo: absoluteUrl(siteOrigin, '/apple-touch-icon.png'),
+  foundingDate: '2013',
+});
 
 const NAV_ITEMS = [
   { href: '/servicios', label: 'Servicios' },
@@ -118,10 +119,10 @@ const isActive = (href: string) => canonicalPath === href || canonicalPath.start
     <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <script is:inline type="application/ld+json" set:html={jsonLd(organizationSchema)} />
+    <script is:inline type="application/ld+json" set:html={jsonLdString(organization)} />
     {
       structuredData.map((schema) => (
-        <script is:inline type="application/ld+json" set:html={jsonLd(schema)} />
+        <script is:inline type="application/ld+json" set:html={jsonLdString(schema)} />
       ))
     }
   </head>
@@ -157,11 +158,7 @@ const isActive = (href: string) => canonicalPath === href || canonicalPath.start
               </a>
             ))
           }
-          <Button
-            href={CTA.href}
-            size="sm"
-            aria-current={isActive(CTA.href) ? 'page' : undefined}
-          >
+          <Button href={CTA.href} size="sm" aria-current={isActive(CTA.href) ? 'page' : undefined}>
             {CTA.label}
           </Button>
         </nav>

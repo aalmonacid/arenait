@@ -6,6 +6,7 @@ import PageHero from '../../components/PageHero.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import ClosingCta from '../../components/ClosingCta.astro';
 import { getProjects, getProjectsPage, getSiteSettings } from '../../lib/content';
+import { absoluteUrl, breadcrumbSchema, collectionPageSchema } from '../../lib/structuredData';
 
 const [projects, page, settings] = await Promise.all([
   getProjects(),
@@ -23,23 +24,19 @@ const groups = page.serviceFilters
   }))
   .filter((group) => group.projects.length > 0);
 
-// JSON-LD: lista de proyectos (solo los títulos publicados).
+// JSON-LD: lista de proyectos (solo los títulos publicados) y ruta de migas.
+const siteOrigin = new URL('/', Astro.site).toString().replace(/\/$/, '');
 const structuredData = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
+  collectionPageSchema({
     name: page.heroTitle,
     description: page.seoDescription,
-    url: new URL('/proyectos', Astro.site).toString(),
-    mainEntity: {
-      '@type': 'ItemList',
-      itemListElement: projects.map((project, index) => ({
-        '@type': 'ListItem',
-        position: index + 1,
-        name: project.title,
-      })),
-    },
-  },
+    url: absoluteUrl(siteOrigin, '/proyectos'),
+    itemNames: projects.map((project) => project.title),
+  }),
+  breadcrumbSchema([
+    { name: 'Inicio', url: absoluteUrl(siteOrigin, '/') },
+    { name: 'Proyectos', url: absoluteUrl(siteOrigin, '/proyectos') },
+  ]),
 ];
 
 const filterButton =
@@ -51,6 +48,7 @@ const legendClass = 'text-xs font-bold uppercase tracking-label text-secondary';
   title={page.seoTitle}
   description={page.seoDescription}
   structuredData={structuredData}
+  ogImage="/og-proyectos.jpg"
 >
   <PageHero kicker="Proyectos" title={page.heroTitle} lead={page.heroIntro} />
 
@@ -117,7 +115,10 @@ const legendClass = 'text-xs font-bold uppercase tracking-label text-secondary';
     </div>
   </section>
 
-  <section class="py-12 md:py-16 px-4 md:px-8 bg-white border-b border-neutral-200" aria-label="Experiencia">
+  <section
+    class="py-12 md:py-16 px-4 md:px-8 bg-white border-b border-neutral-200"
+    aria-label="Experiencia"
+  >
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
       <div class="border-t-2 border-neutral-900 pt-5">
         <h2 class={legendClass}>{page.experienceBizagiTitle}</h2>

@@ -12,6 +12,7 @@ import ClosingCta from '../components/ClosingCta.astro';
 import Button from '../components/Button.astro';
 import { getHomePage, getProjects, getSiteSettings } from '../lib/content';
 import { buildWhatsappUrl } from '../lib/contact';
+import { absoluteUrl, webSiteSchema } from '../lib/structuredData';
 
 const [home, settings, projects] = await Promise.all([
   getHomePage(),
@@ -37,9 +38,24 @@ const titleLead = titleHasHighlight
 // Imagen para compartir: archivo estático 1200x630 derivado con
 // `node scripts/make-images.mjs` (el adaptador de Cloudflare usa `passthrough`).
 const ogImage = '/og-home.jpg';
+
+// JSON-LD: Organization lo emite el layout en todas las páginas; WebSite solo en el inicio.
+const structuredData = [
+  webSiteSchema({
+    name: settings.siteName,
+    url: absoluteUrl(Astro.site?.toString() ?? '', '/'),
+    description: settings.defaultDescription,
+    inLanguage: 'es-CO',
+  }),
+];
 ---
 
-<BaseLayout title={home.seoTitle} description={home.seoDescription} ogImage={ogImage}>
+<BaseLayout
+  title={home.seoTitle}
+  description={home.seoDescription}
+  ogImage={ogImage}
+  structuredData={structuredData}
+>
   <!-- Hero editorial: tipografía como protagonista sobre una retícula visible.
        Sin foto ni scrim: el motivo gráfico es la fila de puntos del logo. -->
   <section class="relative overflow-hidden bg-white pt-16 md:pt-28" aria-labelledby="hero-title">
