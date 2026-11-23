@@ -29,6 +29,8 @@ Sitio web de Arena IT: software a la medida, procesos en Bizagi e inteligencia a
 | `npm run test:e2e`                                | Pruebas e2e (Playwright)                  |
 | `node scripts/make-images.mjs`                    | Regenera imágenes OG, de `/nosotros` y favicon |
 | `npm run seed:content -- --dry-run`               | Resumen de la carga de contenido a Sanity (sin escribir) |
+| `npm run verify:live -- <url> [--prod]`           | Verificación de solo lectura de un sitio publicado (cabeceras, SEO, sitemap, política, privacidad de leads) |
+| `npm run og:generate`                             | Regenera las imágenes OG de `/servicios`, `/proyectos` y `/contacto` |
 
 ## Diseño (Swiss Minimalist)
 
