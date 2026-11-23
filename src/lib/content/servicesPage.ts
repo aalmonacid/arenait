@@ -12,6 +12,7 @@ export const fallbackServicesPage: ServicesPage = {
     'Diseñamos, construimos y operamos soluciones a la medida y automatizamos procesos para organizaciones públicas y privadas. Incorporamos inteligencia artificial donde genera valor medible, con el control que exigen tus áreas de riesgo, seguridad y cumplimiento.',
   heroPrimaryCta: { label: 'Cuéntanos tu reto', href: '/contacto' },
   heroSecondaryCta: { label: 'Ver cómo trabajamos', href: '#como-trabajamos' },
+  portfolioCta: { label: 'Descarga el portafolio (PDF)', href: '/portafolio-arena-it.pdf' },
   quickLinks: [
     { label: '01 Construimos', href: '#construimos' },
     { label: '02 Aplicamos IA', href: '#aplicamos-ia' },

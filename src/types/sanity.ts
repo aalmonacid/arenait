@@ -165,6 +165,8 @@ export interface ServicesPage extends SeoFields, ClosingFields {
   heroIntro: string;
   heroPrimaryCta: LinkItem;
   heroSecondaryCta: LinkItem;
+  /** Descarga del portafolio de servicios (PDF en `public/portafolio-arena-it.pdf`). */
+  portfolioCta: LinkItem;
   quickLinks: LinkItem[];
   pillars: ServicesPillar[];
   /** Texto del botón de cada servicio (lleva a /contacto?servicio=<slug>). */

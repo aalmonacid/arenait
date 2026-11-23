@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Arena IT · Portafolio de servicios 2026</title>
+<style>
+@font-face{font-family:"PJS";src:url("../../public/fonts/plus-jakarta-sans-latin.woff2") format("woff2");font-weight:200 800}
+@font-face{font-family:"PJS";src:url("../../public/fonts/plus-jakarta-sans-latin-ext.woff2") format("woff2");font-weight:200 800;unicode-range:U+0100-024F}
+:root{--p:#0075C9;--s:#294E6C;--a:#FEA621;--n9:#0F172A;--n2:#E2E8F0;--n0:#F8FAFC}
+@page{size:A4;margin:0}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:"PJS",Inter,Arial,sans-serif;color:var(--n9);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;padding:16mm 16mm 14mm;position:relative;overflow:hidden;page-break-after:always;background:#fff}
+.page:last-child{page-break-after:auto}
+.logo{display:inline-flex;align-items:flex-end;gap:.12em;font-weight:800;text-transform:uppercase;letter-spacing:-.02em;font-size:22pt;line-height:1}
+.logo .it{color:var(--p);position:relative}
+.logo .it svg{position:absolute;left:50%;top:-.6em;transform:translateX(-50%)}
+.eyebrow{display:flex;align-items:center;gap:10px;font-size:7.5pt;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--s);margin:0 0 4mm}
+.eyebrow:before{content:"";width:12mm;height:2px;background:var(--n9)}
+h1{font-size:40pt;line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:0}
+h2{font-size:21pt;line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:0 0 5mm}
+h3{font-size:11pt;font-weight:800;color:var(--s);margin:0 0 1.5mm;letter-spacing:-.01em}
+p{font-size:9.5pt;line-height:1.55;margin:0 0 3mm}
+.small{font-size:8.3pt;line-height:1.5}
+.code{font-size:7pt;font-weight:800;letter-spacing:.16em;color:var(--p);display:block;margin-bottom:1mm}
+.foot{position:absolute;left:16mm;right:16mm;bottom:9mm;display:flex;justify-content:space-between;font-size:7pt;color:var(--s);border-top:1px solid var(--n2);padding-top:2.5mm;letter-spacing:.04em}
+
+/* portada */
+.cover{background:var(--s);color:#fff;display:flex;flex-direction:column}
+.cover .logo{color:#fff}.cover .logo .it{color:var(--a)}
+.cover h1{color:#fff;margin-top:52mm;max-width:160mm}
+.cover .lead{font-size:12.5pt;line-height:1.55;color:#E2E8F0;max-width:150mm;margin-top:9mm}
+.dots{margin-top:10mm}
+.pillars{margin-top:auto;display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid #fff}
+.pillars div{padding:5mm 4mm 0 0}
+.pillars b{display:block;font-size:7pt;letter-spacing:.16em;color:var(--a);margin-bottom:1.5mm}
+.pillars span{font-size:11.5pt;font-weight:800}
+.pillars p{color:#E2E8F0;font-size:8.3pt;margin-top:1.5mm}
+.cover .web{margin-top:9mm;font-size:8pt;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#fff}
+
+/* servicios */
+.pillar{border-top:2px solid var(--n9);padding-top:3.5mm;margin-bottom:5mm}
+.pillar-head{display:flex;align-items:baseline;gap:4mm;margin-bottom:2.5mm}
+.pillar-head .code{margin:0}
+.pillar-head h3{font-size:13pt;color:var(--n9);margin:0}
+.svc{display:grid;grid-template-columns:repeat(2,1fr);gap:2.5mm 7mm}
+.svc div{border-left:3px solid var(--p);padding-left:3mm}
+.svc h4{font-size:9.3pt;margin:0 0 .6mm;font-weight:800}
+.svc p{font-size:8.1pt;line-height:1.45;margin:0;color:#334155}
+.bizagi{background:var(--n0);border:1px solid var(--n2);border-top:4px solid var(--a);padding:4mm 5mm;margin-top:1mm}
+.bizagi h3{color:var(--n9)}
+.bizagi ul{margin:2mm 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:1mm 6mm}
+.bizagi li,.list li{font-size:8.2pt;line-height:1.45;position:relative;padding-left:4mm}
+.bizagi li:before,.list li:before{content:"";position:absolute;left:0;top:1.6mm;width:1.8mm;height:1.8mm;background:var(--p)}
+.list{list-style:none;margin:0;padding:0}
+
+/* cómo trabajamos */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0 6mm;border-top:2px solid var(--n9);margin-bottom:8mm}
+.steps div{padding:3.5mm 0;border-bottom:1px solid var(--n2)}
+.steps h4{font-size:9.5pt;margin:0 0 1mm;font-weight:800}
+.steps p{font-size:8pt;line-height:1.45;margin:0;color:#334155}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;margin-bottom:8mm}
+.card{border:1px solid var(--n2);border-top:3px solid var(--p);padding:3.5mm}
+.card h4{font-size:9pt;margin:0 0 1mm;font-weight:800}
+.card p{font-size:7.9pt;line-height:1.45;margin:0;color:#334155}
+.sec{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5mm 7mm}
+
+/* clientes y proyectos */
+.clients{display:grid;grid-template-columns:repeat(4,1fr);gap:2.5mm;margin-bottom:7mm}
+.client{border:1px solid var(--n2);min-height:15mm;display:flex;align-items:center;justify-content:center;text-align:center;
+  font-weight:800;font-size:8.6pt;line-height:1.25;padding:2mm;color:var(--s);background:#fff}
+.client small{display:block;font-weight:600;font-size:6.6pt;color:#64748B;letter-spacing:.04em;margin-top:.8mm}
+.cases{display:grid;grid-template-columns:repeat(2,1fr);gap:3mm;margin-bottom:6mm}
+.case{border:1px solid var(--n2);border-top:3px solid var(--s);padding:3.5mm 4mm}
+.case .meta{font-size:7pt;letter-spacing:.1em;text-transform:uppercase;color:var(--s);font-weight:800;margin-bottom:1.2mm}
+.case h4{font-size:9.3pt;margin:0 0 1.2mm;font-weight:800;line-height:1.3}
+.case p{font-size:8pt;line-height:1.45;margin:0;color:#334155}
+.case .big{font-size:15pt;font-weight:800;color:var(--p);letter-spacing:-.02em;margin:.5mm 0 1mm;line-height:1.1}
+.sectors{display:flex;flex-wrap:wrap;gap:2mm;margin-bottom:7mm}
+.sectors span{border:1.5px solid var(--n9);padding:1.8mm 3.5mm;font-size:7.2pt;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.contact{background:var(--s);color:#fff;padding:7mm 8mm;display:grid;grid-template-columns:1.3fr 1fr;gap:6mm;align-items:center}
+.contact h2{color:#fff;font-size:17pt;margin:0 0 2mm}
+.contact p{color:#E2E8F0;margin:0}
+.contact .data{font-size:9pt;line-height:1.8}
+.contact .data b{color:var(--a);font-size:7pt;letter-spacing:.16em;text-transform:uppercase;display:block;line-height:1.2;margin-top:1.5mm}
+</style>
+</head>
+<body>
+
+<!-- 1. PORTADA -->
+<section class="page cover">
+  <div class="logo"><span>Arena</span><span class="it"><svg width="30" height="8" viewBox="0 0 34 8"><circle cx="2" cy="4" r=".9" fill="#7FB8E6"/><circle cx="7" cy="4" r=".9" fill="#7FB8E6"/><circle cx="12" cy="4" r="1.8" fill="#7FB8E6"/><circle cx="17" cy="4" r="2.6" fill="#FEA621"/><circle cx="22" cy="4" r="1.8" fill="#7FB8E6"/><circle cx="27" cy="4" r=".9" fill="#7FB8E6"/><circle cx="32" cy="4" r=".9" fill="#7FB8E6"/></svg>IT</span></div>
+  <h1>Software e IA para operaciones reales.</h1>
+  <p class="lead">Desde 2013 diseñamos, construimos y operamos soluciones a la medida, procesos en Bizagi e inteligencia artificial para organizaciones públicas y privadas.</p>
+  <svg class="dots" width="136" height="32" viewBox="0 0 136 32"><circle cx="4" cy="16" r="3" fill="#7FB8E6"/><circle cx="22" cy="16" r="4" fill="#7FB8E6"/><circle cx="44" cy="16" r="7" fill="#7FB8E6"/><circle cx="72" cy="16" r="13" fill="#FEA621"/><circle cx="100" cy="16" r="7" fill="#7FB8E6"/><circle cx="122" cy="16" r="4" fill="#7FB8E6"/><circle cx="132" cy="16" r="3" fill="#7FB8E6"/></svg>
+  <div class="pillars">
+    <div><b>01</b><span>Construimos</span><p>Software a la medida, integración, modernización y automatización de procesos con Bizagi.</p></div>
+    <div><b>02</b><span>Aplicamos IA</span><p>Business Intelligence, automatización documental, asistentes, agentes y modelos predictivos.</p></div>
+    <div><b>03</b><span>Operamos</span><p>Mantenimiento evolutivo, aseguramiento de la calidad y outsourcing de talento TI.</p></div>
+  </div>
+  <div class="web">Portafolio de servicios · 2026 · arenait.co</div>
+</section>
+
+<!-- 2. SERVICIOS -->
+<section class="page">
+  <p class="eyebrow">Servicios</p>
+  <h2>Un solo equipo para construir, aplicar IA y operar.</h2>
+
+  <div class="pillar">
+    <div class="pillar-head"><span class="code">01</span><h3>Construimos</h3></div>
+    <div class="svc">
+      <div><h4>Desarrollo de software a la medida</h4><p>Aplicaciones web, móviles y portales transaccionales diseñados a partir de cómo opera tu empresa.</p></div>
+      <div><h4>Integración y automatización de procesos</h4><p>Conectamos tus sistemas mediante APIs y automatizamos flujos de trabajo de principio a fin.</p></div>
+      <div><h4>Modernización y migración de sistemas legados</h4><p>Modernizamos o migramos aplicaciones por etapas, sin detener la operación diaria.</p></div>
+      <div><h4>Automatización de procesos con Bizagi</h4><p>Modelamos, automatizamos e implementamos procesos en Bizagi, con soporte y migración de versiones.</p></div>
+    </div>
+  </div>
+
+  <div class="pillar">
+    <div class="pillar-head"><span class="code">02</span><h3>Aplicamos IA</h3></div>
+    <div class="svc">
+      <div><h4>Business Intelligence y analítica</h4><p>Indicadores confiables y tableros útiles a partir de los datos que ya genera tu operación.</p></div>
+      <div><h4>Automatización documental con IA</h4><p>Clasificación, extracción y validación de documentos, con revisión humana cuando se requiere.</p></div>
+      <div><h4>Asistentes de IA sobre tu información</h4><p>Asistentes que responden con base en la información de tu empresa, con referencia a la fuente.</p></div>
+      <div><h4>Agentes de IA que ejecutan tareas</h4><p>Agentes que consultan tus sistemas y ejecutan acciones con aprobación humana en los pasos críticos.</p></div>
+      <div><h4>Modelos predictivos</h4><p>Modelos de machine learning integrados a los procesos donde se toman las decisiones.</p></div>
+      <div><h4>IA integrada a tus sistemas actuales</h4><p>Resúmenes, clasificación, búsqueda inteligente y recomendaciones dentro del software que ya usas.</p></div>
+    </div>
+  </div>
+
+  <div class="pillar">
+    <div class="pillar-head"><span class="code">03</span><h3>Operamos</h3></div>
+    <div class="svc">
+      <div><h4>Mantenimiento evolutivo y soporte</h4><p>Soporte, correcciones, actualizaciones y evolución con acuerdos de nivel de servicio (SLA).</p></div>
+      <div><h4>Aseguramiento de la calidad (QA)</h4><p>Pruebas funcionales, automatizadas, de rendimiento y de seguridad antes de cada entrega.</p></div>
+      <div><h4>Outsourcing de talento TI</h4><p>Profesionales especializados que se integran a tu equipo y trabajan bajo tu dirección.</p></div>
+    </div>
+  </div>
+
+  <div class="bizagi">
+    <h3>Especialistas en Bizagi</h3>
+    <p class="small" style="margin:0">Contamos con profesionales certificados en Bizagi. Implementamos procesos, damos soporte, migramos versiones e incorporamos IA a tus procesos:</p>
+    <ul>
+      <li>Clasificación de solicitudes y casos</li>
+      <li>Extracción de información de documentos</li>
+      <li>Asistencia en decisiones, con validación humana</li>
+      <li>Agentes y asistentes conversacionales</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Arena IT · Tecnología para la operación diaria.</span><span>Portafolio de servicios · 2026 · 02</span></div>
+</section>
+
+<!-- 3. CÓMO TRABAJAMOS -->
+<section class="page">
+  <p class="eyebrow">Cómo trabajamos</p>
+  <h2>Un proceso claro, con IA y control humano en cada fase.</h2>
+  <div class="steps">
+    <div><span class="code">01</span><h4>Diagnóstico</h4><p>Priorizamos procesos por impacto y esfuerzo, y proponemos arquitectura, estimación y hoja de ruta.</p></div>
+    <div><span class="code">02</span><h4>Piloto</h4><p>Validamos un caso acotado, con datos reales y métricas de éxito, cuando la solución lo requiere.</p></div>
+    <div><span class="code">03</span><h4>Desarrollo</h4><p>Construimos por incrementos, con revisión humana del código en cada cambio.</p></div>
+    <div><span class="code">04</span><h4>QA</h4><p>Ninguna entrega sale sin pruebas funcionales, automatizadas y de seguridad aprobadas.</p></div>
+    <div><span class="code">05</span><h4>Implementación</h4><p>Ponemos en marcha la solución sin interrumpir la operación, con plan de despliegue y reversión.</p></div>
+    <div><span class="code">06</span><h4>Operación</h4><p>Mantenemos, monitoreamos y evolucionamos la solución con acuerdos de nivel de servicio.</p></div>
+  </div>
+
+  <p class="eyebrow">Modelos de trabajo</p>
+  <h2>Elige cómo quieres trabajar con nosotros.</h2>
+  <div class="cards">
+    <div class="card"><h4>Proyecto con alcance definido</h4><p>Objetivo, alcance y cronograma acordados, con entregas por hitos y seguimiento constante.</p></div>
+    <div class="card"><h4>Célula dedicada</h4><p>Un equipo autónomo para una iniciativa específica, con la agilidad que requiere.</p></div>
+    <div class="card"><h4>Outsourcing de talento TI</h4><p>Profesionales en desarrollo, Bizagi, datos, QA y arquitectura bajo la dirección de tu equipo.</p></div>
+    <div class="card"><h4>Bolsa de horas</h4><p>Horas para soporte, mejoras y consultoría puntual, sin un compromiso de largo plazo.</p></div>
+    <div class="card"><h4>Mantenimiento y soporte</h4><p>Evolución continua de tus aplicaciones con acuerdos de nivel de servicio.</p></div>
+  </div>
+
+  <p class="eyebrow">Seguridad y gobierno de la IA</p>
+  <h2>Trabajamos con el cuidado que exigen tus áreas de riesgo y seguridad.</h2>
+  <ul class="list sec">
+    <li><b>Tu infraestructura:</b> trabajamos en tus repositorios y ambientes cuando nos das acceso.</li>
+    <li><b>Tu política de datos:</b> definimos contigo qué información puede usar la IA, dónde se aloja y cómo se audita.</li>
+    <li><b>Control humano:</b> ningún agente ejecuta operaciones sensibles sin aprobación.</li>
+    <li><b>Trazabilidad:</b> registramos las consultas, decisiones y acciones de los sistemas de IA.</li>
+    <li><b>Datos personales:</b> tratamos la información conforme a la Ley 1581 de 2012.</li>
+    <li><b>Confidencialidad:</b> firmamos acuerdos de confidencialidad cuando tu organización lo requiere.</li>
+  </ul>
+  <div class="foot"><span>Arena IT · Tecnología para la operación diaria.</span><span>Portafolio de servicios · 2026 · 03</span></div>
+</section>
+
+<!-- 4. PROYECTOS Y CONTACTO (sin nombres de clientes: se agregan solo con autorización escrita) -->
+<section class="page">
+  <p class="eyebrow">Proyectos</p>
+  <div class="cases">
+    <div class="case"><div class="meta">Farmacéutico · SQL Server · SSIS</div><h4>Centralización de información de supermercados en SQL Server</h4><div class="big">De 12 horas a 30 minutos</div><p>El proceso completo de cruce de información, con la información normalizada en una base de datos propia.</p></div>
+    <div class="case"><div class="meta">Seguros · Bizagi</div><h4>Implementación y soporte de procesos de radicación e indemnizaciones</h4><div class="big">2019 a 2024</div><p>Soporte continuo a procesos críticos de una aseguradora, con atención y solución de incidentes.</p></div>
+    <div class="case"><div class="meta">Financiero · Bizagi</div><h4>Solución de problemas de desempeño en Bizagi</h4><div class="big">2024</div><p>Identificamos la causa raíz de la lentitud de un proyecto de una entidad financiera, mejoramos los tiempos de respuesta y redujimos la indisponibilidad.</p></div>
+    <div class="case"><div class="meta">Financiero · Bizagi</div><h4>Migración a la nube de un proyecto Bizagi</h4><div class="big">2025 a 2026</div><p>Proyecto Bizagi de una entidad financiera operando en la nube, migrado sin interrupción del servicio.</p></div>
+  </div>
+
+  <p class="eyebrow">Sectores</p>
+  <div class="sectors"><span>Seguros</span><span>Financiero</span><span>Sector público</span><span>Farmacéutico</span><span>Agropecuario</span></div>
+
+  <div class="contact">
+    <div><h2>¿Tienes un reto operativo que el software o la IA pueden resolver?</h2><p>Cuéntanos qué necesitas. Te respondemos con una propuesta concreta.</p></div>
+    <div class="data">
+      <b>Contacto</b>Andrés Arenas · Gerente
+      <b>WhatsApp</b>+57 300 215 6898
+      <b>Web</b>arenait.co
+    </div>
+  </div>
+  <div class="foot"><span>Arena IT · Tecnología para la operación diaria.</span><span>Portafolio de servicios · 2026 · 04</span></div>
+</section>
+
+</body>
+</html>

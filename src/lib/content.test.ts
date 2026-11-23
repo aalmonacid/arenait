@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   fallbackAboutPage,
@@ -39,8 +40,17 @@ describe('respaldo de contenido: guía de estilo del cliente', () => {
     expect(json).not.toMatch(/ISO ?27001|TOGAF|99[.,]9|TCO/);
   });
 
-  it('no enlaza al PDF del portafolio (todavía no se publica)', () => {
-    expect(json).not.toContain('portafolio');
+  it('enlaza al portafolio PDF básico, que existe y no nombra clientes sin autorización', () => {
+    expect(json).toContain('/portafolio-arena-it.pdf');
+    expect(existsSync(new URL('../../public/portafolio-arena-it.pdf', import.meta.url))).toBe(true);
+    // El HTML fuente del PDF no puede traer nombres de clientes pendientes de autorización.
+    const source = readFileSync(
+      new URL('../../scripts/portafolio/portafolio.html', import.meta.url),
+      'utf8',
+    );
+    expect(source).not.toMatch(
+      /Colmena|Santander|Lockton|Colpensiones|Gobernaci[oó]n|SADEP|Secretar[ií]a/,
+    );
   });
 });
 
@@ -118,7 +128,12 @@ describe('mergeContent', () => {
   });
 
   it('completa campos vacíos o ausentes y conserva lo editado', () => {
-    const out = mergeContent(fallback, { title: 'Nuevo', items: [], link: { label: 'Otro' }, opt: '' });
+    const out = mergeContent(fallback, {
+      title: 'Nuevo',
+      items: [],
+      link: { label: 'Otro' },
+      opt: '',
+    });
     expect(out.title).toBe('Nuevo');
     expect(out.items).toEqual(['a', 'b']);
     expect(out.link).toEqual({ label: 'Otro', href: '/x' });
@@ -174,9 +189,9 @@ describe('enlaces dentro de los textos', () => {
   });
 
   it('descarta destinos externos o peligrosos y deja solo el texto', () => {
-    expect(parseInlineLinks('[x](https://malo.example) [y](javascript:alert) [z](//malo.example)')).toEqual(
-      [{ text: 'x' }, { text: ' ' }, { text: 'y' }, { text: ' ' }, { text: 'z' }],
-    );
+    expect(
+      parseInlineLinks('[x](https://malo.example) [y](javascript:alert) [z](//malo.example)'),
+    ).toEqual([{ text: 'x' }, { text: ' ' }, { text: 'y' }, { text: ' ' }, { text: 'z' }]);
   });
 
   it('stripInlineLinks quita la marca de enlaces', () => {

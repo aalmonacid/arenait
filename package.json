@@ -35,7 +35,8 @@
     "format:check": "prettier --check .",
     "seed:content": "node scripts/seed-content.mjs",
     "verify:live": "node scripts/verify-live.mjs",
-    "og:generate": "node scripts/og/generate-og.mjs"
+    "og:generate": "node scripts/og/generate-og.mjs",
+    "portafolio:generate": "node scripts/portafolio/build.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
