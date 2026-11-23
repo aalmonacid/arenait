@@ -1,5 +1,4 @@
 import { defineConfig, envField } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
 import sanity from '@sanity/astro';
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
@@ -31,7 +30,6 @@ export default defineConfig({
     },
   },
   integrations: [
-    tailwind(),
     sanity({
       projectId: 'xbayv7k2',
       dataset: 'production',
