@@ -49,5 +49,6 @@ export const fallbackAboutPage: AboutPage = {
   closingLinks: [
     { label: 'Cuéntanos tu reto', href: '/contacto' },
     { label: 'Ver proyectos', href: '/proyectos' },
+    { label: 'Descarga el portafolio (PDF)', href: '/portafolio-arena-it.pdf' },
   ],
 };

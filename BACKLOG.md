@@ -19,9 +19,10 @@ Hecho en código (rama `contenido/final-cliente-2026-11`):
 Pendiente:
 
 - [ ] **Antonio:** carga en Sanity (`--dry-run`, luego real, con el token) y actualizar el filtro del webhook (ver `PLAN-PRODUCCION.md`).
-- [ ] **Cliente:** autorización escrita de los casos pendientes (se publican desde el Studio); PDF del portafolio (no se publica hasta tenerlas); validar el contenido final.
+- [ ] **Cliente:** autorización escrita de los casos pendientes (se publican desde el Studio); validar el contenido final y el portafolio PDF básico (sin nombres de clientes; el PDF completo del cliente, con clientes, solo tras las autorizaciones).
 - [x] Mejoras previas a producción (23/11/2026, rama `mejoras/preproduccion`): imágenes OG propias de `/servicios`, `/proyectos` y `/contacto` (`npm run og:generate`); Tailwind por PostCSS (se quitó `@astrojs/tailwind`, peer inválida con Astro 7); `sanity` 6.24.0 y override de `smol-toml` (queda 1 alto de `js-yaml`, solo CLI); 0 advertencias de lint; datos estructurados centralizados en `src/lib/structuredData.ts` (Organization, WebSite, BlogPosting, BreadcrumbList; sin certificaciones ni cifras); `npm run verify:live`; prueba e2e del formulario (`e2e/formulario.spec.ts`, aún sin ejecutar: falta el navegador de Playwright).
-- [ ] Demos de IA; evaluar simplificar el formulario; página propia de Bizagi (decisión diferida); confirmar que `dev.arenait.co` no esté indexado (`verify:live` lo comprueba); validar con el cliente que `apple-touch-icon.png` sirve como logo de Organization; ejecutar los e2e tras `npx playwright install chromium`.
+- [x] Portafolio PDF básico (23/11/2026): `scripts/portafolio/portafolio.html` → `public/portafolio-arena-it.pdf` (`npm run portafolio:generate`, usa Edge o Chrome), sin nombres de clientes; botón en el hero de `/servicios` (campo `portfolioCta` en Sanity) y en el cierre de `/nosotros`. Pendiente: enlace en el correo de acuse (solo cuando el dominio final esté activo).
+- [ ] Evaluar simplificar el formulario. Fuera del lanzamiento por aclaración del cliente (23/11/2026): demos de IA (solo una sugerencia) y página propia de Bizagi (decisión diferida, probablemente nunca); confirmar que `dev.arenait.co` no esté indexado (`verify:live` lo comprueba); validar con el cliente que `apple-touch-icon.png` sirve como logo de Organization; ejecutar los e2e tras `npx playwright install chromium`.
 
 ## Épica 0 — Pivote de posicionamiento (cerrada, 2026-08-24)
 

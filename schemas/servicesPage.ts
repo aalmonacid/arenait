@@ -39,6 +39,7 @@ export const servicesPageSchema = {
       textField('heroIntro', 'Portada: texto'),
       linkField('heroPrimaryCta', 'Portada: botón principal'),
       linkField('heroSecondaryCta', 'Portada: botón secundario'),
+      linkField('portfolioCta', 'Portada: botón de descarga del portafolio (PDF)'),
       linkListField('quickLinks', 'Accesos rápidos'),
     ]),
     ...inGroup('pillars', [
