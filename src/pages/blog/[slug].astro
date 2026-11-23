@@ -9,6 +9,7 @@ import { renderBody } from '../../lib/renderBody';
 import { formatLongDate } from '../../lib/contentRules';
 import { imageDimensions } from '../../lib/portableText';
 import { urlForImage } from '../../lib/imageBuilder';
+import { absoluteUrl, blogPostingSchema, breadcrumbSchema } from '../../lib/structuredData';
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -39,17 +40,24 @@ const cover =
     : undefined;
 
 const siteOrigin = new URL('/', Astro.site).toString().replace(/\/$/, '');
-const articleSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
-  headline: post.title,
-  description: post.description,
-  datePublished: post.publishDate,
-  author: { '@type': 'Organization', name: post.author || settings.siteName },
-  publisher: { '@type': 'Organization', name: settings.siteName, url: siteOrigin },
-  mainEntityOfPage: `${siteOrigin}/blog/${post.slug.current}`,
-  ...(cover ? { image: cover.src } : {}),
-};
+const postUrl = absoluteUrl(siteOrigin, `/blog/${post.slug.current}`);
+const structuredData = [
+  blogPostingSchema({
+    headline: post.title,
+    description: post.description,
+    datePublished: post.publishDate,
+    authorName: post.author,
+    publisherName: settings.siteName,
+    publisherUrl: siteOrigin,
+    url: postUrl,
+    image: cover?.src,
+  }),
+  breadcrumbSchema([
+    { name: 'Inicio', url: absoluteUrl(siteOrigin, '/') },
+    { name: 'Blog', url: absoluteUrl(siteOrigin, '/blog') },
+    { name: post.title, url: postUrl },
+  ]),
+];
 ---
 
 <BaseLayout
@@ -57,7 +65,7 @@ const articleSchema = {
   description={post.description}
   ogType="article"
   ogImage={cover?.src}
-  structuredData={[articleSchema]}
+  structuredData={structuredData}
 >
   <article class="bg-white">
     <PageHero kicker={kicker} title={post.title} lead={byline} />

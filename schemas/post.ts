@@ -1,3 +1,4 @@
+import type { Rule as SanityRule, ValidationContext } from 'sanity';
 import { richText } from './portableText';
 
 /**
@@ -17,7 +18,7 @@ export const postSchema = {
       name: 'title',
       title: 'Título',
       type: 'string',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'slug',
@@ -26,7 +27,7 @@ export const postSchema = {
       description:
         'Se genera desde el título (botón «Generate»). Es la parte final de la URL (/blog/...): no la cambies una vez publicado.',
       options: { source: 'title', maxLength: 96 },
-      validation: (Rule: any) =>
+      validation: (Rule: SanityRule) =>
         Rule.required().custom((value: { current?: string } | undefined) =>
           !value?.current || /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value.current)
             ? true
@@ -40,14 +41,14 @@ export const postSchema = {
       rows: 3,
       description:
         'Aparece en el listado del blog y como descripción para buscadores (entre 120 y 160 caracteres es lo ideal).',
-      validation: (Rule: any) => Rule.required().max(300),
+      validation: (Rule: SanityRule) => Rule.required().max(300),
     },
     {
       name: 'publishDate',
       title: 'Fecha de publicación',
       type: 'date',
       initialValue: todayIso,
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'author',
@@ -75,8 +76,8 @@ export const postSchema = {
           title: 'Texto alternativo',
           type: 'string',
           description: 'Obligatorio si hay imagen: sin él, la portada no se publica.',
-          validation: (Rule: any) =>
-            Rule.custom((value: string | undefined, context: any) =>
+          validation: (Rule: SanityRule) =>
+            Rule.custom((value: string | undefined, context: ValidationContext) =>
               context.parent?.asset && !value?.trim()
                 ? 'Describe la imagen (texto alternativo).'
                 : true,
@@ -87,7 +88,7 @@ export const postSchema = {
     richText('body', 'Cuerpo del artículo', {
       description:
         'Párrafos, títulos H2/H3, citas, listas, negrita, cursiva, enlaces e imágenes (con texto alternativo).',
-      validation: (Rule: any) => Rule.required().min(1),
+      validation: (Rule: SanityRule) => Rule.required().min(1),
     }),
   ],
   orderings: [

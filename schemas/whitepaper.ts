@@ -1,3 +1,4 @@
+import type { Rule as SanityRule } from 'sanity';
 export const whitepaperSchema = {
   name: 'whitepaper',
   title: 'Whitepaper (Lead Magnet)',
@@ -7,7 +8,7 @@ export const whitepaperSchema = {
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'slug',
@@ -17,7 +18,7 @@ export const whitepaperSchema = {
         source: 'title',
         maxLength: 96,
       },
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'summary',

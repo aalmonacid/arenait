@@ -1,3 +1,4 @@
+import type { Rule as SanityRule, ValidationContext } from 'sanity';
 import { richText } from './portableText';
 import { todayInBogota } from '../src/lib/contentRules';
 
@@ -35,8 +36,8 @@ export const privacyPolicySchema = {
       type: 'string',
       description:
         'Solo números separados por punto (1.2, 2.0). No puede repetirse. Es la parte final de la URL de esta versión (1.2 → /version-1-2).',
-      validation: (Rule: any) =>
-        Rule.required().custom(async (value: string | undefined, context: any) => {
+      validation: (Rule: SanityRule) =>
+        Rule.required().custom(async (value: string | undefined, context: ValidationContext) => {
           if (!value) return true;
           if (!/^[0-9]+(\.[0-9]+)*$/.test(value.trim())) {
             return 'Usa solo números separados por punto (por ejemplo, 1.2).';
@@ -58,7 +59,7 @@ export const privacyPolicySchema = {
       type: 'date',
       description:
         'La versión vigente es la de fecha más reciente que no sea futura. Una versión con fecha futura se publica pero no rige hasta ese día (el sitio se reconstruye al publicar: si la fecha es futura, hay que reconstruirlo ese día).',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'changeSummary',
@@ -92,7 +93,7 @@ export const privacyPolicySchema = {
       name: 'sections',
       title: 'Secciones',
       type: 'array',
-      validation: (Rule: any) => Rule.required().min(1),
+      validation: (Rule: SanityRule) => Rule.required().min(1),
       of: [
         {
           type: 'object',
@@ -104,7 +105,7 @@ export const privacyPolicySchema = {
               title: 'Título',
               type: 'string',
               description: 'Con su numeración: «1. Responsable del tratamiento».',
-              validation: (Rule: any) => Rule.required(),
+              validation: (Rule: SanityRule) => Rule.required(),
             },
             {
               name: 'anchor',
@@ -112,7 +113,7 @@ export const privacyPolicySchema = {
               type: 'string',
               description:
                 'Permite enlazar a la sección (/politica-de-tratamiento-de-datos#cookies). Conserva «cookies» y «encargados»: el aviso de cookies y otras páginas enlazan a ellas.',
-              validation: (Rule: any) =>
+              validation: (Rule: SanityRule) =>
                 Rule.custom((value: string | undefined) =>
                   !value || /^[a-z][a-z0-9-]*$/.test(value)
                     ? true

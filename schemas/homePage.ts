@@ -1,3 +1,4 @@
+import type { Rule as SanityRule } from 'sanity';
 import { PILLARS } from './options';
 import {
   closingFields,
@@ -45,7 +46,7 @@ export const homePageSchema = {
         name: 'pillars',
         title: 'Servicios: los tres pilares',
         type: 'array',
-        validation: (Rule: any) => Rule.required().length(3),
+        validation: (Rule: SanityRule) => Rule.required().length(3),
         of: [
           {
             type: 'object',
@@ -55,7 +56,7 @@ export const homePageSchema = {
                 title: 'Pilar',
                 type: 'string',
                 options: { list: PILLARS, layout: 'dropdown' },
-                validation: (Rule: any) => Rule.required(),
+                validation: (Rule: SanityRule) => Rule.required(),
               },
               stringField('number', 'Número (01, 02, 03)'),
               stringField('title', 'Nombre'),
@@ -71,7 +72,7 @@ export const homePageSchema = {
     ...inGroup('process', [
       stringField('processTitle', 'Cómo trabajamos: titular'),
       titleTextList('processSteps', 'Cómo trabajamos: las seis fases', {
-        validation: (Rule: any) => Rule.required().length(6),
+        validation: (Rule: SanityRule) => Rule.required().length(6),
       }, { title: 'Fase' }),
       linkField('processLink', 'Cómo trabajamos: enlace'),
     ]),

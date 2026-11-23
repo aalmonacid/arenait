@@ -1,3 +1,4 @@
+import type { Rule as SanityRule } from 'sanity';
 import { PILLARS } from './options';
 
 /**
@@ -28,7 +29,7 @@ export const serviceSchema = {
       name: 'title',
       title: 'Título',
       type: 'string',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'slug',
@@ -40,7 +41,7 @@ export const serviceSchema = {
         source: 'title',
         maxLength: 96,
       },
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'icon',
@@ -51,21 +52,21 @@ export const serviceSchema = {
         list: SERVICE_ICONS,
         layout: 'dropdown',
       },
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'order',
       title: 'Orden',
       type: 'number',
       description: 'Posición en /servicios: 1 aparece primero, 2 segundo, y así sucesivamente.',
-      validation: (Rule: any) => Rule.required().integer().min(1),
+      validation: (Rule: SanityRule) => Rule.required().integer().min(1),
     },
     {
       name: 'pillar',
       title: 'Pilar',
       type: 'string',
       options: { list: PILLARS, layout: 'dropdown' },
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'featured',
@@ -80,7 +81,7 @@ export const serviceSchema = {
       type: 'string',
       description:
         'Una línea (primera oración de «Qué hacemos»). Se usa en los datos para buscadores.',
-      validation: (Rule: any) => Rule.required().max(200),
+      validation: (Rule: SanityRule) => Rule.required().max(200),
     },
     {
       name: 'seoHeading',
@@ -94,7 +95,7 @@ export const serviceSchema = {
       title: 'Cuando lo necesitas',
       type: 'text',
       rows: 3,
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'whatWeDo',
@@ -102,7 +103,7 @@ export const serviceSchema = {
       type: 'text',
       rows: 4,
       description: 'Un enlace interno se escribe [texto](#ancla) o [texto](/ruta).',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'deliverables',
@@ -110,7 +111,7 @@ export const serviceSchema = {
       type: 'array',
       of: [{ type: 'string' }],
       description: 'Una frase corta por elemento, sin punto final.',
-      validation: (Rule: any) => Rule.required().min(1),
+      validation: (Rule: SanityRule) => Rule.required().min(1),
     },
     {
       name: 'aiTitle',

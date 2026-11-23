@@ -1,3 +1,4 @@
+import type { Rule as SanityRule } from 'sanity';
 export const testimonialSchema = {
   name: 'testimonial',
   title: 'Testimonial',
@@ -7,7 +8,7 @@ export const testimonialSchema = {
       name: 'authorName',
       title: 'Nombre del autor',
       type: 'string',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'role',
@@ -23,7 +24,7 @@ export const testimonialSchema = {
       name: 'quote',
       title: 'Testimonio',
       type: 'text',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'photo',

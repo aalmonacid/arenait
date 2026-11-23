@@ -1,3 +1,4 @@
+import type { Rule as SanityRule } from 'sanity';
 import { isSafeHref } from '../src/lib/safeHref';
 
 /**
@@ -12,7 +13,7 @@ const linkField = {
   type: 'string',
   description:
     'Dirección completa (https://...), correo (mailto:nombre@dominio), ruta del sitio (/contacto) o ancla (#cookies).',
-  validation: (Rule: any) =>
+  validation: (Rule: SanityRule) =>
     Rule.required().custom((value: unknown) =>
       !value || isSafeHref(value)
         ? true
@@ -31,7 +32,7 @@ const imageType = {
       type: 'string',
       description:
         'Describe la imagen para quien no puede verla. Obligatorio: sin él, la imagen no se publica.',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     { name: 'caption', title: 'Pie de foto (opcional)', type: 'string' },
   ],

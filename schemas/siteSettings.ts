@@ -1,3 +1,4 @@
+import type { Rule as SanityRule } from 'sanity';
 import { SECTORS } from './options';
 import { stringField, textField } from './helpers';
 
@@ -24,7 +25,7 @@ export const siteSettingsSchema = {
       type: 'array',
       description:
         'Alimentan los filtros de Proyectos, las cuadrículas de sectores y el bloque «Dónde hemos trabajado». La clave no se cambia.',
-      validation: (Rule: any) => Rule.required().min(1),
+      validation: (Rule: SanityRule) => Rule.required().min(1),
       of: [
         {
           type: 'object',
@@ -34,7 +35,7 @@ export const siteSettingsSchema = {
               title: 'Clave',
               type: 'string',
               options: { list: SECTORS, layout: 'dropdown' },
-              validation: (Rule: any) => Rule.required(),
+              validation: (Rule: SanityRule) => Rule.required(),
             },
             stringField('label', 'Etiqueta corta (filtros y tarjetas)'),
             {

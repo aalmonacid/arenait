@@ -5,12 +5,21 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import { getPosts } from '../../lib/content';
 import { formatLongDate } from '../../lib/contentRules';
+import { absoluteUrl, breadcrumbSchema } from '../../lib/structuredData';
 
 const posts = await getPosts();
+const siteOrigin = new URL('/', Astro.site).toString().replace(/\/$/, '');
+const structuredData = [
+  breadcrumbSchema([
+    { name: 'Inicio', url: absoluteUrl(siteOrigin, '/') },
+    { name: 'Blog', url: absoluteUrl(siteOrigin, '/blog') },
+  ]),
+];
 ---
 
 <BaseLayout
   title="Blog"
+  structuredData={structuredData}
   description="Artículos sobre desarrollo de software a la medida, modernización de sistemas y buenas prácticas de TI para empresas."
 >
   <PageHero

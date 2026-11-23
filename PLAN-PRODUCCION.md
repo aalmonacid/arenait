@@ -75,7 +75,7 @@ El sitio se migró de Vercel a Cloudflare Workers el 13/11/2026. Paso a paso y s
 4. Configurar dominio y DNS; preparar las redirecciones 301 del sitio anterior.
 5. Definir `PUBLIC_ALLOW_INDEXING=true` y `PUBLIC_SITE_URL` como variables de compilación en Cloudflare y redesplegar.
 6. Registrar el sitio en Google Search Console y enviar `sitemap-index.xml`.
-7. QA final contra el dominio real: consola sin violaciones de CSP, Lighthouse y axe en todas las páginas, formulario, `/admin`, menú móvil y 404.
+7. QA final contra el dominio real: `npm run verify:live -- https://arenait.co --prod` (cabeceras, indexación, canonical, sitemap, versión de la política y privacidad de leads en Sanity; solo lectura), consola sin violaciones de CSP, Lighthouse y axe en todas las páginas, formulario, `/admin`, menú móvil y 404.
 8. Plan de reversión: dejar el sitio anterior accesible (o el DNS anterior a mano) hasta confirmar el lanzamiento.
 
 ## Accesibilidad (alcance real)
@@ -88,7 +88,7 @@ El sitio se migró de Vercel a Cloudflare Workers el 13/11/2026. Paso a paso y s
 
 ## Después del lanzamiento
 
-- Revisar `npm audit` mensualmente. Al 15/11/2026 quedan 14 avisos en producción (12 moderados, 2 altos), todos en la cadena del CLI de Sanity y no en el runtime del Worker; `npm audit fix --force` baja Sanity a la v5, no aplicarlo.
+- Revisar `npm audit` mensualmente. Al 23/11/2026 quedan 13 avisos en producción (12 moderados, 1 alto: `js-yaml`), todos en la cadena del CLI de Sanity (`@sanity/cli` → `@vercel/frameworks`) y no en el runtime del Worker. Se subió `sanity` a 6.24.0 y un `overrides` de `smol-toml` eliminó el otro alto. El de `js-yaml` no se puede corregir sin romper el CLI (exige js-yaml 4, que elimina `safeLoad`): queda como deuda hasta que `@sanity/cli` actualice. `npm audit fix --force` baja Sanity a la v5: no aplicarlo. El paso del CI es informativo (`continue-on-error`).
 - CI ya reintroducido (`.github/workflows/ci.yml`, pasa en `main`). Falta la suite e2e.
 - Rate limiting con almacenamiento externo (KV/Durable Objects de Cloudflare) solo si el spam lo justifica.
 - Medir con datos reales de analítica antes de plantear experimentos de conversión o una versión en inglés.

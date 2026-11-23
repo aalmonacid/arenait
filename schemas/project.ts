@@ -1,3 +1,4 @@
+import type { Rule as SanityRule } from 'sanity';
 import { AUTHORIZATIONS, PROJECT_CATEGORIES, SECTORS } from './options';
 
 /**
@@ -21,21 +22,21 @@ export const projectSchema = {
       name: 'title',
       title: 'Título',
       type: 'string',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'slug',
       title: 'Dirección (slug)',
       type: 'slug',
       options: { source: 'title', maxLength: 96 },
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'order',
       title: 'Orden',
       type: 'number',
       description: 'Posición en /proyectos dentro de su grupo (1 aparece primero).',
-      validation: (Rule: any) => Rule.required().integer().min(1),
+      validation: (Rule: SanityRule) => Rule.required().integer().min(1),
     },
     {
       name: 'authorization',
@@ -45,7 +46,7 @@ export const projectSchema = {
         'Cómo se puede nombrar al cliente. Un caso «Pendiente» debe quedarse en borrador: publicarlo es lo que lo muestra en el sitio.',
       options: { list: AUTHORIZATIONS, layout: 'dropdown' },
       initialValue: 'pendiente',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'client',
@@ -53,7 +54,7 @@ export const projectSchema = {
       type: 'string',
       description:
         'Solo el nombre real si hay autorización; si no, una descripción anónima («Entidad financiera»).',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'intermediary',
@@ -66,21 +67,21 @@ export const projectSchema = {
       title: 'Sector',
       type: 'string',
       options: { list: SECTORS, layout: 'dropdown' },
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'category',
       title: 'Servicio (filtro y grupo)',
       type: 'string',
       options: { list: PROJECT_CATEGORIES, layout: 'dropdown' },
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'serviceLabel',
       title: 'Servicio: texto',
       type: 'string',
       fieldset: 'service',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'serviceAnchor',
@@ -88,7 +89,7 @@ export const projectSchema = {
       type: 'string',
       description: 'Dirección del servicio en /servicios (por ejemplo, bizagi).',
       fieldset: 'service',
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'secondaryServiceLabel',
@@ -113,7 +114,7 @@ export const projectSchema = {
       title: 'Reto',
       type: 'text',
       rows: 3,
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'whatWeDid',
@@ -121,14 +122,14 @@ export const projectSchema = {
       type: 'array',
       of: [{ type: 'string' }],
       description: 'Una oración completa por elemento, con punto final.',
-      validation: (Rule: any) => Rule.required().min(1),
+      validation: (Rule: SanityRule) => Rule.required().min(1),
     },
     {
       name: 'result',
       title: 'Resultado',
       type: 'text',
       rows: 3,
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: 'note',
@@ -150,7 +151,7 @@ export const projectSchema = {
       type: 'number',
       fieldset: 'home',
       description: 'Posición entre los destacados (1 aparece primero).',
-      validation: (Rule: any) => Rule.integer().min(1),
+      validation: (Rule: SanityRule) => Rule.integer().min(1),
     },
     {
       name: 'homeSummary',
