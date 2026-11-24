@@ -14,7 +14,7 @@ const BASE_HEADERS: Record<string, string> = {
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), browsing-topics=()',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
 
 // El API solo devuelve JSON: no necesita cargar nada ni puede enmarcarse.

@@ -2,7 +2,7 @@
 
 > Actualizado el 24/11/2026. Resume qué se hizo en el código, qué falta y **quién** debe hacerlo. No contiene secretos: los valores (tokens, URLs de webhook) se cargan directamente en Cloudflare/Sanity, nunca en el repo.
 >
-> **Avance estimado hacia producción: ≈ 79 %** (estimación con los pesos por frente del documento de control; no es una medida exacta; el 22/11/2026 el mismo cálculo daba ≈ 71 %). Lo técnico está en ≈ 93 % y lo no técnico, que depende del cliente, en ≈ 54 %. Lo que depende de Antonio y de Claude está cerca del 95 %: código, pruebas (141 unitarias y 23 e2e), CI, contenido cargado en Sanity, secretos, WAF, webhook, SPF/DMARC y prueba de correo en `dev.arenait.co`. Lo que falta depende del cliente y de lo legal: aprobación del contenido, del portafolio y de la política, autorizaciones de casos, destino de los leads y el corte de dominio. **El 24/11/2026 se envió la nota de revisión al cliente.**
+> **Avance estimado hacia producción: ≈ 80 %** (estimación con los pesos por frente del documento de control; no es una medida exacta; el 22/11/2026 el mismo cálculo daba ≈ 71 % y la mañana del 24/11/2026 ≈ 79 %). Lo técnico está en ≈ 95 % y lo no técnico, que depende del cliente, en ≈ 54 %. Lo que depende de Antonio y de Claude está cerca del 95 %: código, pruebas (141 unitarias y 23 e2e), CI, contenido cargado en Sanity, secretos, WAF, webhook, SPF/DMARC y prueba de correo en `dev.arenait.co`. Lo que falta depende del cliente y de lo legal: aprobación del contenido, del portafolio y de la política, autorizaciones de casos, destino de los leads y el corte de dominio. **El 24/11/2026 se envió la nota de revisión al cliente.**
 >
 > **Datos de operación:** Antonio administra el DNS de `arenait.co` en Cloudflare (no hace falta pedirlo al cliente para el corte de dominio). Los leads del formulario deben llegar a una cuenta de correo del cliente: hoy `MAIL_TO_OWNER` apunta a un correo de Antonio, de pruebas, y el cambio es solo ese secreto en Cloudflare, sin código.
 
@@ -11,14 +11,14 @@
 | Área | Estado | Notas |
 |---|---|---|
 | Código (tipos, lint, build) | Listo | `astro check` 0 errores; ESLint 0 errores y 0 advertencias (24/11/2026) |
-| Pruebas unitarias | Listo | 141 tests con `npm run test:unit` |
+| Pruebas unitarias | Listo | 161 tests con `npm run test:unit` (24/11/2026), incluidos 20 del handler `POST /api/leads` con Sanity, Turnstile y Resend simulados: origen, tipo de contenido, límite de envíos, tamaño, JSON, honeypot, validación, captcha (con 503 si falta el secreto en producción), guardado con ID privado, 502 sin filtrar datos personales a los registros y avisos |
 | Pruebas e2e | Listo | 23 pruebas en Chromium con `npm run test:e2e` (24/11/2026), incluidas las 5 del formulario con `/api/leads` simulado. `playwright.config.ts` espera hasta 180 s a que arranque el servidor de desarrollo (con 60 s fallaba en la primera carga) |
 | Diseño | Listo, pendiente de aprobación | Sistema editorial aplicado a todo el sitio; el cliente debe aprobar botones naranja y titulares nuevos |
 | Seguridad (código) | Listo | CSP única en todo el sitio (excepto `/admin` y `/api`), endpoint de leads endurecido, leads con ID privado |
 | Hosting | **Migrado a Cloudflare Workers (13/11/2026)** | Desplegado desde `main` en `dev.arenait.co`; Vercel Hobby no permite uso comercial. Falta asociar el dominio definitivo |
 | Formulario de contacto | Listo y probado en Cloudflare | Captcha Turnstile, guardado en Sanity, correo al dueño y copia al visitante (Resend), regla de límite de envíos en el WAF |
 | Seguridad (cuentas) | **Parcial (usted)** | Rotar claves expuestas en capturas/chat; ver «Acciones en Sanity» y «Cloudflare» |
-| Rendimiento | Medido y mejorado | Lighthouse móvil del home: Performance 94 (88–95) y CLS 0 en 5 de 5 corridas (antes 74–90 y CLS 0.207); LCP ~1.1 s en home, contacto y casos (antes 2.6 s en contacto y casos). TBT variable (88–519 ms), sin tendencia clara. Medido el 12/11/2026 sobre `dev.arenait.co`, en emulación y sin control de CPU |
+| Rendimiento | Medido y mejorado | Lighthouse móvil del home: Performance 94 (88–95) y CLS 0 en 5 de 5 corridas (antes 74–90 y CLS 0.207); LCP ~1.1 s en home, contacto y casos (antes 2.6 s en contacto y casos). TBT variable (88–519 ms), sin tendencia clara. Medido el 12/11/2026 sobre `dev.arenait.co`, en emulación y sin control de CPU. **Remedido el 24/11/2026 con el contenido nuevo** (Lighthouse 13.6.0, mediana de 3 corridas, simulado): 100 de Performance en casi todas las rutas; el único hallazgo, CLS 0.162 en móvil en `/proyectos` por los filtros ocultos, se corrigió (CLS 0.000, Performance 100 verificado en dev); falta repetir sobre el dominio final |
 | Accesibilidad | AA verificado, AAA parcial | Correcciones aplicadas; ver «Accesibilidad» |
 | SEO | Listo para activar | Indexación por variable de entorno; `noindex` sigue activo hasta que se active |
 | Legal | **Bloqueado por el cliente** | Datos del responsable del tratamiento |
@@ -86,6 +86,34 @@ El sitio se migró de Vercel a Cloudflare Workers el 13/11/2026. Paso a paso y s
 7. QA final contra el dominio real: `npm run verify:live -- https://arenait.co --prod` (cabeceras, indexación, canonical, sitemap, versión de la política y privacidad de leads en Sanity; solo lectura), consola sin violaciones de CSP, Lighthouse y axe en todas las páginas, formulario, `/admin`, menú móvil y 404.
 8. Plan de reversión: dejar el sitio anterior accesible (o el DNS anterior a mano) hasta confirmar el lanzamiento.
 
+### Plan de corte detallado (24/11/2026; se ejecuta cuando el cliente apruebe)
+
+El DNS lo administra Antonio en Cloudflare, así que el corte no depende del cliente en lo técnico. Hoy `arenait.co` redirige a `www.arenait.co`, que sirve el sitio anterior; ese sitio es la reversión.
+
+**D-2 a D-1 (no afecta a dev ni al sitio actual)**
+- [ ] Bajar el TTL de los registros del apex y de `www` a 5 minutos, 24 a 48 horas antes.
+- [ ] Agregar `arenait.co` (y `www.arenait.co` si se sirven ambos) a los hostnames del widget de Turnstile y a los CORS origins de Sanity, con «Allow credentials».
+- [ ] Cambiar el secreto `MAIL_TO_OWNER` a la cuenta de correo del cliente (cuando la confirme).
+- [ ] Acordar con el cliente la ventana: un día entre semana por la mañana, nunca un viernes. Anotar los registros DNS actuales para poder devolverlos.
+- [ ] Congelar contenido y código: solo correcciones críticas.
+- [ ] Línea base: `npm run verify:live -- https://dev.arenait.co` sin ✘.
+
+**Día D**
+1. Variables de **compilación** `PUBLIC_SITE_URL=https://arenait.co` y `PUBLIC_ALLOW_INDEXING=true`; reintentar la construcción (cambiar una variable de compilación exige una construcción nueva).
+2. Asociar el dominio al Worker (Domains & Routes), redirigir `www` al apex con 301 y revisar SSL/TLS.
+3. Confirmar que la regla de límite del WAF sobre `/api/leads` aplica al dominio final.
+4. `npm run verify:live -- https://arenait.co --prod`: debe terminar sin ✘.
+5. Prueba real del formulario en el dominio final (captcha, contacto en Sanity, aviso al cliente, copia de acuse). Borrar el contacto de prueba y confirmar 0 contactos públicos.
+6. Navegador: consola sin violaciones de CSP, menú móvil, 404 y `/admin` con sesión.
+7. Redirigir con 301 o dar de baja `dev.arenait.co` para que no quede indexable.
+8. Search Console: verificar la propiedad y enviar `sitemap-index.xml`.
+9. Lighthouse y axe sobre el dominio final; comparar con la medición del 24/11/2026.
+10. Agregar el enlace del portafolio PDF al correo de acuse (`buildCopyEmail` en `src/lib/mailer.ts`) y desplegar.
+
+**Reversión:** si algo crítico falla, devolver los registros DNS anotados (el TTL bajo hace el cambio rápido) y poner `PUBLIC_ALLOW_INDEXING` en `false`. El sitio anterior sigue en `www` hasta confirmar el lanzamiento.
+
+**D+1 a D+7:** logs del Worker (respuestas `201` en `/api/leads`), reportes DMARC, segunda prueba de correo con el DKIM propio en PASS y luego DMARC a `quarantine` y revocar el token `seed-content`. Retirar el sitio anterior de `www` solo cuando se confirme el lanzamiento.
+
 ## Accesibilidad (alcance real)
 
 - **Verificado (axe-core, 11 rutas, desktop y móvil):** 0 violaciones de contraste AA.
@@ -142,4 +170,4 @@ El 24/11/2026 Antonio envió al cliente la nota de revisión de contenido, porta
 
 ### Claude (cuando se pida)
 
-Rate limit real (binding o KV), pruebas del handler `/api/leads`, e2e, fuente única de casos de estudio, `BlogPosting`, migas visibles, consolidar `Button`/`TextLink`, `overrides` de npm, 17 avisos de lint, analítica con CSP, CSP del Studio en modo bloqueo.
+Rate limit real (binding o KV), fuente única de casos de estudio, `BlogPosting`, migas visibles, consolidar `Button`/`TextLink`, `overrides` de npm, 17 avisos de lint, analítica con CSP, CSP del Studio en modo bloqueo.
