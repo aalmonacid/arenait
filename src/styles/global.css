@@ -180,6 +180,15 @@
   @apply mb-0;
 }
 
+/* Filtros de /proyectos: visibles desde el HTML (evita el salto de diseño al
+   cargar) y ocultos solo cuando JavaScript está desactivado, porque sin el
+   script los botones no hacen nada. */
+@media (scripting: none) {
+  [data-project-filters] {
+    display: none;
+  }
+}
+
 @layer base {
   html {
     @apply antialiased motion-safe:scroll-smooth;

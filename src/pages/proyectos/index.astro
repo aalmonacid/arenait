@@ -52,10 +52,11 @@ const legendClass = 'text-xs font-bold uppercase tracking-label text-secondary';
 >
   <PageHero kicker="Proyectos" title={page.heroTitle} lead={page.heroIntro} />
 
-  <!-- Filtros: se muestran solo cuando carga /scripts/project-filters.js. Sin
-       JavaScript permanecen ocultos y se ven todos los proyectos. -->
+  <!-- Filtros: salen visibles desde el HTML para no empujar el contenido al
+       cargar (CLS). Sin JavaScript se ocultan con la regla `scripting: none` de
+       global.css y se ven todos los proyectos. -->
   <section class="bg-neutral-50 border-b border-neutral-200" aria-label="Filtros de proyectos">
-    <div data-project-filters hidden>
+    <div data-project-filters>
       <div class="max-w-7xl mx-auto px-4 md:px-8 py-6 grid grid-cols-1 gap-5">
         <fieldset class="flex flex-wrap items-center gap-2 border-0 p-0 m-0 min-w-0">
           <legend class:list={[legendClass, 'mb-2 p-0']}>
