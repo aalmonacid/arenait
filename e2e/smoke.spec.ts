@@ -139,7 +139,7 @@ test.describe('Nosotros page', () => {
 test.describe('404 page', () => {
   test('shows the 404 message for an unknown route', async ({ page }) => {
     const response = await page.goto('/esto-no-existe');
-    await expect(page.getByRole('heading')).toContainText('404');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('No encontramos esa página');
     expect(response?.status()).toBe(404);
   });
 });

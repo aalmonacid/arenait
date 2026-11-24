@@ -1,16 +1,18 @@
 # Plan a producción — ArenaIT
 
-> Actualizado el 15/11/2026. Resume qué se hizo en el código, qué falta y **quién** debe hacerlo. No contiene secretos: los valores (tokens, URLs de webhook) se cargan directamente en Cloudflare/Sanity, nunca en el repo.
+> Actualizado el 24/11/2026. Resume qué se hizo en el código, qué falta y **quién** debe hacerlo. No contiene secretos: los valores (tokens, URLs de webhook) se cargan directamente en Cloudflare/Sanity, nunca en el repo.
 >
-> **Avance estimado hacia producción: ~72 %.** Técnico listo (lint, tipos, 60 pruebas, build y CI en verde; `dev.arenait.co` verificado en vivo el 15/11/2026). El lanzamiento depende de cuentas, datos legales, contenido y dominio: ver «Pendientes por responsable» más abajo.
+> **Avance estimado hacia producción: ~70 %** (estimación por esfuerzo, no una medición). Lo que depende de Antonio y de Claude está cerca del 95 %: código, pruebas (141 unitarias y 23 e2e), CI, contenido cargado en Sanity, secretos, WAF, webhook, SPF/DMARC y prueba de correo en `dev.arenait.co`. Lo que falta depende del cliente y de lo legal: aprobación del contenido, del portafolio y de la política, autorizaciones de casos, destino de los leads y el corte de dominio. **El 24/11/2026 se envió la nota de revisión al cliente.**
+>
+> **Datos de operación:** Antonio administra el DNS de `arenait.co` en Cloudflare (no hace falta pedirlo al cliente para el corte de dominio). Los leads del formulario deben llegar a una cuenta de correo del cliente: hoy `MAIL_TO_OWNER` apunta a un correo de Antonio, de pruebas, y el cambio es solo ese secreto en Cloudflare, sin código.
 
 ## Estado por área
 
 | Área | Estado | Notas |
 |---|---|---|
-| Código (tipos, lint, build) | Listo | `astro check` 0 errores; ESLint 0 errores (17 warnings de `any` en el borde Sanity/GROQ) |
-| Pruebas unitarias | Listo | 60 tests (validación de leads, rate limiting, aviso, correo, captcha, servicios) con `npm run test:unit` |
-| Pruebas e2e | Pendiente de correr | La suite existe (`npm run test:e2e`) pero no corre en este equipo (el Playwright instalado espera otro Chromium); ejecutarla en una máquina normal |
+| Código (tipos, lint, build) | Listo | `astro check` 0 errores; ESLint 0 errores y 0 advertencias (24/11/2026) |
+| Pruebas unitarias | Listo | 141 tests con `npm run test:unit` |
+| Pruebas e2e | Listo | 23 pruebas en Chromium con `npm run test:e2e` (24/11/2026), incluidas las 5 del formulario con `/api/leads` simulado. `playwright.config.ts` espera hasta 180 s a que arranque el servidor de desarrollo (con 60 s fallaba en la primera carga) |
 | Diseño | Listo, pendiente de aprobación | Sistema editorial aplicado a todo el sitio; el cliente debe aprobar botones naranja y titulares nuevos |
 | Seguridad (código) | Listo | CSP única en todo el sitio (excepto `/admin` y `/api`), endpoint de leads endurecido, leads con ID privado |
 | Hosting | **Migrado a Cloudflare Workers (13/11/2026)** | Desplegado desde `main` en `dev.arenait.co`; Vercel Hobby no permite uso comercial. Falta asociar el dominio definitivo |
@@ -40,6 +42,8 @@ Requieren acceso a https://www.sanity.io/manage. No hay forma de hacerlas desde 
    4. Verificar sin token que la consulta pública devuelve 9 proyectos y 0 pendientes, y que el Studio muestra los borradores.
    Autorizar un caso pendiente = publicar su borrador en el Studio (previa autorización escrita del cliente).
 
+   **Hecho el 24/11/2026:** carga real con `--force --delete-legacy` (42 operaciones; se borraron los 6 servicios antiguos). Verificado sin token con `verify:live`: 13 servicios, 9 proyectos, 2 artículos, 2 versiones de la política, 0 proyectos con autorización `pendiente` y 0 leads públicos. El filtro del webhook ya incluye los 10 tipos (se quitó el tipo obsoleto `caseStudy`) y una edición de prueba en el Studio disparó el despliegue. El token `seed-content` (Editor) es local: revocarlo en Sanity y quitarlo del `.env` cuando no haya más cargas.
+
 ## Acciones en Cloudflare — estado
 
 El sitio se migró de Vercel a Cloudflare Workers el 13/11/2026. Paso a paso y solución de problemas: `GUIA-HABILITACION.md`.
@@ -51,13 +55,17 @@ El sitio se migró de Vercel a Cloudflare Workers el 13/11/2026. Paso a paso y s
 - [x] Enlace de implementación + webhook de Sanity apuntando a `main`.
 - [x] Regla de limitación de velocidad en el WAF sobre `/api/leads` (5 solicitudes, bloqueo corto del plan gratuito; probada: 429 con `error code: 1015`).
 - [x] CORS de Sanity y hostnames de Turnstile para `dev.arenait.co`.
+- [x] (24/11/2026) Secretos confirmados en **Producción** (`MAIL_FROM`, `MAIL_TO_OWNER`, `RESEND_API_KEY`, `SANITY_API_WRITE_TOKEN`, `TURNSTILE_SECRET_KEY`) y regla de límite `Limite formulario contacto` activa (bloquea POST a `/api/leads`).
+- [x] (24/11/2026) Token de Sanity y clave de Resend rotados; Vercel desconectado del repositorio; la rama `migracion/cloudflare` ya no existe.
+- [x] (24/11/2026) `main` protegido con un ruleset de GitHub: no se puede borrar ni reescribir (force push). No exige PR ni checks: se decidió mantener el flujo de fusión local y `push` directo; el CI se revisa después del push.
+- [x] (24/11/2026) SPF (`v=spf1 include:_spf.google.com ~all`) y DMARC (`p=none`, reportes a `datos@arenait.co`) publicados en `arenait.co`. DKIM y SPF de Resend ya existían (`resend._domainkey`, `rsend`).
+- [x] (24/11/2026) Prueba real del formulario en `dev.arenait.co`: lead guardado en Sanity, aviso y copia de acuse entregados en la bandeja principal en 11 s, SPF, DMARC y DKIM de Amazon SES en PASS. La firma DKIM propia de `arenait.co` dio `temperror` puntual; el DNS responde bien desde 1.1.1.1 y 8.8.8.8. Repetir una prueba y confirmar PASS antes de pasar DMARC a `quarantine`. El lead de prueba se borró.
 
 **Pendiente (usted)**
-- [ ] Rotar el token de Sanity y la clave de Resend que se pegaron en un chat, y el Deploy Hook de Vercel que se vio en una captura; revocar los anteriores.
 - [ ] Asociar el dominio definitivo al Worker (Domains & Routes). Hoy `arenait.co` redirige a `www.arenait.co`, que sirve el sitio anterior; conservarlo hasta confirmar el lanzamiento.
 - [ ] El día del lanzamiento: `PUBLIC_SITE_URL` y `PUBLIC_ALLOW_INDEXING=true` como variables de **compilación**; dominio definitivo en hostnames de Turnstile y CORS de Sanity; revisar SSL/TLS y la redirección `arenait.co` ↔ `www`.
 - [ ] Analítica: Web Analytics de Cloudflare (requiere permitir su script en `public/_headers`); hoy no hay ninguna activa.
-- [ ] Desconectar el repositorio en Vercel y borrar la rama `migracion/cloudflare`.
+- [ ] Cambiar `MAIL_TO_OWNER` (secreto en Producción) a la cuenta de correo del cliente cuando la confirme, antes del lanzamiento.
 - [ ] Primera semana: revisar los logs del Worker (respuestas `201` en `/api/leads`).
 
 **Notas técnicas de la migración**
@@ -99,21 +107,24 @@ El sitio se migró de Vercel a Cloudflare Workers el 13/11/2026. Paso a paso y s
 
 | # | Acción | Dónde |
 |---|---|---|
-| 1 | Rotar el token de Sanity y la clave de Resend expuestos; revocar los anteriores y cargar los nuevos como secretos del Worker (Producción) | Sanity manage, Resend, Cloudflare |
-| 2 | Desconectar Vercel (Settings → Git, o borrar el proyecto) y quitar la app en GitHub (Settings → Applications) para eliminar el estado rojo «Vercel» de cada commit | Vercel, GitHub |
-| 3 | Proteger `main` (PR obligatorio y CI `verify` requerido) y activar secret scanning | GitHub → Settings |
+| 1 | ~~Rotar el token de Sanity y la clave de Resend expuestos~~ **Hecho** | Sanity manage, Resend, Cloudflare |
+| 2 | ~~Desconectar Vercel~~ **Hecho (24/11/2026)** | Vercel, GitHub |
+| 3 | Proteger `main`: **hecho** el ruleset contra borrado y force push (24/11/2026); queda opcional exigir PR y el CI `verify`, y activar secret scanning | GitHub → Settings |
 | 4 | CORS de Sanity: quitar `arenait.vercel.app` y los `localhost`; dejar `dev.arenait.co` y, al lanzar, el dominio final (con y sin `www`) | Sanity manage |
-| 5 | Confirmar `TURNSTILE_SECRET_KEY` en el entorno **Producción** del Worker (sin él el formulario responde 503) | Cloudflare |
+| 5 | ~~Confirmar `TURNSTILE_SECRET_KEY` en Producción~~ **Hecho (24/11/2026)** | Cloudflare |
 | 6 | Confirmar en el panel que `workers.dev` y las URLs de vista previa están desactivados (ya está en `wrangler.jsonc`) | Cloudflare |
-| 7 | Publicar **SPF y DMARC** en `arenait.co`. Hoy el apex solo tiene MX de Google y verificaciones: sin SPF ni DMARC se puede suplantar `@arenait.co` y los avisos pueden caer en spam. Sugerido: SPF que incluya Google (`include:_spf.google.com`) y empezar DMARC en `p=none` con reporte, subiendo a `quarantine` cuando los reportes salgan limpios. Validar con quien administre el correo antes de publicar | DNS (Cloudflare) |
+| 7 | **SPF y DMARC publicados el 24/11/2026** (SPF con Google; DMARC en `p=none` con reportes a `datos@arenait.co`). Pendiente: subir DMARC a `quarantine` cuando los reportes salgan limpios y el DKIM propio dé PASS | DNS (Cloudflare) |
 | 8 | Revisar la consola del navegador en `/admin` (logueado): la CSP del Studio va en modo solo-reporte; si no hay violaciones, avisar para pasarla a modo bloqueo | Navegador |
 | 9 | Decidir si el dataset `production` pasa a privado (con token de lectura para el build) o si leads van a un dataset aparte | Sanity manage |
 | 10 | Opcional: registro CAA en el DNS; inventario de subdominios del dominio antes de volver a poner `includeSubDomains` en HSTS | DNS |
 
 ### Cliente (Andrés Arenas / Arena IT)
 
+El 24/11/2026 Antonio envió al cliente la nota de revisión de contenido, portafolio PDF y política v1.2, con las decisiones pendientes. Se espera su respuesta.
+
 | # | Acción |
 |---|---|
+| 0 | Indicar la cuenta de correo que recibirá los leads del formulario (`MAIL_TO_OWNER`), probar que el alias `datos@arenait.co` entrega a alguien (la prueba quedó a cargo del cliente) y responder la nota de revisión |
 | 1 | Revisión jurídica de la política v1.2 (ya incluye razón social y NIT del RUT, domicilio a nivel de ciudad y el canal `datos@arenait.co`; por decisión del cliente no se publica la dirección de la sede) |
 | 1b | Crear el alias de correo `datos@arenait.co` (canal para ejercer derechos): debe existir antes de publicar la política v1.2 |
 | 2 | Aprobar el diseño (botones naranja, titulares, secciones) |
@@ -125,7 +136,7 @@ El sitio se migró de Vercel a Cloudflare Workers el 13/11/2026. Paso a paso y s
 
 | # | Acción |
 |---|---|
-| 1 | Prueba real del formulario en `dev.arenait.co` (captcha, lead en Sanity, correo al dueño, acuse) con un lead de prueba; consultar sin token que el lead **no** es público; borrar el lead de prueba |
+| 1 | ~~Prueba real del formulario en `dev.arenait.co`~~ **Hecha el 24/11/2026** (ver «Hecho y verificado»); el lead de prueba se borró y `verify:live` confirma 0 leads públicos |
 | 2 | Día del corte: asociar el dominio al Worker; `PUBLIC_SITE_URL` y `PUBLIC_ALLOW_INDEXING=true` como variables de compilación; dominio final en Turnstile y CORS de Sanity; revisar que la regla del WAF sobre `/api/leads` aplica al dominio final; redirigir o dar de baja `dev.arenait.co` para que no quede indexable; redesplegar |
 | 3 | Control de calidad sobre el dominio real: consola sin violaciones de CSP, Lighthouse y axe en todas las páginas, formulario, `/admin`, menú móvil y 404; Search Console y sitemap; mantener el sitio anterior unos días como reversión |
 
